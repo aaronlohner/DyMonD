@@ -16,6 +16,10 @@
 #include <pcap/pcap.h>
 #include <limits>
 #include <stdint.h>
+
+#include <sniffed_info.pb.h>
+#include <server.hpp>
+
 using namespace std;
 using namespace boost::filesystem;
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))
@@ -249,6 +253,8 @@ int main( int argc, char *argv[] )
     char* daddr = (char*)malloc(sizeof("aaa.bbb.ccc.ddd"));
    
     vector<struct flow*> flowarray;
+
+    setup_server();
     
   
 //printf( "enter the Network Interface name: ");scanf("%p", token);  
@@ -447,8 +453,19 @@ myfile.open("flows.csv", std::ios_base::out);
 FP.open("log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
 
+ 
+ string srlzd;
+ int size;
+
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {
+    FlowInfo finfo;
+    finfo.set_s_addr(flowarray[i]->saddr);
+    finfo.set_s_port(flowarray[i]->sport);
+    finfo.set_d_addr(flowarray[i]->daddr);
+    finfo.set_d_port(flowarray[i]->dport);
+    finfo.set_num_bytes_30(flowarray[i]->NumBytes/30);
+
    if(flowarray[i]->Ack_times.size()>1)
 {
    diff=0.0;
@@ -459,10 +476,16 @@ if (flowarray[i]->Packets.size() == 100 ) {
       RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
      FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
      
+     finfo.set_rst(RST);
 
 }
 else
-     { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";}
+     { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
+     
+     finfo.set_rst(-1);}
+
+    send_message(finfo);
+
 }
  }
 FP.close();

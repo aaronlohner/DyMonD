@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message FlowInfo {
+  string s_addr = 1;
+  string s_port = 2;
+  string d_addr = 3;
+  string d_port = 4;
+  int32 num_bytes_30 = 5;
+  double rst = 6;
+}

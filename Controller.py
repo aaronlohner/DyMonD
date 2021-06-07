@@ -49,8 +49,8 @@ def getName(label):
     return label[0:counter1], label[counter1:len(label)].upper()
 
 
-data = open("networkTSK2.txt", "r")
-output = open("networkTSK2.json", "w")
+data = open("log.txt", "r")
+output = open("log.json", "w")
 
 nodes = {}
 edges = {}
