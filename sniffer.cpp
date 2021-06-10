@@ -17,7 +17,6 @@
 #include <limits>
 #include <stdint.h>
 
-#include <sniffed_info.pb.h>
 #include <server.hpp>
 
 using namespace std;
@@ -254,6 +253,7 @@ int main( int argc, char *argv[] )
    
     vector<struct flow*> flowarray;
 
+    // TRIGGERS SERVER TO BEGIN
     setup_server();
     
   
@@ -452,10 +452,6 @@ myfile.open("flows.csv", std::ios_base::out);
  // performance metrics clacualation and dumping into file
 FP.open("log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
-
- 
- string srlzd;
- int size;
 
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {

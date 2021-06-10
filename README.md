@@ -6,4 +6,4 @@ The objective of your task is to convert the agent(i.e. sniffer) and controller 
 
 `protoc --cpp_out=../proto_gen sniffed_info.proto`
 `cd ..`
-c++ server.cpp proto_gen/sniffed_info.pb.cc -o server -I/mnt/c/Users/Aaron/COMP_Research/DymonD/proto_gen `pkg-config --cflags --libs protobuf`
+g++ -o sniffer sniffer.cpp server.cpp proto_gen/sniffed_info.pb.cc -I/mnt/c/Users/Aaron/COMP_Research/DymonD/include -lpcap -lboost_filesystem -lboost_system `pkg-config --cflags --libs protobuf`

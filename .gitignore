@@ -1,2 +1,6 @@
+.vscode
 *.zip
 teastoreall.pcap
+log*
+networkTSK*
+flows.csv
