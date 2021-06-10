@@ -19,13 +19,13 @@ def recv_message(conn, msg_type):
     # Decode the message
     msg = msg_type()
     msg.ParseFromString(data)
-    # Create a FlowInfo object and populate it with received data
+    # Create a Flow object and populate it with received data
     return msg
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    response = recv_message(s, sniffed_info_pb2.FlowInfo)
+    response = recv_message(s, sniffed_info_pb2.Flow)
     while response is not None:
-        # Assuming that the incoming response type is a protobuf FlowInfo object
-        print(f'Received {response.s_addr}:{response.s_port} {response.d_addr}:{response.d_port} {response.num_bytes_30}-{response.rst}')
-        response = recv_message(s, sniffed_info_pb2.FlowInfo)
+        # Assuming that the incoming response type is a protobuf Flow object
+        print(f'Received {response.s_addr}:{response.s_port} {response.d_addr}:{response.d_port} {response.num_bytes}-{response.rst}')
+        response = recv_message(s, sniffed_info_pb2.Flow)

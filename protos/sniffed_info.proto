@@ -1,10 +1,18 @@
 syntax = "proto3";
 
-message FlowInfo {
+message Flow {
   string s_addr = 1;
   string s_port = 2;
   string d_addr = 3;
   string d_port = 4;
-  int32 num_bytes_30 = 5;
-  double rst = 6;
+  int32 num_bytes = 5;
+  //bool protof = 6;
+  double rst = 7; // technically not part of flow struct
+  //repeated string packets = 8;
+  //repeated AckTime ack_times = 9;
+}
+
+message AckTime {
+  int32 sec = 1;
+  int32 usec = 2; // microseconds
 }

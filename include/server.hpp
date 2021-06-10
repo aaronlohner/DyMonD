@@ -8,7 +8,6 @@
 #include <string>
 using namespace std;
 
-
 #define PORT 8080
 extern int server_fd, new_socket, valread;
 extern struct sockaddr_in address;
@@ -18,4 +17,4 @@ extern char buffer[1024];
 
 int setup_server();
 
-int send_message(FlowInfo &finfo);
+int send_message(Flow &finfo);

@@ -1,6 +1,6 @@
 // Server side C/C++ program to demonstrate Socket programming
 #include <server.hpp>
-//#include <sniffed_info.pb.h>
+// #include <sniffed_info.pb.h>
 
 int server_fd, new_socket, valread;
 struct sockaddr_in address;
@@ -55,9 +55,9 @@ int setup_server() {
 	return 0;
 }
 
-int send_message(/*vector<flow &> flowElement*/FlowInfo &finfo){
+int send_message(/*vector<flow &> flowElement*/Flow &flow){
 	string data;
-	finfo.SerializeToString(&data);
+	flow.SerializeToString(&data);
 	size_t length = data.size();
 	uint32_t nlength = htonl(length);
 	send(new_socket, &nlength, 4, 0);

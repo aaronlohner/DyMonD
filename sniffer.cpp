@@ -17,6 +17,7 @@
 #include <limits>
 #include <stdint.h>
 
+//#include <sniffed_info.pb.h>
 #include <server.hpp>
 
 using namespace std;
@@ -455,12 +456,12 @@ FP.open("log.txt", std::ios_base::out); // using standard ports
 
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {
-    FlowInfo finfo;
-    finfo.set_s_addr(flowarray[i]->saddr);
-    finfo.set_s_port(flowarray[i]->sport);
-    finfo.set_d_addr(flowarray[i]->daddr);
-    finfo.set_d_port(flowarray[i]->dport);
-    finfo.set_num_bytes_30(flowarray[i]->NumBytes/30);
+    Flow flow;
+    flow.set_s_addr(flowarray[i]->saddr);
+    flow.set_s_port(flowarray[i]->sport);
+    flow.set_d_addr(flowarray[i]->daddr);
+    flow.set_d_port(flowarray[i]->dport);
+    flow.set_num_bytes(flowarray[i]->NumBytes/30);
 
    if(flowarray[i]->Ack_times.size()>1)
 {
@@ -472,15 +473,15 @@ if (flowarray[i]->Packets.size() == 100 ) {
       RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
      FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
      
-     finfo.set_rst(RST);
+     flow.set_rst(RST);
 
 }
 else
      { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
      
-     finfo.set_rst(-1);}
+     flow.set_rst(-1);}
 
-    send_message(finfo);
+    send_message(flow);
 
 }
  }
