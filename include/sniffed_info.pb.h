@@ -46,7 +46,7 @@ struct TableStruct_sniffed_5finfo_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -59,9 +59,13 @@ extern AckTimeDefaultTypeInternal _AckTime_default_instance_;
 class Flow;
 struct FlowDefaultTypeInternal;
 extern FlowDefaultTypeInternal _Flow_default_instance_;
+class FlowArray;
+struct FlowArrayDefaultTypeInternal;
+extern FlowArrayDefaultTypeInternal _FlowArray_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::AckTime* Arena::CreateMaybeMessage<::AckTime>(Arena*);
 template<> ::Flow* Arena::CreateMaybeMessage<::Flow>(Arena*);
+template<> ::FlowArray* Arena::CreateMaybeMessage<::FlowArray>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
 // ===================================================================
@@ -273,6 +277,147 @@ class Flow final :
 };
 // -------------------------------------------------------------------
 
+class FlowArray final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:FlowArray) */ {
+ public:
+  inline FlowArray() : FlowArray(nullptr) {}
+  ~FlowArray() override;
+  explicit constexpr FlowArray(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  FlowArray(const FlowArray& from);
+  FlowArray(FlowArray&& from) noexcept
+    : FlowArray() {
+    *this = ::std::move(from);
+  }
+
+  inline FlowArray& operator=(const FlowArray& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline FlowArray& operator=(FlowArray&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const FlowArray& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const FlowArray* internal_default_instance() {
+    return reinterpret_cast<const FlowArray*>(
+               &_FlowArray_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(FlowArray& a, FlowArray& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(FlowArray* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(FlowArray* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline FlowArray* New() const final {
+    return new FlowArray();
+  }
+
+  FlowArray* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<FlowArray>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const FlowArray& from);
+  void MergeFrom(const FlowArray& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(FlowArray* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "FlowArray";
+  }
+  protected:
+  explicit FlowArray(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kFlowsFieldNumber = 1,
+  };
+  // repeated .Flow flows = 1;
+  int flows_size() const;
+  private:
+  int _internal_flows_size() const;
+  public:
+  void clear_flows();
+  ::Flow* mutable_flows(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow >*
+      mutable_flows();
+  private:
+  const ::Flow& _internal_flows(int index) const;
+  ::Flow* _internal_add_flows();
+  public:
+  const ::Flow& flows(int index) const;
+  ::Flow* add_flows();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow >&
+      flows() const;
+
+  // @@protoc_insertion_point(class_scope:FlowArray)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow > flows_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sniffed_5finfo_2eproto;
+};
+// -------------------------------------------------------------------
+
 class AckTime final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:AckTime) */ {
  public:
@@ -317,7 +462,7 @@ class AckTime final :
                &_AckTime_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(AckTime& a, AckTime& b) {
     a.Swap(&b);
@@ -647,6 +792,49 @@ inline void Flow::set_rst(double value) {
 
 // -------------------------------------------------------------------
 
+// FlowArray
+
+// repeated .Flow flows = 1;
+inline int FlowArray::_internal_flows_size() const {
+  return flows_.size();
+}
+inline int FlowArray::flows_size() const {
+  return _internal_flows_size();
+}
+inline void FlowArray::clear_flows() {
+  flows_.Clear();
+}
+inline ::Flow* FlowArray::mutable_flows(int index) {
+  // @@protoc_insertion_point(field_mutable:FlowArray.flows)
+  return flows_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow >*
+FlowArray::mutable_flows() {
+  // @@protoc_insertion_point(field_mutable_list:FlowArray.flows)
+  return &flows_;
+}
+inline const ::Flow& FlowArray::_internal_flows(int index) const {
+  return flows_.Get(index);
+}
+inline const ::Flow& FlowArray::flows(int index) const {
+  // @@protoc_insertion_point(field_get:FlowArray.flows)
+  return _internal_flows(index);
+}
+inline ::Flow* FlowArray::_internal_add_flows() {
+  return flows_.Add();
+}
+inline ::Flow* FlowArray::add_flows() {
+  // @@protoc_insertion_point(field_add:FlowArray.flows)
+  return _internal_add_flows();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow >&
+FlowArray::flows() const {
+  // @@protoc_insertion_point(field_list:FlowArray.flows)
+  return flows_;
+}
+
+// -------------------------------------------------------------------
+
 // AckTime
 
 // int32 sec = 1;
@@ -692,6 +880,8 @@ inline void AckTime::set_usec(::PROTOBUF_NAMESPACE_ID::int32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

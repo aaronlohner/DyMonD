@@ -33,6 +33,18 @@ struct FlowDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT FlowDefaultTypeInternal _Flow_default_instance_;
+constexpr FlowArray::FlowArray(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : flows_(){}
+struct FlowArrayDefaultTypeInternal {
+  constexpr FlowArrayDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~FlowArrayDefaultTypeInternal() {}
+  union {
+    FlowArray _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT FlowArrayDefaultTypeInternal _FlowArray_default_instance_;
 constexpr AckTime::AckTime(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : sec_(0)
@@ -46,7 +58,7 @@ struct AckTimeDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT AckTimeDefaultTypeInternal _AckTime_default_instance_;
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_sniffed_5finfo_2eproto[2];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_sniffed_5finfo_2eproto[3];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_sniffed_5finfo_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_sniffed_5finfo_2eproto = nullptr;
 
@@ -63,6 +75,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_sniffed_5finfo_2eproto::offset
   PROTOBUF_FIELD_OFFSET(::Flow, num_bytes_),
   PROTOBUF_FIELD_OFFSET(::Flow, rst_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::FlowArray, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::FlowArray, flows_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::AckTime, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -72,11 +90,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_sniffed_5finfo_2eproto::offset
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Flow)},
-  { 11, -1, sizeof(::AckTime)},
+  { 11, -1, sizeof(::FlowArray)},
+  { 17, -1, sizeof(::AckTime)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Flow_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_FlowArray_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_AckTime_default_instance_),
 };
 
@@ -84,13 +104,14 @@ const char descriptor_table_protodef_sniffed_5finfo_2eproto[] PROTOBUF_SECTION_V
   "\n\022sniffed_info.proto\"f\n\004Flow\022\016\n\006s_addr\030\001"
   " \001(\t\022\016\n\006s_port\030\002 \001(\t\022\016\n\006d_addr\030\003 \001(\t\022\016\n\006"
   "d_port\030\004 \001(\t\022\021\n\tnum_bytes\030\005 \001(\005\022\013\n\003rst\030\007"
-  " \001(\001\"$\n\007AckTime\022\013\n\003sec\030\001 \001(\005\022\014\n\004usec\030\002 \001"
-  "(\005b\006proto3"
+  " \001(\001\"!\n\tFlowArray\022\024\n\005flows\030\001 \003(\0132\005.Flow\""
+  "$\n\007AckTime\022\013\n\003sec\030\001 \001(\005\022\014\n\004usec\030\002 \001(\005b\006p"
+  "roto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sniffed_5finfo_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sniffed_5finfo_2eproto = {
-  false, false, 170, descriptor_table_protodef_sniffed_5finfo_2eproto, "sniffed_info.proto", 
-  &descriptor_table_sniffed_5finfo_2eproto_once, nullptr, 0, 2,
+  false, false, 205, descriptor_table_protodef_sniffed_5finfo_2eproto, "sniffed_info.proto", 
+  &descriptor_table_sniffed_5finfo_2eproto_once, nullptr, 0, 3,
   schemas, file_default_instances, TableStruct_sniffed_5finfo_2eproto::offsets,
   file_level_metadata_sniffed_5finfo_2eproto, file_level_enum_descriptors_sniffed_5finfo_2eproto, file_level_service_descriptors_sniffed_5finfo_2eproto,
 };
@@ -494,6 +515,201 @@ void Flow::InternalSwap(Flow* other) {
 
 // ===================================================================
 
+class FlowArray::_Internal {
+ public:
+};
+
+FlowArray::FlowArray(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  flows_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlowArray)
+}
+FlowArray::FlowArray(const FlowArray& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      flows_(from.flows_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:FlowArray)
+}
+
+void FlowArray::SharedCtor() {
+}
+
+FlowArray::~FlowArray() {
+  // @@protoc_insertion_point(destructor:FlowArray)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void FlowArray::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void FlowArray::ArenaDtor(void* object) {
+  FlowArray* _this = reinterpret_cast< FlowArray* >(object);
+  (void)_this;
+}
+void FlowArray::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void FlowArray::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void FlowArray::Clear() {
+// @@protoc_insertion_point(message_clear_start:FlowArray)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  flows_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* FlowArray::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // repeated .Flow flows = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_flows(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* FlowArray::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:FlowArray)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .Flow flows = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_flows_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_flows(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:FlowArray)
+  return target;
+}
+
+size_t FlowArray::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:FlowArray)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .Flow flows = 1;
+  total_size += 1UL * this->_internal_flows_size();
+  for (const auto& msg : this->flows_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void FlowArray::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:FlowArray)
+  GOOGLE_DCHECK_NE(&from, this);
+  const FlowArray* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<FlowArray>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:FlowArray)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:FlowArray)
+    MergeFrom(*source);
+  }
+}
+
+void FlowArray::MergeFrom(const FlowArray& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:FlowArray)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  flows_.MergeFrom(from.flows_);
+}
+
+void FlowArray::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:FlowArray)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void FlowArray::CopyFrom(const FlowArray& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:FlowArray)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool FlowArray::IsInitialized() const {
+  return true;
+}
+
+void FlowArray::InternalSwap(FlowArray* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  flows_.InternalSwap(&other->flows_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata FlowArray::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_sniffed_5finfo_2eproto_getter, &descriptor_table_sniffed_5finfo_2eproto_once,
+      file_level_metadata_sniffed_5finfo_2eproto[1]);
+}
+
+// ===================================================================
+
 class AckTime::_Internal {
  public:
 };
@@ -714,13 +930,16 @@ void AckTime::InternalSwap(AckTime* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata AckTime::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_sniffed_5finfo_2eproto_getter, &descriptor_table_sniffed_5finfo_2eproto_once,
-      file_level_metadata_sniffed_5finfo_2eproto[1]);
+      file_level_metadata_sniffed_5finfo_2eproto[2]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::Flow* Arena::CreateMaybeMessage< ::Flow >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Flow >(arena);
+}
+template<> PROTOBUF_NOINLINE ::FlowArray* Arena::CreateMaybeMessage< ::FlowArray >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::FlowArray >(arena);
 }
 template<> PROTOBUF_NOINLINE ::AckTime* Arena::CreateMaybeMessage< ::AckTime >(Arena* arena) {
   return Arena::CreateMessageInternal< ::AckTime >(arena);

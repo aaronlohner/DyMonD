@@ -24,8 +24,9 @@ def recv_message(conn, msg_type):
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    response = recv_message(s, sniffed_info_pb2.Flow)
+    response = recv_message(s, sniffed_info_pb2.FlowArray)
     while response is not None:
-        # Assuming that the incoming response type is a protobuf Flow object
-        print(f'Received {response.s_addr}:{response.s_port} {response.d_addr}:{response.d_port} {response.num_bytes}-{response.rst}')
+        # Assuming that the incoming response type is a protobuf FlowArray object
+        for i, flow in enumerate(response.flows):
+            print(f'Received #{i+1}: {flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.num_bytes}-{flow.rst}')
         response = recv_message(s, sniffed_info_pb2.Flow)

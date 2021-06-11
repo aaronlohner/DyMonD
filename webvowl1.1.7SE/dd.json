@@ -1,0 +1,145 @@
+
+{"id": "0",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.2\nPort: "
+    },
+    "attributes":[
+    "#bd87d4"
+    ]
+    },
+    {"id": "1",
+    "label": "HTTP/REGISTERY/SERVICES",
+    "comment": {
+    "undefined":"172.19.0.3\nPort: 8080"
+    },
+    "attributes":[
+    "#c08072"
+    ]
+    },
+    {"id": "2",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.5\nPort: 53834"
+    },
+    "attributes":[
+    "#f8e971"
+    ]
+    },
+    {"id": "3",
+    "label": "Unknown",
+    "comment": {
+    "undefined":"172.18.0.10\nPort: 5672"
+    },
+    "attributes":[
+    "#bc696d"
+    ]
+    },
+    {"id": "4",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.2\nPort: 44328"
+    },
+    "attributes":[
+    "#f4e3ba"
+    ]
+    },
+    {"id": "5",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.8\nPort: 51308"
+    },
+    "attributes":[
+    "#656795"
+    ]
+    },
+    {"id": "6",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.7\nPort: 37910"
+    },
+    "attributes":[
+    "#dd7e57"
+    ]
+    },
+    {"id": "7",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.9\nPort: 45836"
+    },
+    "attributes":[
+    "#85d552"
+    ]
+    },
+    {"id": "8",
+    "label": "HTTP/WEBUI/CATEGORY/CARTACTION",
+    "comment": {
+    "undefined":"172.19.0.2\nPort: 8080"
+    },
+    "attributes":[
+    "#bd87d4"
+    ]
+    },
+    {"id": "9",
+    "label": "HTTP/PERSISTENCE/PRODUCTS",
+    "comment": {
+    "undefined":"172.19.0.2\nPort: 8080"
+    },
+    "attributes":[
+    "#f4e3ba"
+    ]
+    },
+    {"id": "10",
+    "label": "MYSQL",
+    "comment": {
+    "undefined":"172.19.0.6\nPort: 3306"
+    },
+    "attributes":[
+    "#65e4a7"
+    ]
+    },
+    {"id": "11",
+    "label": "HTTP/AUTH/USERACTIONS/ISLOGGEDIN",
+    "comment": {
+    "undefined":"172.19.0.5\nPort: 8080"
+    },
+    "attributes":[
+    "#f8e971"
+    ]
+    },
+    {"id": "12",
+    "label": "HTTP/RECOMMENDER/RECOMMEND",
+    "comment": {
+    "undefined":"172.19.0.8\nPort: 8080"
+    },
+    "attributes":[
+    "#656795"
+    ]
+    },
+    {"id": "13",
+    "label": "HTTP/IMAGES/GETWEBIMAGES",
+    "comment": {
+    "undefined":"172.19.0.7\nPort: 8080"
+    },
+    "attributes":[
+    "#dd7e57"
+    ]
+    },
+    {"id": "14",
+    "label": "Client",
+    "comment": {
+    "undefined":"172.19.0.10\nPort: "
+    },
+    "attributes":[
+    "#807780"
+    ]
+    },
+    {"id": "15",
+    "label": "HTTP/AUTH/USERACTIONS/ISLOGGEDIN",
+    "comment": {
+    "undefined":"172.19.0.10\nPort: 8080"
+    },
+    "attributes":[
+    "#807780"
+    ]
+    }

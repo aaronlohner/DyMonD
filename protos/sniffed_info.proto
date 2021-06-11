@@ -12,7 +12,11 @@ message Flow {
   //repeated AckTime ack_times = 9;
 }
 
-message AckTime {
-  int32 sec = 1;
-  int32 usec = 2; // microseconds
+message FlowArray {
+  repeated Flow flows = 1;
 }
+
+// message AckTime {
+//   int32 sec = 1;
+//   int32 usec = 2; // microseconds
+// }

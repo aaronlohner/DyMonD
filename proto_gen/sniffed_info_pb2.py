@@ -19,58 +19,58 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12sniffed_info.proto\"m\n\x08\x46lowInfo\x12\x0e\n\x06s_addr\x18\x01 \x01(\t\x12\x0e\n\x06s_port\x18\x02 \x01(\t\x12\x0e\n\x06\x64_addr\x18\x03 \x01(\t\x12\x0e\n\x06\x64_port\x18\x04 \x01(\t\x12\x14\n\x0cnum_bytes_30\x18\x05 \x01(\x05\x12\x0b\n\x03rst\x18\x06 \x01(\x01\x62\x06proto3'
+  serialized_pb=b'\n\x12sniffed_info.proto\"f\n\x04\x46low\x12\x0e\n\x06s_addr\x18\x01 \x01(\t\x12\x0e\n\x06s_port\x18\x02 \x01(\t\x12\x0e\n\x06\x64_addr\x18\x03 \x01(\t\x12\x0e\n\x06\x64_port\x18\x04 \x01(\t\x12\x11\n\tnum_bytes\x18\x05 \x01(\x05\x12\x0b\n\x03rst\x18\x07 \x01(\x01\"!\n\tFlowArray\x12\x14\n\x05\x66lows\x18\x01 \x03(\x0b\x32\x05.Flow\"$\n\x07\x41\x63kTime\x12\x0b\n\x03sec\x18\x01 \x01(\x05\x12\x0c\n\x04usec\x18\x02 \x01(\x05\x62\x06proto3'
 )
 
 
 
 
-_FLOWINFO = _descriptor.Descriptor(
-  name='FlowInfo',
-  full_name='FlowInfo',
+_FLOW = _descriptor.Descriptor(
+  name='Flow',
+  full_name='Flow',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='s_addr', full_name='FlowInfo.s_addr', index=0,
+      name='s_addr', full_name='Flow.s_addr', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='s_port', full_name='FlowInfo.s_port', index=1,
+      name='s_port', full_name='Flow.s_port', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='d_addr', full_name='FlowInfo.d_addr', index=2,
+      name='d_addr', full_name='Flow.d_addr', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='d_port', full_name='FlowInfo.d_port', index=3,
+      name='d_port', full_name='Flow.d_port', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='num_bytes_30', full_name='FlowInfo.num_bytes_30', index=4,
+      name='num_bytes', full_name='Flow.num_bytes', index=4,
       number=5, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rst', full_name='FlowInfo.rst', index=5,
-      number=6, type=1, cpp_type=5, label=1,
+      name='rst', full_name='Flow.rst', index=5,
+      number=7, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -88,18 +88,106 @@ _FLOWINFO = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=22,
-  serialized_end=131,
+  serialized_end=124,
 )
 
-DESCRIPTOR.message_types_by_name['FlowInfo'] = _FLOWINFO
+
+_FLOWARRAY = _descriptor.Descriptor(
+  name='FlowArray',
+  full_name='FlowArray',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='flows', full_name='FlowArray.flows', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=126,
+  serialized_end=159,
+)
+
+
+_ACKTIME = _descriptor.Descriptor(
+  name='AckTime',
+  full_name='AckTime',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='sec', full_name='AckTime.sec', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='usec', full_name='AckTime.usec', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=161,
+  serialized_end=197,
+)
+
+_FLOWARRAY.fields_by_name['flows'].message_type = _FLOW
+DESCRIPTOR.message_types_by_name['Flow'] = _FLOW
+DESCRIPTOR.message_types_by_name['FlowArray'] = _FLOWARRAY
+DESCRIPTOR.message_types_by_name['AckTime'] = _ACKTIME
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-FlowInfo = _reflection.GeneratedProtocolMessageType('FlowInfo', (_message.Message,), {
-  'DESCRIPTOR' : _FLOWINFO,
+Flow = _reflection.GeneratedProtocolMessageType('Flow', (_message.Message,), {
+  'DESCRIPTOR' : _FLOW,
   '__module__' : 'sniffed_info_pb2'
-  # @@protoc_insertion_point(class_scope:FlowInfo)
+  # @@protoc_insertion_point(class_scope:Flow)
   })
-_sym_db.RegisterMessage(FlowInfo)
+_sym_db.RegisterMessage(Flow)
+
+FlowArray = _reflection.GeneratedProtocolMessageType('FlowArray', (_message.Message,), {
+  'DESCRIPTOR' : _FLOWARRAY,
+  '__module__' : 'sniffed_info_pb2'
+  # @@protoc_insertion_point(class_scope:FlowArray)
+  })
+_sym_db.RegisterMessage(FlowArray)
+
+AckTime = _reflection.GeneratedProtocolMessageType('AckTime', (_message.Message,), {
+  'DESCRIPTOR' : _ACKTIME,
+  '__module__' : 'sniffed_info_pb2'
+  # @@protoc_insertion_point(class_scope:AckTime)
+  })
+_sym_db.RegisterMessage(AckTime)
 
 
 # @@protoc_insertion_point(module_scope)

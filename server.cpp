@@ -1,12 +1,12 @@
 // Server side C/C++ program to demonstrate Socket programming
 #include <server.hpp>
-// #include <sniffed_info.pb.h>
+//#include <sniffer.hpp>
 
-int server_fd, new_socket, valread;
+int server_fd, new_socket;
 struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
-char buffer[1024] = {0};
+FlowArray flow_array = FlowArray();
 
 int setup_server() {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -55,14 +55,35 @@ int setup_server() {
 	return 0;
 }
 
-int send_message(/*vector<flow &> flowElement*/Flow &flow){
+int add_to_flow_array(flow *flow) {
+	Flow *flow_proto = flow_array.add_flows();
+
+	flow_proto->set_s_addr(flow->saddr);
+	flow_proto->set_s_port(flow->sport);
+	flow_proto->set_d_addr(flow->daddr);
+	flow_proto->set_d_port(flow->dport);
+	flow_proto->set_num_bytes(flow->NumBytes/30);
+
+	return 0;
+}
+
+int add_to_flow_array(flow *flow, double RST) {
+	add_to_flow_array(flow);
+	flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
+
+	return 0;
+}
+
+int send_message(vector<struct flow*> flowarray){
 	string data;
-	flow.SerializeToString(&data);
+	flow_array.SerializeToString(&data);
 	size_t length = data.size();
 	uint32_t nlength = htonl(length);
 	send(new_socket, &nlength, 4, 0);
 	send(new_socket, data.c_str(), length, 0);
 	printf("Serialized message sent\n");
+
+	flow_array.clear_flows();
 
 	return 0;
 }

@@ -6,15 +6,19 @@
 #include <string.h>
 #include <sniffed_info.pb.h>
 #include <string>
+#include <sniffer.hpp>
 using namespace std;
 
 #define PORT 8080
-extern int server_fd, new_socket, valread;
-extern struct sockaddr_in address;
-extern int opt;
-extern int addrlen;
-extern char buffer[1024];
+// extern int server_fd, new_socket;
+// extern struct sockaddr_in address;
+// extern int opt;
+// extern int addrlen;
 
 int setup_server();
 
-int send_message(Flow &finfo);
+int add_to_flow_array(flow *flow);
+
+int add_to_flow_array(flow *flow, double RST);
+
+int send_message(vector<struct flow*> flowarray);
