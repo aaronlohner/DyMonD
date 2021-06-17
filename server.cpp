@@ -1,11 +1,17 @@
 // Server side C/C++ program to demonstrate Socket programming
 #include <server.hpp>
-//#include <sniffer.hpp>
 
-int server_fd, new_socket;
+// #ifdef _WIN32
+// #include <Windows.h>
+// #else
+// #include <unistd.h>
+// #endif
+
+int server_fd, new_socket, valread;
 struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
+char buffer[1024] = {0};
 FlowArray flow_array = FlowArray();
 
 int setup_server() {
@@ -52,6 +58,19 @@ int setup_server() {
 		exit(EXIT_FAILURE);
 	}
 	printf("Connected.\n");
+	
+	// Receive filter requests
+	receive_message();
+
+	return 0;
+}
+
+int receive_message() {
+	printf("Waiting for filter request...\n");
+	// Only continue once message is received
+	while (!valread) valread = recv(new_socket, buffer, 1024, 0);
+	printf("%s\n", buffer);
+	
 	return 0;
 }
 
@@ -87,8 +106,3 @@ int send_message(vector<struct flow*> flowarray){
 
 	return 0;
 }
-
-// int main(int argc, char const *argv[])
-// {	
-// 	return 0;
-// }

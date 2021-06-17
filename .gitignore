@@ -4,3 +4,4 @@ teastoreall.pcap
 log*
 networkTSK*
 flows.csv
+__pycache__/

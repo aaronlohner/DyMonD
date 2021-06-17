@@ -5,18 +5,13 @@ message Flow {
   string s_port = 2;
   string d_addr = 3;
   string d_port = 4;
-  int32 num_bytes = 5;
-  //bool protof = 6;
-  double rst = 7; // technically not part of flow struct
-  //repeated string packets = 8;
-  //repeated AckTime ack_times = 9;
+  int32 num_bytes = 5; // throughput -- calculation done in Python for now
+  bool is_server = 6;
+  double rst = 7; // technically not part of flow struct -- not for client connections
+  string service_type = 8;
+
 }
 
 message FlowArray {
   repeated Flow flows = 1;
 }
-
-// message AckTime {
-//   int32 sec = 1;
-//   int32 usec = 2; // microseconds
-// }

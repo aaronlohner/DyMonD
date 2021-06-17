@@ -46,16 +46,13 @@ struct TableStruct_sniffed_5finfo_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sniffed_5finfo_2eproto;
-class AckTime;
-struct AckTimeDefaultTypeInternal;
-extern AckTimeDefaultTypeInternal _AckTime_default_instance_;
 class Flow;
 struct FlowDefaultTypeInternal;
 extern FlowDefaultTypeInternal _Flow_default_instance_;
@@ -63,7 +60,6 @@ class FlowArray;
 struct FlowArrayDefaultTypeInternal;
 extern FlowArrayDefaultTypeInternal _FlowArray_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
-template<> ::AckTime* Arena::CreateMaybeMessage<::AckTime>(Arena*);
 template<> ::Flow* Arena::CreateMaybeMessage<::Flow>(Arena*);
 template<> ::FlowArray* Arena::CreateMaybeMessage<::FlowArray>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -182,8 +178,10 @@ class Flow final :
     kSPortFieldNumber = 2,
     kDAddrFieldNumber = 3,
     kDPortFieldNumber = 4,
-    kRstFieldNumber = 7,
+    kServiceTypeFieldNumber = 8,
     kNumBytesFieldNumber = 5,
+    kIsServerFieldNumber = 6,
+    kRstFieldNumber = 7,
   };
   // string s_addr = 1;
   void clear_s_addr();
@@ -241,13 +239,18 @@ class Flow final :
   std::string* _internal_mutable_d_port();
   public:
 
-  // double rst = 7;
-  void clear_rst();
-  double rst() const;
-  void set_rst(double value);
+  // string service_type = 8;
+  void clear_service_type();
+  const std::string& service_type() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_service_type(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_service_type();
+  PROTOBUF_FUTURE_MUST_USE_RESULT std::string* release_service_type();
+  void set_allocated_service_type(std::string* service_type);
   private:
-  double _internal_rst() const;
-  void _internal_set_rst(double value);
+  const std::string& _internal_service_type() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_service_type(const std::string& value);
+  std::string* _internal_mutable_service_type();
   public:
 
   // int32 num_bytes = 5;
@@ -257,6 +260,24 @@ class Flow final :
   private:
   ::PROTOBUF_NAMESPACE_ID::int32 _internal_num_bytes() const;
   void _internal_set_num_bytes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // bool is_server = 6;
+  void clear_is_server();
+  bool is_server() const;
+  void set_is_server(bool value);
+  private:
+  bool _internal_is_server() const;
+  void _internal_set_is_server(bool value);
+  public:
+
+  // double rst = 7;
+  void clear_rst();
+  double rst() const;
+  void set_rst(double value);
+  private:
+  double _internal_rst() const;
+  void _internal_set_rst(double value);
   public:
 
   // @@protoc_insertion_point(class_scope:Flow)
@@ -270,8 +291,10 @@ class Flow final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr s_port_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr d_addr_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr d_port_;
-  double rst_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr service_type_;
   ::PROTOBUF_NAMESPACE_ID::int32 num_bytes_;
+  bool is_server_;
+  double rst_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sniffed_5finfo_2eproto;
 };
@@ -413,149 +436,6 @@ class FlowArray final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Flow > flows_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_sniffed_5finfo_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AckTime final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:AckTime) */ {
- public:
-  inline AckTime() : AckTime(nullptr) {}
-  ~AckTime() override;
-  explicit constexpr AckTime(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  AckTime(const AckTime& from);
-  AckTime(AckTime&& from) noexcept
-    : AckTime() {
-    *this = ::std::move(from);
-  }
-
-  inline AckTime& operator=(const AckTime& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline AckTime& operator=(AckTime&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const AckTime& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const AckTime* internal_default_instance() {
-    return reinterpret_cast<const AckTime*>(
-               &_AckTime_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  friend void swap(AckTime& a, AckTime& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(AckTime* other) {
-    if (other == this) return;
-    if (GetOwningArena() == other->GetOwningArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(AckTime* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AckTime* New() const final {
-    return new AckTime();
-  }
-
-  AckTime* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<AckTime>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const AckTime& from);
-  void MergeFrom(const AckTime& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AckTime* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "AckTime";
-  }
-  protected:
-  explicit AckTime(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kSecFieldNumber = 1,
-    kUsecFieldNumber = 2,
-  };
-  // int32 sec = 1;
-  void clear_sec();
-  ::PROTOBUF_NAMESPACE_ID::int32 sec() const;
-  void set_sec(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_sec() const;
-  void _internal_set_sec(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int32 usec = 2;
-  void clear_usec();
-  ::PROTOBUF_NAMESPACE_ID::int32 usec() const;
-  void set_usec(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_usec() const;
-  void _internal_set_usec(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:AckTime)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::int32 sec_;
-  ::PROTOBUF_NAMESPACE_ID::int32 usec_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sniffed_5finfo_2eproto;
 };
@@ -770,6 +650,26 @@ inline void Flow::set_num_bytes(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Flow.num_bytes)
 }
 
+// bool is_server = 6;
+inline void Flow::clear_is_server() {
+  is_server_ = false;
+}
+inline bool Flow::_internal_is_server() const {
+  return is_server_;
+}
+inline bool Flow::is_server() const {
+  // @@protoc_insertion_point(field_get:Flow.is_server)
+  return _internal_is_server();
+}
+inline void Flow::_internal_set_is_server(bool value) {
+  
+  is_server_ = value;
+}
+inline void Flow::set_is_server(bool value) {
+  _internal_set_is_server(value);
+  // @@protoc_insertion_point(field_set:Flow.is_server)
+}
+
 // double rst = 7;
 inline void Flow::clear_rst() {
   rst_ = 0;
@@ -788,6 +688,51 @@ inline void Flow::_internal_set_rst(double value) {
 inline void Flow::set_rst(double value) {
   _internal_set_rst(value);
   // @@protoc_insertion_point(field_set:Flow.rst)
+}
+
+// string service_type = 8;
+inline void Flow::clear_service_type() {
+  service_type_.ClearToEmpty();
+}
+inline const std::string& Flow::service_type() const {
+  // @@protoc_insertion_point(field_get:Flow.service_type)
+  return _internal_service_type();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Flow::set_service_type(ArgT0&& arg0, ArgT... args) {
+ 
+ service_type_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Flow.service_type)
+}
+inline std::string* Flow::mutable_service_type() {
+  // @@protoc_insertion_point(field_mutable:Flow.service_type)
+  return _internal_mutable_service_type();
+}
+inline const std::string& Flow::_internal_service_type() const {
+  return service_type_.Get();
+}
+inline void Flow::_internal_set_service_type(const std::string& value) {
+  
+  service_type_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* Flow::_internal_mutable_service_type() {
+  
+  return service_type_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* Flow::release_service_type() {
+  // @@protoc_insertion_point(field_release:Flow.service_type)
+  return service_type_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void Flow::set_allocated_service_type(std::string* service_type) {
+  if (service_type != nullptr) {
+    
+  } else {
+    
+  }
+  service_type_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), service_type,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:Flow.service_type)
 }
 
 // -------------------------------------------------------------------
@@ -833,55 +778,9 @@ FlowArray::flows() const {
   return flows_;
 }
 
-// -------------------------------------------------------------------
-
-// AckTime
-
-// int32 sec = 1;
-inline void AckTime::clear_sec() {
-  sec_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 AckTime::_internal_sec() const {
-  return sec_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 AckTime::sec() const {
-  // @@protoc_insertion_point(field_get:AckTime.sec)
-  return _internal_sec();
-}
-inline void AckTime::_internal_set_sec(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  sec_ = value;
-}
-inline void AckTime::set_sec(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_sec(value);
-  // @@protoc_insertion_point(field_set:AckTime.sec)
-}
-
-// int32 usec = 2;
-inline void AckTime::clear_usec() {
-  usec_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 AckTime::_internal_usec() const {
-  return usec_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 AckTime::usec() const {
-  // @@protoc_insertion_point(field_get:AckTime.usec)
-  return _internal_usec();
-}
-inline void AckTime::_internal_set_usec(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  usec_ = value;
-}
-inline void AckTime::set_usec(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_usec(value);
-  // @@protoc_insertion_point(field_set:AckTime.usec)
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 

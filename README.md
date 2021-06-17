@@ -5,8 +5,7 @@ For the first time, you should compile the agent program by running ""g++ -o sni
 The objective of your task is to convert the agent(i.e. sniffer) and controller programs to client-server one and using a more efficient way to serialize the data between them (i.e the data dumped into log.txt file) such as Google- protobuf used in the prototype.
 
 `cd protos`
-`protoc --cpp_out=../proto_gen sniffed_info.proto`
-`protoc --python_out=../proto_gen sniffed_info.proto`
+`protoc --cpp_out=../proto_gen --python_out=../proto_gen sniffed_info.proto`
 `cd ..`
 `mv proto_gen/sniffed_info.pb.h include/`
 g++ -o sniffer sniffer.cpp server.cpp proto_gen/sniffed_info.pb.cc -I/mnt/c/Users/Aaron/COMP_Research/DymonD/include -lpcap -lboost_filesystem -lboost_system `pkg-config --cflags --libs protobuf`
