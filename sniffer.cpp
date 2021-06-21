@@ -165,7 +165,8 @@ int main( int argc, char *argv[] )
     if(token !=NULL)
     {
 
-
+    printf("Starting to sniff for packets");
+    
 	cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
         
         if( cap == NULL) {

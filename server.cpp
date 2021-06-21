@@ -99,7 +99,7 @@ int send_message(vector<struct flow*> flowarray){
 	uint32_t nlength = htonl(length);
 	send(new_socket, &nlength, 4, 0);
 	send(new_socket, data.c_str(), length, 0);
-	printf("Serialized flows sent\n");
+	printf("Flows sent to client\n");
 
 	flow_array.clear_flows();
 

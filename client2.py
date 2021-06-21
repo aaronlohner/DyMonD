@@ -45,7 +45,7 @@ def generate_graph(flow_array, nodes, edges, newNode1, newNode2, id1, id2):#:Flo
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
-txt = raw_input("Enter the Network Interface Name:")
+txt = raw_input("Enter the Network Interface Name: ")
 send_message(s, txt)
 response = recv_message(s, sniffed_info_pb2.FlowArray)
 # generate_graph(response, None, None, None, None, None, None)
