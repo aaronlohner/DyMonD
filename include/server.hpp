@@ -23,4 +23,4 @@ int add_to_flow_array(flow *flow, double RST);
 
 int send_message(vector<struct flow*> flowarray);
 
-int receive_message();
+void receive_message(char *inputBuffer);

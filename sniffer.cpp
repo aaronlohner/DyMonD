@@ -158,8 +158,9 @@ int main( int argc, char *argv[] )
     setup_server();
     
   
-    printf("Enter the Network Interface name: ");
-    scanf("%s", token);
+    // printf("Enter the Network Interface name: ");
+    // scanf("%s", token);
+    receive_message(token);
 
     if(token !=NULL)
     {
@@ -399,6 +400,8 @@ FP.close();
 
 if( cap != NULL)
                 pcap_close(cap);
+
+}
 
 free(saddr);
 free(daddr); 

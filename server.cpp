@@ -59,19 +59,18 @@ int setup_server() {
 	}
 	printf("Connected.\n");
 	
-	// Receive filter requests
-	receive_message();
+	// // Receive filter requests
+	// receive_message();
 
 	return 0;
 }
 
-int receive_message() {
-	printf("Waiting for filter request...\n");
+void receive_message(char *inputBuffer) {
+	printf("Waiting for the Network Interface name...\n");
 	// Only continue once message is received
-	while (!valread) valread = recv(new_socket, buffer, 1024, 0);
-	printf("%s\n", buffer);
+	while (!valread) valread = recv(new_socket, inputBuffer, 32, 0);
+	printf("Received: %s\n", inputBuffer);
 	
-	return 0;
 }
 
 int add_to_flow_array(flow *flow) {
@@ -100,7 +99,7 @@ int send_message(vector<struct flow*> flowarray){
 	uint32_t nlength = htonl(length);
 	send(new_socket, &nlength, 4, 0);
 	send(new_socket, data.c_str(), length, 0);
-	printf("Serialized message sent\n");
+	printf("Serialized flows sent\n");
 
 	flow_array.clear_flows();
 
