@@ -139,7 +139,7 @@ int main( int argc, char *argv[] )
   //char port[6];char port1[6];
    char errbuf[PCAP_ERRBUF_SIZE];
    memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-    char token[32];//char *token=NULL;
+  //char *token=NULL;
     char* raw = NULL;
     pcap_t* cap = NULL;
     struct pcap_pkthdr pkthdr;
@@ -158,41 +158,37 @@ int main( int argc, char *argv[] )
     setup_server();
     
   
-    printf("Enter the Network Interface name: ");
-    scanf("%s", token);
+//printf( "enter the Network Interface name: ");scanf("%p", token);  
+//printf( "enter the IP address: ");scanf("%s", ip);
 
-    if(token !=NULL)
-    {
+//strcat(s,ip);
+
+//if(token !=NULL)
+//{
 
 
-	cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
+	/*cap = pcap_open_live(token, 65535, 0, 1000, errbuf);
         
         if( cap == NULL) {
                 printf("errbuf");
                 printf("%s\n",errbuf); exit(1);
         }
-        time_t start, end;//,raw_time;
-        double elapsed;
-        start = time(NULL);  
-        end = time(NULL);
-        elapsed = difftime(end, start);
-	// time(&start);
-    //     end=((int)start+30;
+        time_t start, end,raw_time;
+	time(&start);
+        end=((int)start+30;
 
 
-//         while(time(&raw_time)<end)
-// {*/
-        while(elapsed <= 30.0)
-        {
+        while(time(&raw_time)<end)
+{*/
 
-        /*cap = pcap_open_offline("teastoreall.pcap", errbuf);
+cap = pcap_open_offline("teastoreall.pcap", errbuf);
         
         if( cap == NULL) {
                 printf("errbuf");
                 printf("%s\n",errbuf); exit(1);
-        }*/
+        }
         raw = (char *)pcap_next(cap, &(pkthdr));
-        if( NULL != raw)
+        while( NULL != raw)
 {
         char* cp = raw;
 
@@ -205,7 +201,7 @@ int main( int argc, char *argv[] )
         int foundIndex = 0, tp,tp_l;
         bool Pfound = false;
         bool found = false;
-	    int b = 0;
+	int b = 0;
         eth_hdr = packet_parse_ethhdr(cp);
         
        if (eth_hdr->ether_type != 0x0800) // not an IP packet
@@ -324,16 +320,15 @@ free_iphdr(ip_hdr);
 
 } // else eth_type
 
-    //     raw = (char*)pcap_next(cap, &pkthdr);
-    // } //while
-    }
-else
-{ 
-printf("raw is null \n");}
-    end = time(NULL);
-     elapsed = difftime(end, start);  
- 
-} //30s duration
+        raw = (char*)pcap_next(cap, &pkthdr);
+    } //while
+    
+    printf("raw is null \n");
+
+/*nanosleep((const struct timespec[]){{0, 20000000L}},NULL);
+found=false;Pfound=false;
+
+}*/
 
 
 myfile.open("flows.csv", std::ios_base::out);
