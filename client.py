@@ -12,9 +12,9 @@ def send_message(conn:socket, mesg:str) -> None:
     # maybe also depth of call graph (int)
     mesg = bytes(mesg.encode('utf-8'))
     length = sys.getsizeof(mesg)
-    print(f'length: {length}, bytes: {length.to_bytes(4, byteorder="big")}')
+    # print(f'length: {length}, bytes: {length.to_bytes(4, byteorder="big")}')
     conn.send(length.to_bytes(4, byteorder="big"))
-    print(f'mesg: {mesg}')
+    #print(f'mesg: {mesg}')
     conn.send(mesg)
     print("Sent message")
 

@@ -1,3 +1,4 @@
+import sys
 import socket
 import struct
 from proto_gen import sniffed_info_pb2
@@ -10,7 +11,10 @@ PORT = 8080        # The port used by the server
 def send_message(conn, mesg):#:socket):
     # sends IP address (for now, just send the network interface)
     # maybe also depth of call graph (int)
-    conn.send(bytes(mesg.encode('utf-8')))
+    mesg = bytes(mesg.encode('utf-8'))
+    length = sys.getsizeof(mesg)
+    conn.send(length.to_bytes(4, byteorder="big"))
+    conn.send(mesg)
     print("Sent message")
 
 def recv_message(conn, msg_type):# -> FlowArray:
@@ -43,15 +47,18 @@ def generate_graph(flow_array, nodes, edges, newNode1, newNode2, id1, id2):#:Flo
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
+
 live = None
-while live != 'L' or live != 'O':
-    live = raw_input("Type 'L' for live mode, 'O' for offline mode: ")
-if live == 'L':
+while live != 'l' and live != 'o':
+    live = raw_input("Type 'l' for live mode, 'o' for offline mode: ")
+    
+if live == 'l':
     txt = raw_input("Enter the Network Interface name: ")
 else:
     txt = raw_input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
-    if txt is None:
+    if len(txt) == 0:
         txt = "teastoreall.pcap"
+
 send_message(s, txt)
 response = recv_message(s, sniffed_info_pb2.FlowArray)
 # generate_graph(response, None, None, None, None, None, None)
