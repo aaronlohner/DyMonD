@@ -1,12 +1,6 @@
 // Server side C/C++ program to demonstrate Socket programming
 #include <server.hpp>
 
-// #ifdef _WIN32
-// #include <Windows.h>
-// #else
-// #include <unistd.h>
-// #endif
-
 int server_fd, new_socket, valread;
 struct sockaddr_in address;
 int opt = 1;
@@ -66,11 +60,15 @@ int setup_server() {
 }
 
 void receive_message(char *inputBuffer) {
-	printf("Waiting for the Network Interface name...\n");
+	printf("Waiting for a message from client...\n");
+	int mesg_len_buf, mesg_length; //valread;
 	// Only continue once message is received
-	while (!valread) valread = recv(new_socket, inputBuffer, 32, 0);
+	while (!valread) valread = recv(new_socket, &mesg_len_buf, 4, 0);
+	mesg_length = ntohl(mesg_len_buf);
+	//printf("Length: %d\n", mesg_length);
+	recv(new_socket, inputBuffer, mesg_length, 0);
 	printf("Received: %s\n", inputBuffer);
-	
+	valread = 0;
 }
 
 int add_to_flow_array(flow *flow) {

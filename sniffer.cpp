@@ -139,7 +139,7 @@ int main( int argc, char *argv[] )
   //char port[6];char port1[6];
    char errbuf[PCAP_ERRBUF_SIZE];
    memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-    char token[32];//char *token=NULL;
+    char on_off_line[1], token[32];//char *token=NULL;
     char* raw = NULL;
     pcap_t* cap = NULL;
     struct pcap_pkthdr pkthdr;
@@ -154,45 +154,44 @@ int main( int argc, char *argv[] )
    
     vector<struct flow*> flowarray;
 
-    // TRIGGERS SERVER TO BEGIN
-    setup_server();
-    
-  
-    // printf("Enter the Network Interface name: ");
-    // scanf("%s", token);
-    receive_message(token);
+    setup_server(); // prepares server to incoming client tcp connection
+    receive_message(on_off_line); // receive indication if using live mode or not
+    receive_message(token); // receive network interface name (live) or name of pcap file (offline)
 
     if(token !=NULL)
     {
 
-    printf("Starting to sniff for packets");
+        printf("Starting to sniff for packets\n");
     
-	cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
-        
-        if( cap == NULL) {
-                printf("errbuf");
-                printf("%s\n",errbuf); exit(1);
-        }
-        time_t start, end;//,raw_time;
+        time_t start, end;
         double elapsed;
-        start = time(NULL);  
-        end = time(NULL);
-        elapsed = difftime(end, start);
-	// time(&start);
-    //     end=((int)start+30;
-
-
-//         while(time(&raw_time)<end)
-// {*/
-        while(elapsed <= 30.0)
+        if(on_off_line[0] == 'l')
         {
+            cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
+                
+            if( cap == NULL) {
+                    printf("errbuf");
+                    printf("%s\n",errbuf); exit(1);
+            }
+            //time_t start, end;//,raw_time;
+            // double elapsed;
+            start = time(NULL);  
+            end = time(NULL);
+            elapsed = difftime(end, start);
+        }
+        else
+        {
+            cap = pcap_open_offline(token, errbuf);
+            
+            if( cap == NULL) {
+                    printf("errbuf");
+                    printf("%s\n",errbuf); exit(1);
+            }
+        }
 
-        /*cap = pcap_open_offline("teastoreall.pcap", errbuf);
+        while((on_off_line[0] == 'l' && elapsed <= 30.0) || on_off_line[0] == 'o')
+        {
         
-        if( cap == NULL) {
-                printf("errbuf");
-                printf("%s\n",errbuf); exit(1);
-        }*/
         raw = (char *)pcap_next(cap, &(pkthdr));
         if( NULL != raw)
 {
@@ -326,14 +325,16 @@ free_iphdr(ip_hdr);
 
 } // else eth_type
 
-    //     raw = (char*)pcap_next(cap, &pkthdr);
-    // } //while
     }
-else
+else //if raw == NULL
 { 
-printf("raw is null \n");}
-    end = time(NULL);
-     elapsed = difftime(end, start);  
+    printf("raw is null \n");
+    if(on_off_line[0] == 'l') {
+        end = time(NULL);
+        elapsed = difftime(end, start);
+    }
+break;
+} 
  
 } //30s duration
 

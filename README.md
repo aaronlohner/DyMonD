@@ -17,7 +17,7 @@ g++ -o sniffer sniffer.cpp server.cpp proto_gen/sniffed_info.pb.cc -I/home/alohn
 OR
 `python client2.py`
 
-INSTRUCTION TO RUN APP LIVE
+INSTRUCTIONS TO RUN APP LIVE
 1- open two ssh shell windows to compute=-04 node
 2- At the first shell window:
 •	`sudo docker exec -it ycsbclient bash`

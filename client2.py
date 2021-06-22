@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import socket
 import struct
 from proto_gen import sniffed_info_pb2
@@ -45,7 +43,15 @@ def generate_graph(flow_array, nodes, edges, newNode1, newNode2, id1, id2):#:Flo
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
-txt = raw_input("Enter the Network Interface Name: ")
+live = None
+while live != 'L' or live != 'O':
+    live = raw_input("Type 'L' for live mode, 'O' for offline mode: ")
+if live == 'L':
+    txt = raw_input("Enter the Network Interface name: ")
+else:
+    txt = raw_input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
+    if txt is None:
+        txt = "teastoreall.pcap"
 send_message(s, txt)
 response = recv_message(s, sniffed_info_pb2.FlowArray)
 # generate_graph(response, None, None, None, None, None, None)

@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-
+import sys
 import socket
 from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
@@ -8,11 +7,16 @@ from script import node, edge
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 8080        # The port used by the server
 
-def send_message(conn:socket):
+def send_message(conn:socket, mesg:str) -> None:
     # sends IP address (for now, just send the network interface)
     # maybe also depth of call graph (int)
-    conn.send(b'n_int')
-    print("Sent network interface")
+    mesg = bytes(mesg.encode('utf-8'))
+    length = sys.getsizeof(mesg)
+    print(f'length: {length}, bytes: {length.to_bytes(4, byteorder="big")}')
+    conn.send(length.to_bytes(4, byteorder="big"))
+    print(f'mesg: {mesg}')
+    conn.send(mesg)
+    print("Sent message")
 
 def recv_message(conn, msg_type) -> FlowArray:
     """ Receive a message, prefixed with its size, from a TCP/IP socket """
@@ -40,7 +44,20 @@ def generate_graph(flow_array:FlowArray, nodes, edges, newNode1, newNode2, id1, 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    send_message(s)
+
+    live = None
+    while live != 'l' and live != 'o':
+        live = input("Type 'l' for live mode, 'o' for offline mode: ")
+    send_message(s, live)
+
+    if live == 'l':
+        txt = input("Enter the Network Interface name: ")
+    else:
+        txt = input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
+        if len(txt) == 0:
+            txt = "teastoreall.pcap"
+
+    send_message(s, txt)
     response = recv_message(s, sniffed_info_pb2.FlowArray)
     # generate_graph(response, None, None, None, None, None, None)
     while response is not None:
