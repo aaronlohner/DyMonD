@@ -54,7 +54,9 @@ while live != 'l' and live != 'o':
 send_message(s, live)
 
 if live == 'l':
-    txt = raw_input("Enter the Network Interface name: ")
+    txt = raw_input("Enter the Network Interface name or leave blank to use e69b93ccc8384_l: ")
+    if len(txt) == 0:
+        txt = "e69b93ccc8384_l"
 else:
     txt = raw_input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
     if len(txt) == 0:

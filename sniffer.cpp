@@ -192,7 +192,7 @@ int main( int argc, char *argv[] )
 
         while((on_off_line[0] == 'l' && elapsed <= 30.0) || on_off_line[0] == 'o')
         {
-        
+        printf("mode, time: %c, %d", on_off_line[0], elapsed);
         raw = (char *)pcap_next(cap, &(pkthdr));
         if( NULL != raw)
 {
@@ -359,7 +359,7 @@ myfile.open("flows.csv", std::ios_base::out);
     myfile.close();
 
  // performance metrics clacualation and dumping into file
-FP.open("log.txt", std::ios_base::out); // using standard ports
+FP.open("log2.txt", std::ios_base::out); // using standard ports
  double diff, RST;
 
  for(int i = 0; i < flowarray.size(); i++) {
