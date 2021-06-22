@@ -196,7 +196,7 @@ int main( int argc, char *argv[] )
         elapsed = difftime(end, start);
         while((on_off_line[0] == 'l' && elapsed <= 30.0) || on_off_line[0] == 'o')
         {
-        printf("mode, time: %c, %f", on_off_line[0], elapsed);
+        //printf("mode, time: %c, %f", on_off_line[0], elapsed);
         raw = (char *)pcap_next(cap, &(pkthdr));
         if( NULL != raw)
 {
@@ -334,12 +334,14 @@ free_iphdr(ip_hdr);
 else //if raw == NULL
 { 
     printf("raw is null \n");
+    if(on_off_line[0] == 'o') {
+        break;
+    }
+}
     if(on_off_line[0] == 'l') {
         end = time(NULL);
         elapsed = difftime(end, start);
     }
-break;
-} 
  
 } //30s duration
 
