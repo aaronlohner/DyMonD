@@ -167,6 +167,7 @@ int main( int argc, char *argv[] )
         double elapsed;
         if(on_off_line[0] == 'l')
         {
+            printf("Opening live thread on %s\n", token);
             cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
                 
             if( cap == NULL) {

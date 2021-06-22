@@ -13,7 +13,7 @@ def send_message(conn, mesg):#:socket):
     # maybe also depth of call graph (int)
     mesg = bytes(mesg.encode('utf-8'))
     length = sys.getsizeof(mesg)
-    conn.send(length.to_bytes(4, byteorder="big"))
+    conn.send(struct.pack('>i', length))
     conn.send(mesg)
     print("Sent message")
 
@@ -51,7 +51,8 @@ s.connect((HOST, PORT))
 live = None
 while live != 'l' and live != 'o':
     live = raw_input("Type 'l' for live mode, 'o' for offline mode: ")
-    
+send_message(s, live)
+
 if live == 'l':
     txt = raw_input("Enter the Network Interface name: ")
 else:

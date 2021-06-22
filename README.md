@@ -29,6 +29,9 @@ INSTRUCTIONS TO RUN APP LIVE
 •	 `g++ -g -o sniffer sniffer.cpp -lpcap -lboost_filesystem -lboost_system`
 •	`sudo ./sniffer`
 INSTEAD OF STEP 4, compile sniffer in `DyMonD` folder, then copy to `shared` to run
+- `cp sniffer ../../shared/`
+- `cd ../../shared/`
+- `sudo ./sniffer`
 5- The sniffer will ask for the network interface, please input the one you got in step#2 (e69b93ccc8384_l)
 6- Go to shell window#1 and run the YCSB workload by using the following command:
 `./ycsb run jdbc  -P ../workloads/workloadc  -p jdbc.driver=com.mysql.jdbc.Driver  -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB  -p db.user=root  -p db.passwd=root  -s  -threads 20  -target 0  -p measurementtype=timeseries  -p timeseries.granularity=20000`
