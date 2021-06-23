@@ -180,7 +180,9 @@ int main( int argc, char *argv[] )
         }
         else
         {
-            cap = pcap_open_offline(token, errbuf);
+            string capture = "captures/";
+            capture.append(token);
+            cap = pcap_open_offline(capture.c_str(), errbuf);
             
             if( cap == NULL) {
                     printf("errbuf");
@@ -340,7 +342,7 @@ else //if raw == NULL
 } //30s duration
 
 
-myfile.open("flows.csv", std::ios_base::out);
+myfile.open("flows/flows.csv", std::ios_base::out);
  for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) { 
@@ -359,7 +361,7 @@ myfile.open("flows.csv", std::ios_base::out);
     myfile.close();
 
  // performance metrics clacualation and dumping into file
-FP.open("log2.txt", std::ios_base::out); // using standard ports
+FP.open("logs/log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
 
  for(int i = 0; i < flowarray.size(); i++) {

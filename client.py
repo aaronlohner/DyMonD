@@ -55,7 +55,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         if len(txt) == 0:
             txt = "e69b93ccc8384_l"
     else:
-        txt = input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
+        txt = input("Enter the file name (must be a .pcap file under DyMonD/captures) or leave blank to use teastoreall.pcap: ")
         if len(txt) == 0:
             txt = "teastoreall.pcap"
 

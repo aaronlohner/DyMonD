@@ -53,9 +53,6 @@ int setup_server() {
 	}
 	printf("Connected.\n");
 	
-	// // Receive filter requests
-	// receive_message();
-
 	return 0;
 }
 

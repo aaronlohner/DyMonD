@@ -1,5 +1,7 @@
 import random
 
+# THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
+
 #the script is to generate a json file that can be used in webvowl1.1.7SE
 #input file is csv containing edges in the format of (Node1, Node2, connection information)
 #change input on line #58 and output on line #59
@@ -55,8 +57,8 @@ def getName(label):#get the IPaddress of a node from name
 #####################################
 
 if __name__ == '__main__':
-    data = open("log.txt", "r")#input
-    output = open("networkTSK2.json", "w")#output
+    data = open("logs/log.txt", "r")#input
+    output = open("json/networkTSK2.json", "w")#output
 
     nodes = {}
     edges = {}

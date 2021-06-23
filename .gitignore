@@ -1,8 +1,10 @@
 .vscode
-*.zip
-teastoreall.pcap
-log*
-networkTSK*
-flows.csv
+
 __pycache__/
-sniffer-new.cpp
+captures/
+flows/
+json/
+logs/
+
+*.zip
+*.pyc

@@ -58,7 +58,7 @@ if live == 'l':
     if len(txt) == 0:
         txt = "e69b93ccc8384_l"
 else:
-    txt = raw_input("Enter the file name (must be a .pcap file directly in the DyMonD folder) or leave blank to use teastoreall.pcap: ")
+    txt = raw_input("Enter the file name (must be a .pcap file under DyMonD/captures) or leave blank to use teastoreall.pcap: ")
     if len(txt) == 0:
         txt = "teastoreall.pcap"
 

@@ -1,0 +1,86 @@
+{"class":[{"id": "0",
+"type": "owl:Class"
+},
+{"id": "1",
+"type": "owl:equivalentClass"
+},
+{"id": "2",
+"type": "owl:Class"
+},
+{"id": "3",
+"type": "owl:equivalentClass"
+}],"classAttribute":[{"id": "0",
+"label": "Client",
+"comment": {
+"undefined":"172.17.0.4\nPort: 50382"
+},
+"attributes":[
+"#dc9ce5"
+]
+},
+{"id": "1",
+"label": "HTTP",
+"comment": {
+"undefined":"172.17.0.3\nPort: 8080"
+},
+"attributes":[
+"#7c9efe"
+]
+},
+{"id": "2",
+"label": "Client",
+"comment": {
+"undefined":"172.17.0.3\nPort: 41262"
+},
+"attributes":[
+"#7c9efe"
+]
+},
+{"id": "3",
+"label": "MYSQL",
+"comment": {
+"undefined":"172.17.0.2\nPort: 3306"
+},
+"attributes":[
+"#7ff68a"
+]
+}],"property":[{"id": "0",
+"type": "owl:ObjectProperty"
+},
+{"id": "1",
+"type": "owl:ObjectProperty"
+},
+{"id": "2",
+"type": "owl:DatatypeProperty"
+},
+{"id": "3",
+"type": "owl:ObjectProperty"
+},
+{"id": "4",
+"type": "owl:ObjectProperty"
+}],"propertyAttribute":[{"id": "0",
+"label": "TH: 59855, RST: 0.00603293",
+"domain": "0",
+"range": "1"
+},
+{"id": "1",
+"label": "TH: 3229223, RST: 0.0966137",
+"domain": "1",
+"range": "0"
+},
+{"id": "2",
+"label": "same address",
+"domain": "2",
+"range": "1"
+},
+{"id": "3",
+"label": "TH: 11652, RST: 0.133063",
+"domain": "2",
+"range": "3"
+},
+{"id": "4",
+"label": "TH: 75269, C: 2",
+"domain": "3",
+"range": "2"
+}]
+}
