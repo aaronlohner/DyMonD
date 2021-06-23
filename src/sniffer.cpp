@@ -1,6 +1,5 @@
 #include <sniffer.hpp>
 #include <server.hpp>
-//#include <include/server.hpp>
 
 void *check_malloc(unsigned long size)
 {

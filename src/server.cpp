@@ -1,4 +1,3 @@
-// Server side C/C++ program to demonstrate Socket programming
 #include <server.hpp>
 
 int server_fd, new_socket, valread;
@@ -62,7 +61,6 @@ void receive_message(char *inputBuffer) {
 	// Only continue once message is received
 	while (!valread) valread = recv(new_socket, &mesg_len_buf, 4, 0);
 	mesg_length = ntohl(mesg_len_buf);
-	//printf("Length: %d\n", mesg_length);
 	recv(new_socket, inputBuffer, mesg_length, 0);
 	printf("Received: %s\n", inputBuffer);
 	valread = 0;
