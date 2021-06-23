@@ -163,7 +163,8 @@ int main( int argc, char *argv[] )
 
         printf("Starting to sniff for packets\n");
     
-        
+        time_t start, end;
+        double elapsed;
         if(on_off_line[0] == 'l')
         {
             printf("Opening live thread on %s\n", token);
@@ -173,11 +174,9 @@ int main( int argc, char *argv[] )
                     printf("errbuf");
                     printf("%s\n",errbuf); exit(1);
             }
-            //time_t start, end;//,raw_time;
-            // double elapsed;
-            // start = time(NULL);  
-            // end = time(NULL);
-            // elapsed = difftime(end, start);
+            start = time(NULL);  
+            end = time(NULL);
+            elapsed = difftime(end, start);
         }
         else
         {
@@ -189,11 +188,6 @@ int main( int argc, char *argv[] )
             }
         }
 
-        time_t start, end;
-        double elapsed;
-        start = time(NULL);  
-        end = time(NULL);
-        elapsed = difftime(end, start);
         while((on_off_line[0] == 'l' && elapsed <= 30.0) || on_off_line[0] == 'o')
         {
         //printf("mode, time: %c, %f", on_off_line[0], elapsed);
