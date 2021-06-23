@@ -1,21 +1,8 @@
 The agent (sniffer file) is the sniffer reads network traffic form a pre-recorded network traffic (i.e. the pcap file) and produces "log.txt" that contains the captured communications flows.  The controller program reads this "log.txt" file and converts it to call graph through describing nodes and edges in a json file for visualization. The last step is to run the visualization tool (WEBVOWL file) by opening the index.html file and choosing the produced .json file as a source for ontology file to view.
 
-`cd protos`
-`protoc --cpp_out=../proto_gen --python_out=../proto_gen sniffed_info.proto`
-`cd ..`
-`mv proto_gen/sniffed_info.pb.h include/`
-g++ -o sniffer sniffer.cpp server.cpp proto_gen/sniffed_info.pb.cc -I/mnt/c/Users/Aaron/COMP_Research/DyMonD/include -lpcap -lboost_filesystem -lboost_system `pkg-config --cflags --libs protobuf`
-OR
-g++ -o sniffer sniffer.cpp server.cpp proto_gen/sniffed_info.pb.cc -I/home/alohne/DyMonD/include -lpcap -lboost_filesystem -lboost_system `pkg-config --cflags --libs protobuf`
-
-`./sniffer`
-`python client.py`
-OR
-`python client2.py`
-
-INSTRUCTIONS TO RUN APP LIVE
-1- open two ssh shell windows to compute=-04 node
-2- At the first shell window:
+*Run in live mode*
+1. Open three ssh shell windows to compute-04 node
+2. In the first shell:
 •	`sudo docker exec -it ycsbclient bash`
 •	`cd YCSBCLIENT/bin`
 2- At the second shell window: 

@@ -57,8 +57,8 @@ def getName(label):#get the IPaddress of a node from name
 #####################################
 
 if __name__ == '__main__':
-    data = open("logs/log.txt", "r")#input
-    output = open("json/networkTSK2.json", "w")#output
+    data = open("../logs/log.txt", "r")#input
+    output = open("../json/networkTSK3.json", "w")#output
 
     nodes = {}
     edges = {}
