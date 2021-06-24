@@ -22,6 +22,7 @@ then start the client by running `python client2.py`
 9. In the first shell, run the YCSB workload by using the following command:
 
 `./ycsb run jdbc  -P ../workloads/workloadc  -p jdbc.driver=com.mysql.jdbc.Driver  -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB  -p db.user=root  -p db.passwd=root  -s  -threads 20  -target 0  -p measurementtype=timeseries  -p timeseries.granularity=20000`
+
 10. In the third shell, enter the information prompted by the client to start sniffing the workload
 
 The sniffer program will sniff the given interface for 30 seconds and then produces the "log.txt" & "flows.csv" files and ends.
