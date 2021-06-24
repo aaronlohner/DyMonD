@@ -15,7 +15,7 @@ The output should be two interfaces: the loopback interface a second interface w
 4. Exit the docker container (should be done automatically) and run `ip a|grep ^<number>` using the final <number> portion from the output above.
 The output shows the localhost's interface name connected to the YCSB webserver container in the same format as above.
 5. Run `cd /home/alohne/DyMonD` then compile the server code by running `cat sniffer.sh` and then by running all the lines of code in this script except the first and last ones.
-6. Copy the compiled sniffer code into the shared folder by running `cp ../../shared sniffer`. Then run `cd ../../shared`
+6. Copy the compiled sniffer code into the shared folder by running `cp sniffer ../../shared`. Then run `cd ../../shared`
 7. Start the server with `sudo ./sniffer`
 8. In the third shell, run `cd /home/alohne/DyMonD`
 then start the client by running `python client2.py`
