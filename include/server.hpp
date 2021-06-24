@@ -10,17 +10,13 @@
 using namespace std;
 
 #define PORT 8080
-// extern int server_fd, new_socket;
-// extern struct sockaddr_in address;
-// extern int opt;
-// extern int addrlen;
 
-int setup_server();
+void setup_server();
 
-int add_to_flow_array(flow *flow);
+void add_to_flow_array(flow *flow);
 
-int add_to_flow_array(flow *flow, double RST);
+void add_to_flow_array(flow *flow, double RST);
 
-int send_message(vector<struct flow*> flowarray);
+void send_message(vector<struct flow*> flowarray);
 
 void receive_message(char *inputBuffer);

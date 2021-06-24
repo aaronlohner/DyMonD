@@ -153,7 +153,7 @@ int main( int argc, char *argv[] )
    
     vector<struct flow*> flowarray;
 
-    setup_server(); // prepares server to incoming client tcp connection
+    setup_server(); // prepare server for incoming client tcp connection
     receive_message(on_off_line); // receive indication if using live mode or not
     receive_message(token); // receive network interface name (live) or name of pcap file (offline)
 
@@ -326,13 +326,14 @@ free_iphdr(ip_hdr);
 } // else eth_type
 
     }
-else //if raw == NULL
-{ 
-    printf("raw is null \n");
-    if(on_off_line[0] == 'o') {
-        break;
+    else //if raw == NULL
+    { 
+        printf("raw is null \n");
+        if(on_off_line[0] == 'o') {
+            break;
+        }
     }
-}
+
     if(on_off_line[0] == 'l') {
         end = time(NULL);
         elapsed = difftime(end, start);
@@ -359,7 +360,7 @@ myfile.open("flows/flows.csv", std::ios_base::out);
 }
     myfile.close();
 
- // performance metrics clacualation and dumping into file
+ // performance metrics calcualation and dumping into file
 FP.open("logs/log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
 
@@ -388,26 +389,26 @@ else
 }
  }
 
- send_message(flowarray);
+    send_message(flowarray);
 
-FP.close();
+    FP.close();
 
- for(int i = 0; i < flowarray.size(); i++)
-{ 
-    for (int j=0; j<flowarray[i]->Ack_times.size(); j++)
-         free(flowarray[i]->Ack_times[j]);
-     free(flowarray[i]);
-}
+    for(int i = 0; i < flowarray.size(); i++)
+    { 
+        for (int j=0; j<flowarray[i]->Ack_times.size(); j++)
+            free(flowarray[i]->Ack_times[j]);
+        free(flowarray[i]);
+    }
 
 
-  
+    
 
-if( cap != NULL)
-                pcap_close(cap);
+    if( cap != NULL)
+        pcap_close(cap);
 
-}
+    }
 
-free(saddr);
-free(daddr); 
-return 0;
+    free(saddr);
+    free(daddr); 
+    return 0;
 }

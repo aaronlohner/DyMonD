@@ -6,4 +6,4 @@ cd ..
 mv proto_gen/sniffed_info.pb.h include/
 g++ -o sniffer src/sniffer.cpp src/server.cpp proto_gen/sniffed_info.pb.cc -Iinclude -lpcap -lboost_filesystem -lboost_system `pkg-config --cflags --libs protobuf`
 # Start up sniffer
-./sniffer
+sudo ./sniffer

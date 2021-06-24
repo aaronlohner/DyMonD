@@ -5,35 +5,30 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 from script import node, edge
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8080        # The port used by the server
+PORT = 8080         # The port used by the server
 
 def send_message(conn:socket, mesg:str) -> None:
-    # sends IP address (for now, just send the network interface)
-    # maybe also depth of call graph (int)
+    """Send a message though the TCP socket."""
     mesg = bytes(mesg.encode('utf-8'))
     length = sys.getsizeof(mesg)
-    # print(f'length: {length}, bytes: {length.to_bytes(4, byteorder="big")}')
+    # First send the message length
     conn.send(length.to_bytes(4, byteorder="big"))
-    #print(f'mesg: {mesg}')
     conn.send(mesg)
     print("Sent message")
 
-def recv_message(conn, msg_type) -> FlowArray:
-    """ Receive a message, prefixed with its size, from a TCP/IP socket """
-    # Receive the size of the message data
+def recv_message(conn:socket, msg_type) -> FlowArray:
+    """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
-    # recv() seems to wait until buffer is nonempty
     size = conn.recv(4)
-    # Trigger to stop waiting for server message is when incoming message size is 0
+    # Stop waiting for server to send messages when receive an incoming message of size 0
     if int.from_bytes(size, "big") == 0:
+        print("Exiting")
         return None
-    # Receive the message data
     data = conn.recv(int.from_bytes(size, "big"))
-    # Decode the message
+    # Create object of specified type to store received data
     msg = msg_type()
     msg.ParseFromString(data)
-    # Create a Flow object and populate it with received data
     return msg
 
 def generate_graph(flow_array:FlowArray, nodes, edges, newNode1, newNode2, id1, id2):
@@ -45,21 +40,21 @@ def generate_graph(flow_array:FlowArray, nodes, edges, newNode1, newNode2, id1, 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
 
-    live = None
-    while live != 'l' and live != 'o':
-        live = input("Type 'l' for live mode, 'o' for offline mode: ")
-    send_message(s, live)
+    mode = None
+    while mode != 'l' and mode != 'o':
+        mode = input("Type 'l' for live mode, 'o' for offline mode: ")
+    send_message(s, mode)
 
-    if live == 'l':
+    if mode == 'l':
         txt = input("Enter the Network Interface name or leave blank to use e69b93ccc8384_l: ")
         if len(txt) == 0:
             txt = "e69b93ccc8384_l"
     else:
-        txt = input("Enter the file name (must be a .pcap file under DyMonD/captures) or leave blank to use teastoreall.pcap: ")
+        txt = input("Enter the file name (must be a .pcap file in the captures folder) or leave blank to use teastoreall.pcap: ")
         if len(txt) == 0:
             txt = "teastoreall.pcap"
-
     send_message(s, txt)
+    
     response = recv_message(s, sniffed_info_pb2.FlowArray)
     # generate_graph(response, None, None, None, None, None, None)
     while response is not None:
