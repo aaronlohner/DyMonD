@@ -1,10 +1,16 @@
 import random
+from client import setup_client, stop_client, recv_message
+from proto_gen import sniffed_info_pb2
+from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 # THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
 
 #the script is to generate a json file that can be used in webvowl1.1.7SE
 #input file is csv containing edges in the format of (Node1, Node2, connection information)
 #change input on line #58 and output on line #59
+
+nodes = {}
+edges = {}
 
 class node: #attributes of a node
     def __init__(self, ptype, pname, paddress, pPort, pcolor):
@@ -54,14 +60,10 @@ def getName(label):#get the IPaddress of a node from name
     if counter2 == len(label)-1: counter2 = len(label)
     return label[0:counter1], label[counter1:len(label)].upper()
 
-#####################################
 
-if __name__ == '__main__':
+def generate_graph_from_file():
     data = open("../logs/log.txt", "r")#input
-    output = open("../json/networkTSK3.json", "w")#output
 
-    nodes = {}
-    edges = {}
     newNode1 = None
     newNode2 = None
     id1 = None
@@ -141,10 +143,15 @@ if __name__ == '__main__':
             newNode2 = None
             id1 = None
             id2 = None
-        
-        
-    #########################################
+    data.close()
 
+def generate_graph(flow_array:FlowArray, newNode1, newNode2, id1, id2):
+    node1 = flow_array.flows[0].s_addr
+    node2 = flow_array.flows[0].d_addr
+    print(f'{node1}, {node2}')
+
+def write_json_output():
+    output = open("../json/networkTSK3.json", "w")#output
     output.write("{")
     output.write("\"class\":[")#write nodes
     for key in nodes:
@@ -187,5 +194,15 @@ if __name__ == '__main__':
             else:
                 output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH + ", C: " + (str)(edges[key].C) + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
     output.write("]\n}")
-    data.close()
     output.close()  
+
+if __name__ == '__main__':
+    setup_client()
+    response = recv_message(sniffed_info_pb2.FlowArray)
+    #generate_graph(response, None, None, None, None)
+    while response is not None:
+        # Assuming that the incoming response type is a protobuf FlowArray object
+        for i, flow in enumerate(response.flows):
+            print(f'Received #{i+1}: {flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.num_bytes}-{flow.rst}')
+        response = recv_message(sniffed_info_pb2.FlowArray)
+    stop_client()
