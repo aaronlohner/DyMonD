@@ -199,7 +199,7 @@ def generate_graph(flow_array:FlowArray):
                         nodes[key].name = "Client"
                     break
 
-        newEdge = edge("owl:ObjectProperty", flow.num_bytes, flow.rst, 1, str(id1), str(id2))
+        newEdge = edge("owl:ObjectProperty", str(flow.num_bytes), str(flow.rst), 1, str(id1), str(id2))
         if newEdge not in edges.values():#add new edge
             edges[len(edges)] = newEdge
         else:
