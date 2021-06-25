@@ -62,7 +62,7 @@ def getName(label):#get the IPaddress of a node from name
 
 
 def generate_graph_from_file():
-    data = open("../logs/log.txt", "r")#input
+    data = open("logs/log.txt", "r")#input
 
     newNode1 = None
     newNode2 = None
@@ -145,13 +145,79 @@ def generate_graph_from_file():
             id2 = None
     data.close()
 
-def generate_graph(flow_array:FlowArray, newNode1, newNode2, id1, id2):
-    node1 = flow_array.flows[0].s_addr
-    node2 = flow_array.flows[0].d_addr
-    print(f'{node1}, {node2}')
+def generate_graph(flow_array:FlowArray):
+    newNode1 = None
+    newNode2 = None
+    id1 = None
+    id2 = None
 
-def write_json_output():
-    output = open("../json/networkTSK3.json", "w")#output
+    for flow in response.flows:
+        if flow.s_port.isdigit() and not flow.d_port.isdigit():#node 1 is client and node2 is server
+            newNode1 = node("owl:Class", "Client", flow.s_addr, flow.s_port, randomColor())
+            newNode2 = node("owl:equivalentClass", getName(flow.d_port)[1], flow.d_addr, getName(flow.d_port)[0],randomColor())
+        elif not flow.s_port.isdigit() and flow.d_port.isdigit():#node 1 is server and node2 is client
+            newNode1 = node("owl:equivalentClass", getName(flow.s_port)[1], (flow.s_addr), getName(flow.s_port)[0],randomColor())
+            newNode2 = node("owl:Class", "Client", flow.d_addr, flow.d_port, randomColor())
+        elif flow.s_port.isdigit() and flow.d_port.isdigit():#both nodes are not server
+            newNode1 = node("owl:Class", "Unknown", flow.s_addr, flow.s_port,randomColor())
+            newNode2 = node("owl:Class", "Unknown", flow.d_addr, flow.d_port,randomColor())
+        if newNode1 not in nodes.values():#if node 1 is not included in graph
+            id1 = len(nodes)
+            nodes[len(nodes)] = newNode1#expand node list
+
+            for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
+                if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
+                    newNode1.color = nodes[key].color
+                    edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
+                elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
+                    newNode1.color = nodes[key].color
+                    edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
+        else:
+            for key in nodes:
+                if nodes[key] == newNode1:
+                    id1 = key
+                    if nodes[key].name == "Unknown" and newNode1.name == "Client":
+                        nodes[key].name = "Client"
+                    break
+        
+        if newNode2 not in nodes.values():#if node 2 is not included in graph
+            id2 = len(nodes)
+            nodes[len(nodes)] = newNode2#expand node list
+            
+            for key in nodes:#assign same color to nodes with same IPaddress
+                if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
+                    newNode2.color = nodes[key].color
+                    edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id2))
+                elif nodes[key].address == newNode2.address and nodes[key].type == "owl:equivalentClass" and newNode2.type == "owl:Class":
+                    newNode2.color = nodes[key].color
+                    edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id2), str(key))
+        else:
+            for key in nodes:
+                if nodes[key] == newNode2:
+                    id2 = key
+                    if nodes[key].name == "Unknown" and newNode2.name == "Client":
+                        nodes[key].name = "Client"
+                    break
+
+        newEdge = edge("owl:ObjectProperty", flow.num_bytes, flow.rst, 1, str(id1), str(id2))
+        if newEdge not in edges.values():#add new edge
+            edges[len(edges)] = newEdge
+        else:
+            for key in edges:#if edge in graph, add throughput to existed edge and increment connection
+                if edges[key] == newEdge:
+                    edges[key].TH = str(int(edges[key].TH) + int(flow.num_bytes))
+                    edges[key].C = str(int(edges[key].C) + 1)
+                    if flow.rst:
+                        print(str(edges[key]) + str(flow.rst))
+                        edges[key].RST = str(flow.rst)
+        newNode1 = None
+        newNode2 = None
+        id1 = None
+        id2 = None
+
+
+def write_json_output(fname:str):
+    output = open("json/" + fname + ".json", "w")#output
     output.write("{")
     output.write("\"class\":[")#write nodes
     for key in nodes:
@@ -199,10 +265,11 @@ def write_json_output():
 if __name__ == '__main__':
     setup_client()
     response = recv_message(sniffed_info_pb2.FlowArray)
-    #generate_graph(response, None, None, None, None)
-    while response is not None:
-        # Assuming that the incoming response type is a protobuf FlowArray object
-        for i, flow in enumerate(response.flows):
-            print(f'Received #{i+1}: {flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.num_bytes}-{flow.rst}')
-        response = recv_message(sniffed_info_pb2.FlowArray)
+    generate_graph(response)
+    write_json_output("tcp")
+    # while response is not None:
+    #     # Assuming that the incoming response type is a protobuf FlowArray object
+    #     for i, flow in enumerate(response.flows):
+    #         print(f'Received #{i+1}: {flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.num_bytes}-{flow.rst}')
+    #     response = recv_message(sniffed_info_pb2.FlowArray)
     stop_client()

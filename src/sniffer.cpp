@@ -132,7 +132,7 @@ void free_udphdr(udphdr* h)
 int main( int argc, char *argv[] )
 {
 
-   std::ofstream myfile, FP;
+   std::ofstream myfile;//, FP;
   //char ip[32];
   //char s[32]="ipv4(src=";
   //char port[6];char port1[6];
@@ -361,7 +361,7 @@ myfile.open("flows/flows.csv", std::ios_base::out);
     myfile.close();
 
  // performance metrics calcualation and dumping into file
-FP.open("logs/log.txt", std::ios_base::out); // using standard ports
+//FP.open("logs/log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
 
  for(int i = 0; i < flowarray.size(); i++) {
@@ -374,13 +374,13 @@ if (flowarray[i]->Packets.size() == 100 ) {
  diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
       }
       RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
-     FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
+     //FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
      
      add_to_flow_array(flowarray[i], RST);
 
 }
 else
-     { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
+     { //FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
      
      add_to_flow_array(flowarray[i]);
      
@@ -391,7 +391,7 @@ else
 
     send_message(flowarray);
 
-    FP.close();
+    //FP.close();
 
     for(int i = 0; i < flowarray.size(); i++)
     { 

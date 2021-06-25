@@ -18,7 +18,7 @@ The output shows the localhost's interface name connected to the YCSB webserver 
 6. Copy the compiled sniffer code into the shared folder by running `cp sniffer ../../shared`. Then run `cd ../../shared`
 7. Start the server with `sudo ./sniffer`
 8. In the third shell, run `cd /home/alohne/DyMonD`
-then start the client by running `python3 client.py`
+then start the client by running `python3 script.py`
 9. In the first shell, run the YCSB workload by using the following command:
 
 `./ycsb run jdbc  -P ../workloads/workloadc  -p jdbc.driver=com.mysql.jdbc.Driver  -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB  -p db.user=root  -p db.passwd=root  -s  -threads 20  -target 0  -p measurementtype=timeseries  -p timeseries.granularity=20000`
@@ -31,6 +31,6 @@ The sniffer program will sniff the given interface for 30 seconds and then produ
 1. Open two shell windows on the compute-04 node
 2. In both shells, run `cd /home/alohne/DyMonD`
 3. In the first shell, compile and run the server with `sudo ./sniffer.sh`
-4. In the second shell, run the client with `python3 client.py` and enter the information prompted by the client to start sniffing from an existing .pcap file
+4. In the second shell, run the client with `python3 script.py` and enter the information prompted by the client to start sniffing from an existing .pcap file
 
 The sniffer program will sniff the given file and then produces the "log.txt" & "flows.csv" files and ends.
