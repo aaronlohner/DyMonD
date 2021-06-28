@@ -1,3 +1,6 @@
+import sys
+import re
+from time import sleep
 import random
 from client import setup_client, stop_client, recv_message
 from proto_gen import sniffed_info_pb2
@@ -61,8 +64,8 @@ def getName(label):#get the IPaddress of a node from name
     return label[0:counter1], label[counter1:len(label)].upper()
 
 
-def generate_graph_from_file():
-    data = open("logs/log.txt", "r")#input
+def generate_graph_from_file(fname:str):
+    data = open("logs/" + fname, "r")#input
 
     newNode1 = None
     newNode2 = None
@@ -136,7 +139,7 @@ def generate_graph_from_file():
                         edges[key].TH = str(int(edges[key].TH) + int(th))
                         edges[key].C = str(int(edges[key].C) + 1)
                         if rst:
-                            print(str(edges[key]) + str(rst))
+                            # print(str(edges[key]) + str(rst))
                             edges[key].RST = rst
             rst = 0
             newNode1 = None
@@ -151,7 +154,7 @@ def generate_graph(flow_array:FlowArray):
     id1 = None
     id2 = None
 
-    for flow in response.flows:
+    for flow in flow_array.flows:
         if flow.s_port.isdigit() and not flow.d_port.isdigit():#node 1 is client and node2 is server
             newNode1 = node("owl:Class", "Client", flow.s_addr, flow.s_port, randomColor())
             newNode2 = node("owl:equivalentClass", getName(flow.d_port)[1], flow.d_addr, getName(flow.d_port)[0],randomColor())
@@ -208,7 +211,7 @@ def generate_graph(flow_array:FlowArray):
                     edges[key].TH = str(int(edges[key].TH) + int(flow.num_bytes))
                     edges[key].C = str(int(edges[key].C) + 1)
                     if flow.rst:
-                        print(str(edges[key]) + str(flow.rst))
+                        # print(str(edges[key]) + str(flow.rst))
                         edges[key].RST = str(flow.rst)
         newNode1 = None
         newNode2 = None
@@ -217,6 +220,7 @@ def generate_graph(flow_array:FlowArray):
 
 
 def write_json_output(fname:str):
+    print("Writing json output")
     output = open("json/" + fname + ".json", "w")#output
     output.write("{")
     output.write("\"class\":[")#write nodes
@@ -263,13 +267,33 @@ def write_json_output(fname:str):
     output.close()  
 
 if __name__ == '__main__':
-    setup_client()
-    response = recv_message(sniffed_info_pb2.FlowArray)
-    generate_graph(response)
-    write_json_output("tcp")
-    # while response is not None:
-    #     # Assuming that the incoming response type is a protobuf FlowArray object
-    #     for i, flow in enumerate(response.flows):
-    #         print(f'Received #{i+1}: {flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.num_bytes}-{flow.rst}')
-    #     response = recv_message(sniffed_info_pb2.FlowArray)
+    arg_line = " ".join(sys.argv[1:])
+    if re.match("-[if]\s+(\w*(.pcap)?\s+)?-t\s+(y|Y|Yes|yes|n|N|No|no)$", arg_line) is None:
+        raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> -t <y|n>")
+
+    arg = sys.argv[2]
+    if sys.argv[1] == "-i" and len(sys.argv) == 4:
+        print("Using e69b93ccc8384_l")
+        arg = "e69b93ccc8384_l"
+    elif sys.argv[1] == "-f" and len(sys.argv) == 4:
+        print("Using teastoreall.pcap")
+        arg = "teastoreall.pcap"
+
+    tcp = None
+    if len(sys.argv) == 5:
+        tcp = sys.argv[4][0].lower()
+    else:
+        tcp = sys.argv[3][0].lower()
+    setup_client(sys.argv[1][1], arg, tcp)
+
+    if tcp == "y":
+        response = recv_message(sniffed_info_pb2.FlowArray)
+        print("Received response from sniffer")
+        generate_graph(response)
+    else:
+        sleep(0.5)
+        print("Reading from file")
+        generate_graph_from_file("log.txt")
+
+    write_json_output("out")
     stop_client()

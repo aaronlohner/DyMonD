@@ -29,25 +29,14 @@ def recv_message(msg_type) -> FlowArray:
     msg = msg_type()
     msg.ParseFromString(data)
     return msg
+from time import sleep
 
-def setup_client():
-    #with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+def setup_client(mode:chr, arg:str, tcp:str):
     s.connect((HOST, PORT))
+    send_message(mode + tcp)
+    sleep(0.1)
+    send_message(arg)
 
-    mode = None
-    while mode != 'l' and mode != 'o':
-        mode = input("Type 'l' for live mode, 'o' for offline mode: ")
-    send_message(mode)
-
-    if mode == 'l':
-        txt = input("Enter the Network Interface name or leave blank to use e69b93ccc8384_l: ")
-        if len(txt) == 0:
-            txt = "e69b93ccc8384_l"
-    else:
-        txt = input("Enter the file name (must be a .pcap file in the captures folder) or leave blank to use teastoreall.pcap: ")
-        if len(txt) == 0:
-            txt = "teastoreall.pcap"
-    send_message(txt)
     
 def stop_client():
     s.close()

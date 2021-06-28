@@ -34,3 +34,6 @@ The sniffer program will sniff the given interface for 30 seconds and then produ
 4. In the second shell, run the client with `python3 script.py` and enter the information prompted by the client to start sniffing from an existing .pcap file
 
 The sniffer program will sniff the given file and then produces the "log.txt" & "flows.csv" files and ends.
+
+
+g++ -g -o sniffer2 sniifer_MT_URLS.cpp -lpcap -lboost_filesystem -lboost_system -pthread -Iinclude

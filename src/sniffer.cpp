@@ -132,13 +132,13 @@ void free_udphdr(udphdr* h)
 int main( int argc, char *argv[] )
 {
 
-   std::ofstream myfile;//, FP;
+   std::ofstream FP, myfile;
   //char ip[32];
   //char s[32]="ipv4(src=";
   //char port[6];char port1[6];
    char errbuf[PCAP_ERRBUF_SIZE];
    memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-    char on_off_line[1], token[32];//char *token=NULL;
+    char buff[2], mode, token[32], tcp;//char *token=NULL;
     char* raw = NULL;
     pcap_t* cap = NULL;
     struct pcap_pkthdr pkthdr;
@@ -154,8 +154,10 @@ int main( int argc, char *argv[] )
     vector<struct flow*> flowarray;
 
     setup_server(); // prepare server for incoming client tcp connection
-    receive_message(on_off_line); // receive indication if using live mode or not
-    receive_message(token); // receive network interface name (live) or name of pcap file (offline)
+    receive_message(buff);
+    mode = buff[0]; // receive indication if using interface or reading from file
+    tcp = buff[1]; // receive indication if sending via tcp or writing to file
+    receive_message(token);  // receive network interface name or name of pcap file
 
     if(token !=NULL)
     {
@@ -164,7 +166,7 @@ int main( int argc, char *argv[] )
     
         time_t start, end;
         double elapsed;
-        if(on_off_line[0] == 'l')
+        if(mode == 'i')
         {
             printf("Opening live thread on %s\n", token);
             cap = pcap_open_live(token, 65535, 1, 1000, errbuf);
@@ -189,9 +191,9 @@ int main( int argc, char *argv[] )
             }
         }
 
-        while((on_off_line[0] == 'l' && elapsed <= 30.0) || on_off_line[0] == 'o')
+        while((mode == 'i' && elapsed <= 30.0) || mode == 'f')
         {
-        //printf("mode, time: %c, %f", on_off_line[0], elapsed);
+        //printf("mode, time: %c, %f", mode, elapsed);
         raw = (char *)pcap_next(cap, &(pkthdr));
         if( NULL != raw)
 {
@@ -329,12 +331,12 @@ free_iphdr(ip_hdr);
     else //if raw == NULL
     { 
         printf("raw is null \n");
-        if(on_off_line[0] == 'o') {
+        if(mode == 'f') {
             break;
         }
     }
 
-    if(on_off_line[0] == 'l') {
+    if(mode == 'i') {
         end = time(NULL);
         elapsed = difftime(end, start);
     }
@@ -360,10 +362,8 @@ myfile.open("flows/flows.csv", std::ios_base::out);
 }
     myfile.close();
 
- // performance metrics calcualation and dumping into file
-//FP.open("logs/log.txt", std::ios_base::out); // using standard ports
  double diff, RST;
-
+if(tcp == 'y'){
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {
    if(flowarray[i]->Ack_times.size()>1)
@@ -374,13 +374,12 @@ if (flowarray[i]->Packets.size() == 100 ) {
  diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
       }
       RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
-     //FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
      
      add_to_flow_array(flowarray[i], RST);
 
 }
 else
-     { //FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
+     {
      
      add_to_flow_array(flowarray[i]);
      
@@ -388,10 +387,33 @@ else
 
 }
  }
-
     send_message(flowarray);
+} else {
+        FP.open("logs/log.txt", std::ios_base::out); // using standard ports
+        for(int i = 0; i < flowarray.size(); i++) {
+    if (flowarray[i]->Packets.size() == 100 ) {
+    if(flowarray[i]->Ack_times.size()>1)
+    {
+    diff=0.0;
+    for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) 
+        {	if (j!=flowarray[i]->Ack_times.size()-1)
+    diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
+        }
+        RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
+        FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "-"<< RST<<"\n";
+        
 
-    //FP.close();
+    }
+    else
+        { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
+        
+        
+        }
+
+    }
+    }
+    FP.close();
+}
 
     for(int i = 0; i < flowarray.size(); i++)
     { 
