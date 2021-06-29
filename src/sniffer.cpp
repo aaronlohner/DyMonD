@@ -138,7 +138,7 @@ int main( int argc, char *argv[] )
   //char port[6];char port1[6];
    char errbuf[PCAP_ERRBUF_SIZE];
    memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-    char buff[1], mode, token[32], log[32];//char *token=NULL;
+    char mode_buf[1], mode, token[32], log[32];//char *token=NULL;
     char* raw = NULL;
     pcap_t* cap = NULL;
     struct pcap_pkthdr pkthdr;
@@ -154,11 +154,10 @@ int main( int argc, char *argv[] )
     vector<struct flow*> flowarray;
 
     setup_server(); // prepare server for incoming client tcp connection
-    receive_message(buff);
-    mode = buff[0]; // receive indication if using interface or reading from file
+    receive_message(mode_buf);
+    mode = mode_buf[0]; // receive indication if using interface or reading from file
     receive_message(token);  // receive network interface name or name of pcap file
-    log[0] = 0;
-    receive_message(log); // receive indication if sending via tcp or writing to file
+    receive_message(log); // receive indication if sending via tcp or writing to logfile
 
     if(token !=NULL)
     {
