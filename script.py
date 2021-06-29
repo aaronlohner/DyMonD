@@ -268,32 +268,36 @@ def write_json_output(fname:str):
 
 if __name__ == '__main__':
     arg_line = " ".join(sys.argv[1:])
-    if re.match("-[if]\s+(\w*(.pcap)?\s+)?-t\s+(y|Y|Yes|yes|n|N|No|no)$", arg_line) is None:
-        raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> -t <y|n>")
+    if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
+        raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
 
-    arg = sys.argv[2]
-    if sys.argv[1] == "-i" and len(sys.argv) == 4:
+    arg = None
+    if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
         print("Using e69b93ccc8384_l")
         arg = "e69b93ccc8384_l"
-    elif sys.argv[1] == "-f" and len(sys.argv) == 4:
+    elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
         print("Using teastoreall.pcap")
         arg = "teastoreall.pcap"
-
-    tcp = None
-    if len(sys.argv) == 5:
-        tcp = sys.argv[4][0].lower()
     else:
-        tcp = sys.argv[3][0].lower()
-    setup_client(sys.argv[1][1], arg, tcp)
+        arg = sys.argv[2]
 
-    if tcp == "y":
+    log = None
+    if "-w" in sys.argv:
+        if sys.argv[-1] != "-w":
+            log = sys.argv[-1]
+        else:
+            log = "log.txt"
+
+    setup_client(sys.argv[1][1], arg, log)
+
+    if log is None:
         response = recv_message(sniffed_info_pb2.FlowArray)
         print("Received response from sniffer")
         generate_graph(response)
     else:
-        sleep(0.5)
+        sleep(2)
         print("Reading from file")
-        generate_graph_from_file("log.txt")
+        generate_graph_from_file(log)
 
     write_json_output("out")
     stop_client()

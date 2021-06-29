@@ -31,11 +31,13 @@ def recv_message(msg_type) -> FlowArray:
     return msg
 from time import sleep
 
-def setup_client(mode:chr, arg:str, tcp:str):
+def setup_client(mode:chr, arg:str, log:str):
     s.connect((HOST, PORT))
-    send_message(mode + tcp)
+    send_message(mode)
     sleep(0.1)
     send_message(arg)
+    sleep(0.1)
+    send_message(log)
 
     
 def stop_client():

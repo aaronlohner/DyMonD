@@ -138,7 +138,7 @@ int main( int argc, char *argv[] )
   //char port[6];char port1[6];
    char errbuf[PCAP_ERRBUF_SIZE];
    memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-    char buff[2], mode, token[32], tcp;//char *token=NULL;
+    char buff[1], mode, token[32], log[32];//char *token=NULL;
     char* raw = NULL;
     pcap_t* cap = NULL;
     struct pcap_pkthdr pkthdr;
@@ -156,8 +156,9 @@ int main( int argc, char *argv[] )
     setup_server(); // prepare server for incoming client tcp connection
     receive_message(buff);
     mode = buff[0]; // receive indication if using interface or reading from file
-    tcp = buff[1]; // receive indication if sending via tcp or writing to file
     receive_message(token);  // receive network interface name or name of pcap file
+    log[0] = 0;
+    receive_message(log); // receive indication if sending via tcp or writing to file
 
     if(token !=NULL)
     {
@@ -363,7 +364,7 @@ myfile.open("flows/flows.csv", std::ios_base::out);
     myfile.close();
 
  double diff, RST;
-if(tcp == 'y'){
+if(log[0] == 0){
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {
    if(flowarray[i]->Ack_times.size()>1)
@@ -389,7 +390,9 @@ else
  }
     send_message(flowarray);
 } else {
-        FP.open("logs/log.txt", std::ios_base::out); // using standard ports
+        string log_str = "logs/";
+        log_str.append(log);
+        FP.open(log_str, std::ios_base::out); // using standard ports
         for(int i = 0; i < flowarray.size(); i++) {
     if (flowarray[i]->Packets.size() == 100 ) {
     if(flowarray[i]->Ack_times.size()>1)
