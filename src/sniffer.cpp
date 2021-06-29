@@ -364,7 +364,7 @@ myfile.open("flows/flows.csv", std::ios_base::out);
     myfile.close();
 
  double diff, RST;
-if(log[0] == 0){
+if(log[0] == '*'){ // '*' indicates that log shouldn't be used: instead tcp
  for(int i = 0; i < flowarray.size(); i++) {
 if (flowarray[i]->Packets.size() == 100 ) {
    if(flowarray[i]->Ack_times.size()>1)

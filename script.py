@@ -281,7 +281,7 @@ if __name__ == '__main__':
     else:
         arg = sys.argv[2]
 
-    log = None
+    log = "*"
     if "-w" in sys.argv:
         if sys.argv[-1] != "-w":
             log = sys.argv[-1]
@@ -290,12 +290,15 @@ if __name__ == '__main__':
 
     setup_client(sys.argv[1][1], arg, log)
 
-    if log is None:
+    if log == "*": # special char to denote no log to read from
         response = recv_message(sniffed_info_pb2.FlowArray)
         print("Received response from sniffer")
         generate_graph(response)
     else:
-        sleep(2)
+        if sys.argv[1] == "-f":
+            sleep(2)
+        else:
+            sleep(30)
         print("Reading from file")
         generate_graph_from_file(log)
 
