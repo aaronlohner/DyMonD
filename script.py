@@ -276,8 +276,8 @@ if __name__ == '__main__':
         print("Using e69b93ccc8384_l")
         arg = "e69b93ccc8384_l"
     elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-        print("Using teastoreall.pcap")
-        arg = "teastoreall.pcap"
+        print("Using teastore.pcap")
+        arg = "teastore.pcap"
     else:
         arg = sys.argv[2]
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
         generate_graph(response)
     else:
         if sys.argv[1] == "-f":
-            sleep(2)
+            sleep(5)
         else:
             sleep(30)
         print("Reading from file")

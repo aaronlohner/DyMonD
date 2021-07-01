@@ -34,9 +34,9 @@ from time import sleep
 def setup_client(mode:chr, arg:str, log:str):
     s.connect((HOST, PORT))
     send_message(mode)
-    sleep(0.1)
+    sleep(0.2)
     send_message(arg)
-    sleep(0.1)
+    sleep(0.2)
     send_message(log)
 
     
