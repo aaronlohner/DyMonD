@@ -54,6 +54,14 @@ void setup_server() {
 }
 
 /*
+ * Close the socket conection with client
+ */
+void stop_server(){
+	close(client_fd);
+	printf("Server disconnected from client\n");
+}
+
+/*
  * Read incoming message into input buffer
  */
 void receive_message(char *inputBuffer) {

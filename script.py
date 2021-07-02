@@ -290,15 +290,19 @@ if __name__ == '__main__':
 
     setup_client(sys.argv[1][1], arg, log)
 
-    if log == "*": # special char to denote no log to read from
+    if log == "*": # special char to denote that there is no log to read from
         response = recv_message(sniffed_info_pb2.FlowArray)
         print("Received response from sniffer")
         generate_graph(response)
     else:
-        if sys.argv[1] == "-f":
-            sleep(5)
-        else:
-            sleep(30)
+        # if sys.argv[1] == "-f": # read/write to file
+        #     sleep(5)
+        # else: # interface, write to file
+        #     sleep(30)
+
+        # Proceed to read from logfile only when sniffer closes connection and sends a blank message,
+        # indicating it is done writing to logfile
+        recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
 

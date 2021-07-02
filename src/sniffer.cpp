@@ -163,6 +163,7 @@ int main( int argc, char *argv[] )
     {
 
         printf("Starting to sniff for packets\n");
+        
     
         time_t start, end;
         double elapsed;
@@ -407,14 +408,16 @@ else
 
     }
     else
-        { FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
-        
+        { 
+            
+            FP<<flowarray[i]->saddr << ":"<<flowarray[i]->sport<< " " << flowarray[i]->daddr<< ":"<< flowarray[i]->dport<< " "<< flowarray[i]->NumBytes/30<< "\n";
         
         }
 
     }
     }
     FP.close();
+    stop_server();
 }
 
     for(int i = 0; i < flowarray.size(); i++)

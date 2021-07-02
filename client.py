@@ -1,7 +1,7 @@
 import sys
 import socket
-from proto_gen import sniffed_info_pb2
-from proto_gen.sniffed_info_pb2 import FlowArray, Flow
+from time import sleep
+from proto_gen.sniffed_info_pb2 import FlowArray
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 8080         # The port used by the server
@@ -29,7 +29,6 @@ def recv_message(msg_type) -> FlowArray:
     msg = msg_type()
     msg.ParseFromString(data)
     return msg
-from time import sleep
 
 def setup_client(mode:chr, arg:str, log:str):
     s.connect((HOST, PORT))
