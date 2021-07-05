@@ -293,6 +293,8 @@ if __name__ == '__main__':
             log = "log.txt"
 
     t = time.perf_counter()
+
+    '''ORIGINAL VERSION
     setup_client(sys.argv[1][1], arg, log)
 
     if log == "*": # special char to denote that there is no log to read from
@@ -305,7 +307,52 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-        
+    '''
+    '''NEW VERSION'''
+    if sys.argv[1] == "-f": # reading from pcap file
+        # setup_client(arg, log)  
+        if log == "*": # special char to denote that there is no log to read from
+            response = recv_message(sniffed_info_pb2.FlowArray)
+            print("Received response from sniffer")
+            generate_graph(response)
+        else:
+            # Proceed to read from logfile only when sniffer closes connection and sends a
+            # blank message, indicating it is done writing to logfile
+            recv_message(None)
+            print("Reading from file")
+            generate_graph_from_file(log)
+    else: # sniffing network interface
+        # setup_client(log)
+        q = [arg]
+        f = None
+        if log == "*":
+            l = FlowArray()
+            while len(q) > 0:
+                ip = q.pop(0)
+                # instead of starting sniffing immediately after setup_client() data is received,
+                # interface should be sent from here
+                # sniff()
+                f = recv_message(sniffed_info_pb2.FlowArray)
+                l.add(f) # see how to do this in API
+                ips = next_hop_extractor(f, ip)
+                for elem in ips:
+                    q.append(elem)
+            generate_graph(l)
+        else:
+            l = None # open a new master list txt file
+            while len(q) > 0:
+                ip = q.pop(0)
+                # instead of starting sniffing immediately after setup_client() data is received,
+                # interface should be sent from here
+                # sniff()
+                recv_message(None)
+                l = None # append contents of file represented by l to f (then remove f?)
+                ips = next_hop_extractor(f, ip)
+                for elem in ips:
+                    q.append(elem)
+            generate_graph_from_file(log)
+        ''''''
+
     write_json_output("out")
     print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
     stop_client()
