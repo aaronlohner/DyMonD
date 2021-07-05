@@ -1,6 +1,6 @@
 import sys
 import re
-from time import sleep
+import time
 import random
 from client import setup_client, stop_client, recv_message
 from proto_gen import sniffed_info_pb2
@@ -140,7 +140,9 @@ def generate_graph_from_file(fname:str):
                         edges[key].C = str(int(edges[key].C) + 1)
                         if rst:
                             # print(str(edges[key]) + str(rst))
-                            edges[key].RST = rst
+                            oRST = float(edges[key].RST)
+                            oC = float(edges[key].C)
+                            edges[key].RST = str((oRST*(oC-1) + float(rst))/oC)
             rst = 0
             newNode1 = None
             newNode2 = None
@@ -212,7 +214,9 @@ def generate_graph(flow_array:FlowArray):
                     edges[key].C = str(int(edges[key].C) + 1)
                     if flow.rst:
                         # print(str(edges[key]) + str(flow.rst))
-                        edges[key].RST = str(flow.rst)
+                        oRST = float(edges[key].RST)
+                        oC = float(edges[key].C)
+                        edges[key].RST = str((oRST*(oC-1) + float(flow.rst))/oC)
         newNode1 = None
         newNode2 = None
         id1 = None
@@ -276,8 +280,8 @@ if __name__ == '__main__':
         print("Using e69b93ccc8384_l")
         arg = "e69b93ccc8384_l"
     elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-        print("Using teastore.pcap")
-        arg = "teastore.pcap"
+        print("Using teastoreall.pcap")
+        arg = "teastoreall.pcap"
     else:
         arg = sys.argv[2]
 
@@ -288,23 +292,20 @@ if __name__ == '__main__':
         else:
             log = "log.txt"
 
+    t = time.perf_counter()
     setup_client(sys.argv[1][1], arg, log)
 
     if log == "*": # special char to denote that there is no log to read from
         response = recv_message(sniffed_info_pb2.FlowArray)
         print("Received response from sniffer")
         generate_graph(response)
-    else:
-        # if sys.argv[1] == "-f": # read/write to file
-        #     sleep(5)
-        # else: # interface, write to file
-        #     sleep(30)
-
+    else: # read from log
         # Proceed to read from logfile only when sniffer closes connection and sends a blank message,
         # indicating it is done writing to logfile
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-
+        
     write_json_output("out")
+    print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
     stop_client()
