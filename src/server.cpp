@@ -72,10 +72,11 @@ void receive_message(char *inputBuffer) {
 	// Only continue once message is received
 	while (!valread) valread = recv(client_fd, &mesg_len_buf, 4, 0);
 	mesg_length = ntohl(mesg_len_buf);
-	
-	recv(client_fd, inputBuffer, mesg_length, 0);
+	recv(client_fd, buffer, mesg_length, 0);
+	strncpy(inputBuffer, buffer, mesg_length);
 	printf("Received: %s\n", inputBuffer);
 	// Reset global variable for future incoming messages
+	memset(buffer, 0, sizeof(buffer));
 	valread = 0;
 }
 

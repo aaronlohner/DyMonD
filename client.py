@@ -9,8 +9,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def send_message(mesg:str) -> None:
     """Send a message though the TCP socket."""
+    #length = sys.getsizeof(mesg)
     mesg = bytes(mesg.encode('utf-8'))
     length = sys.getsizeof(mesg)
+    print(f"Length: {length}")
     # First send the message length
     s.send(length.to_bytes(4, byteorder="big"))
     s.send(mesg)
@@ -30,15 +32,25 @@ def recv_message(msg_type) -> FlowArray:
     msg.ParseFromString(data)
     return msg
 
-def setup_client(mode:chr, arg:str, log:str):
+''''''
+def setup_client(mode:str, arg:str, log:str):
     s.connect((HOST, PORT))
     send_message(mode)
     sleep(0.2)
     send_message(arg)
     sleep(0.2)
     send_message(log)
+''''''
+'''
+def setup_client(mode:chr):
+    s.connect((HOST, PORT))
+    send_message(mode)
 
-    
+def sniff(arg:str, log:str):
+    send_message(arg)
+    sleep(0.2)
+    send_message(log)
+'''
 def stop_client():
     s.close()
     print("Disconnected from server")

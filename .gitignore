@@ -8,6 +8,7 @@ logs/
 
 *.zip
 *.pyc
+*-old*
 
 sniffer
 sniffer2

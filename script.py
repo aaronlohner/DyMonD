@@ -2,9 +2,9 @@ import sys
 import re
 import time
 import random
-from client import setup_client, stop_client, recv_message
+from client import setup_client, stop_client, recv_message#, sniff
 from proto_gen import sniffed_info_pb2
-from proto_gen.sniffed_info_pb2 import FlowArray, Flow
+from proto_gen.sniffed_info_pb2 import FlowArray
 
 # THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
 
@@ -270,6 +270,9 @@ def write_json_output(fname:str):
     output.write("]\n}")
     output.close()  
 
+def next_hop_extractor(f, ip):# -> List[T]: # make two functions, one for logfile, one for interface?
+    return
+
 if __name__ == '__main__':
     arg_line = " ".join(sys.argv[1:])
     if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
@@ -278,10 +281,10 @@ if __name__ == '__main__':
     arg = None
     if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
         print("Using e69b93ccc8384_l")
-        arg = "e69b93ccc8384_l"
+        arg = "e69b93ccc8384_l" # default network interface from compute-04 node
     elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
         print("Using teastoreall.pcap")
-        arg = "teastoreall.pcap"
+        arg = "teastoreall.pcap" # default pcap file
     else:
         arg = sys.argv[2]
 
@@ -294,8 +297,8 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
 
-    '''ORIGINAL VERSION
-    setup_client(sys.argv[1][1], arg, log)
+    '''ORIGINAL VERSION'''
+    setup_client(str(sys.argv[1][1]), str(arg), log)
 
     if log == "*": # special char to denote that there is no log to read from
         response = recv_message(sniffed_info_pb2.FlowArray)
@@ -307,10 +310,12 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-    '''
-    '''NEW VERSION'''
+    ''''''
+
+    '''NEW VERSION
+    setup_client(sys.argv[1][1])
     if sys.argv[1] == "-f": # reading from pcap file
-        # setup_client(arg, log)  
+        sniff(arg, log)
         if log == "*": # special char to denote that there is no log to read from
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
@@ -351,7 +356,7 @@ if __name__ == '__main__':
                 for elem in ips:
                     q.append(elem)
             generate_graph_from_file(log)
-        ''''''
+        '''
 
     write_json_output("out")
     print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")

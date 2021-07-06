@@ -1,22 +1,18 @@
-#include <assert.h> /* assert */
-#include <iostream>
+// #include <assert.h> /* assert */
+// #include <iostream>
 #include <pthread.h>
 #include <mutex>          // std::mutex
-#include <bits/stdc++.h>
-#include <boost/filesystem.hpp>
-#include <string.h>
-#include <pcap/pcap.h>
-#include <netinet/in.h>
-#include <time.h>
+// #include <bits/stdc++.h>
+// #include <boost/filesystem.hpp>
+// #include <string.h>
+// #include <pcap/pcap.h>
+// #include <netinet/in.h>
+// #include <time.h>
 #include <queue>
-//#include </home/shared/Utils.hpp>
-#include <Utils.hpp>
+#include <Utils.hpp> // modified
 #include <ctime>
-// #include <sniffer.hpp>
-// #include <server.hpp>
-using namespace std;
-using namespace boost::filesystem;
-
+#include <sniffer.hpp> // needed for flow struct defn
+#include <server.hpp> // needed for server method calls
 
 std::mutex mtx;
 vector<struct flow*> flowarray;
@@ -317,6 +313,16 @@ capture_main(void *) {
 }
 
 
+/***********************************
+ 
+ ***********************************
+ 
+ **** MAIN STARTS HERE ****
+ 
+ ***********************************
+
+***********************************/
+
 int main(int argc, char *argv[]){
     std::ofstream myfile, FP, file;
     int b = 0; 	int opt;
@@ -326,22 +332,42 @@ int main(int argc, char *argv[]){
 
 
 
-InitMethodName();    
-while((opt = getopt(argc, argv, ":i:f:p")) != -1){
-		switch(opt){
+InitMethodName();
+// while((opt = getopt(argc, argv, ":i:f:p")) != -1){
+// 		switch(opt){
+// 			case 'i':
+// 				interface = optarg; break;
+// 			case 'p':
+// 		                ipaddress = optarg; break;
+// 			case 'f':
+// 			        tracefile = optarg; break;
+// 		}
+// 	}
+
+char mode_buf[64], arg[64], log[64];
+
+setup_server(); // prepare server for incoming client tcp connection
+receive_message(mode_buf); // receive indication if using interface or reading from file
+receive_message(arg);  // receive network interface name or name of pcap file
+receive_message(log); // receive indication if sending via tcp or writing to logfile
+opt = mode_buf[0];
+string capture_dir = "captures/";
+capture_dir.append(arg);
+switch(opt){
 			case 'i':
-				interface = optarg; break;
+				interface = arg; break;
 			case 'p':
-		                ipaddress = optarg; break;
+		                ipaddress = arg; break;
 			case 'f':
-			        tracefile = optarg; break;
+                    tracefile = (char*)capture_dir.c_str(); break;
 		}
-	}
+
+
  if (interface != NULL)
     LiveMode=true;
         
-	/* Start packet receiving thread */
-	pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
+	    /* Start packet receiving thread */
+	    pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
         /* Start main capture in live or offline mode */
         pthread_create(&capture, NULL, &capture_main, NULL);
 
@@ -391,6 +417,8 @@ while((opt = getopt(argc, argv, ":i:f:p")) != -1){
     FP.open("logs/log.txt", std::ios_base::out); // using standard ports
      double diff, RST;
 
+    if(log[0] != '*'){ // anything but '*' indicates that log should be used
+    printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
              if (flowarray[i]->Ack_times.size() > 1) {
@@ -411,6 +439,33 @@ while((opt = getopt(argc, argv, ":i:f:p")) != -1){
          }
      }
      FP.close();
+     stop_server();
+    } else { // use tcp
+        for(int i = 0; i < flowarray.size(); i++) {
+            if (flowarray[i]->Packets.size() == 100 ) {
+            if(flowarray[i]->Ack_times.size()>1)
+            {
+            diff=0.0;
+            for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) 
+                {	if (j!=flowarray[i]->Ack_times.size()-1)
+            diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
+                }
+                RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
+                
+                add_to_flow_array(flowarray[i], RST);
+
+            }
+            else
+                {
+                
+                add_to_flow_array(flowarray[i]);
+                
+                }
+
+            }
+        }
+        send_message(flowarray);
+    }
 
 
      for(int i = 0; i < flowarray.size(); i++)
