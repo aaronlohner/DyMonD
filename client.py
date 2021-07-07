@@ -9,10 +9,8 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def send_message(mesg:str) -> None:
     """Send a message though the TCP socket."""
-    #length = sys.getsizeof(mesg)
     mesg = bytes(mesg.encode('utf-8'))
     length = sys.getsizeof(mesg)
-    print(f"Length: {length}")
     # First send the message length
     s.send(length.to_bytes(4, byteorder="big"))
     s.send(mesg)

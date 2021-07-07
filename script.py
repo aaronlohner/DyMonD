@@ -126,7 +126,7 @@ def generate_graph_from_file(fname:str):
                         break
                         
             if "-" in weight:#if edge information contains more than throughput, add more information to the edge
-                th, rst = weight.split("-")
+                th, rst = weight.split("-", 1)
                 newEdge = edge("owl:ObjectProperty", th, rst,1, str(id1), str(id2))
             else:#only throughput
                 th = weight
@@ -141,7 +141,7 @@ def generate_graph_from_file(fname:str):
                         if rst:
                             # print(str(edges[key]) + str(rst))
                             oRST = float(edges[key].RST)
-                            oC = float(edges[key].C)
+                            oC = int(edges[key].C)
                             edges[key].RST = str((oRST*(oC-1) + float(rst))/oC)
             rst = 0
             newNode1 = None
@@ -215,7 +215,7 @@ def generate_graph(flow_array:FlowArray):
                     if flow.rst:
                         # print(str(edges[key]) + str(flow.rst))
                         oRST = float(edges[key].RST)
-                        oC = float(edges[key].C)
+                        oC = int(edges[key].C)
                         edges[key].RST = str((oRST*(oC-1) + float(flow.rst))/oC)
         newNode1 = None
         newNode2 = None
