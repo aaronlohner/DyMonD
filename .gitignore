@@ -5,6 +5,7 @@ captures/
 flows/
 json/
 logs/
+test/
 
 *.zip
 *.pyc

@@ -333,38 +333,41 @@ int main(int argc, char *argv[]){
 
 
 InitMethodName();
-// while((opt = getopt(argc, argv, ":i:f:p")) != -1){
-// 		switch(opt){
-// 			case 'i':
-// 				interface = optarg; break;
-// 			case 'p':
-// 		                ipaddress = optarg; break;
-// 			case 'f':
-// 			        tracefile = optarg; break;
-// 		}
-// 	}
-
-char mode_buf[64], arg[64], log[64];
-
-setup_server(); // prepare server for incoming client tcp connection
-receive_message(mode_buf); // receive indication if using interface or reading from file
-receive_message(arg);  // receive network interface name or name of pcap file
-receive_message(log); // receive indication if sending via tcp or writing to logfile
-opt = mode_buf[0];
-string capture_dir = "captures/";
-capture_dir.append(arg);
-switch(opt){
+while((opt = getopt(argc, argv, "i:f:p")) != -1){ // runs if no opt used as well
+		switch(opt){
 			case 'i':
-				interface = arg; break;
+				interface = optarg; break;
 			case 'p':
-		                ipaddress = arg; break;
+		                ipaddress = optarg; break;
 			case 'f':
-                    tracefile = (char*)capture_dir.c_str(); break;
+			        tracefile = optarg; break;
 		}
+	}
 
+char mode_buf[1], arg[32], log[32];
+string capture_dir = "captures/";
+if(argc == 1){
+    setup_server(); // prepare server for incoming client tcp connection
+    receive_message(mode_buf); // receive indication if using interface or reading from file
+    receive_message(arg);  // receive network interface name or name of pcap file
+    receive_message(log); // receive indication if sending via tcp or writing to logfile
+    opt = mode_buf[0];
+    capture_dir.append(arg);
+    switch(opt){
+                case 'i':
+                    interface = arg; break;
+                case 'p':
+                            ipaddress = arg; break;
+                case 'f':
+                        tracefile = (char*)capture_dir.c_str(); break;
+            }
+} else {
+    log[0] = '\0';
+}
+//printf("mode: %c, arg: %s, log: %s, trace: %s, int: %s\n", mode_buf[0], arg, log, tracefile, interface);
 
- if (interface != NULL)
-    LiveMode=true;
+ if (interface != NULL) { 
+    LiveMode=true;}
         
 	    /* Start packet receiving thread */
 	    pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
@@ -412,12 +415,17 @@ switch(opt){
         }
     }
     myfile.close();
-
-     // performance metrics clacualation and dumping into file
-    FP.open("logs/log.txt", std::ios_base::out); // using standard ports
      double diff, RST;
 
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
+    // performance metrics clacualation and dumping into file
+    string log_str = "logs/";
+    if(strlen(log) == 0){
+        log_str.append("log.txt");
+    } else {
+        log_str.append(log);
+    }
+    FP.open(log_str, std::ios_base::out); // using standard ports
     printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {

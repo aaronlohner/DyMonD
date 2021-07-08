@@ -2,7 +2,7 @@ import sys
 import re
 import time
 import random
-from client import setup_client, stop_client, recv_message#, sniff
+from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray
 
@@ -297,7 +297,7 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
 
-    '''ORIGINAL VERSION'''
+    '''ORIGINAL VERSION
     setup_client(str(sys.argv[1][1]), str(arg), log)
 
     if log == "*": # special char to denote that there is no log to read from
@@ -310,9 +310,9 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-    ''''''
+    '''
 
-    '''NEW VERSION
+    '''NEW VERSION'''
     setup_client(sys.argv[1][1])
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg, log)
@@ -320,7 +320,7 @@ if __name__ == '__main__':
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
             generate_graph(response)
-        else:
+        else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
             recv_message(None)
@@ -338,7 +338,7 @@ if __name__ == '__main__':
                 # interface should be sent from here
                 # sniff()
                 f = recv_message(sniffed_info_pb2.FlowArray)
-                l.add(f) # see how to do this in API
+                l.add(f) # see how to do this in API - only add unique flows
                 ips = next_hop_extractor(f, ip)
                 for elem in ips:
                     q.append(elem)
@@ -351,12 +351,12 @@ if __name__ == '__main__':
                 # interface should be sent from here
                 # sniff()
                 recv_message(None)
-                l = None # append contents of file represented by l to f (then remove f?)
+                l = None # append contents of file represented by l to f (then remove f?) - only add unique flows
                 ips = next_hop_extractor(f, ip)
                 for elem in ips:
                     q.append(elem)
             generate_graph_from_file(log)
-        '''
+        ''''''
 
     write_json_output("out")
     print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
