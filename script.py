@@ -61,10 +61,10 @@ def getName(label):#get the IPaddress of a node from name
         if label[counter2] == '/':
             break
     if counter2 == len(label)-1: counter2 = len(label)
-    return label[0:counter1], label[counter1:len(label)].upper()
+    return label[0:counter1], label[counter1:len(label)].upper() # port, service type
 
 
-def generate_graph_from_file(fname:str):
+def generate_graph_from_file_legacy(fname:str):
     data = open("logs/" + fname, "r")#input
 
     newNode1 = None
@@ -85,6 +85,92 @@ def generate_graph_from_file(fname:str):
                 newNode1 = node("owl:equivalentClass", getName(node12)[1], (node1.split(":")[0]), getName(node12)[0],randomColor())
                 newNode2 = node("owl:Class", "Client", node2.split(":")[0], node22, randomColor())
             elif node12.isdigit() and node22.isdigit():#both nodes are not server
+                newNode1 = node("owl:Class", "Unknown", node1.split(":")[0], node12,randomColor())
+                newNode2 = node("owl:Class", "Unknown", node2.split(":")[0], node22,randomColor())
+            if newNode1 not in nodes.values():#if node 1 is not included in graph
+                id1 = len(nodes)
+                nodes[len(nodes)] = newNode1#expand node list
+                
+                for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
+                    if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
+                        newNode1.color = nodes[key].color
+                        edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
+                    elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
+                        newNode1.color = nodes[key].color
+                        edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
+            else:
+                for key in nodes:
+                    if nodes[key] == newNode1:
+                        id1 = key
+                        if nodes[key].name == "Unknown" and newNode1.name == "Client":
+                            nodes[key].name = "Client"
+                        break
+                        
+            if newNode2 not in nodes.values():#if node 2 is not included in graph
+                id2 = len(nodes)
+                nodes[len(nodes)] = newNode2#expand node list
+                
+                for key in nodes:#assign same color to nodes with same IPaddress
+                    if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
+                        newNode2.color = nodes[key].color
+                        edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id2))
+                    elif nodes[key].address == newNode2.address and nodes[key].type == "owl:equivalentClass" and newNode2.type == "owl:Class":
+                        newNode2.color = nodes[key].color
+                        edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id2), str(key))
+            else:
+                for key in nodes:
+                    if nodes[key] == newNode2:
+                        id2 = key
+                        if nodes[key].name == "Unknown" and newNode2.name == "Client":
+                            nodes[key].name = "Client"
+                        break
+                        
+            if "-" in weight:#if edge information contains more than throughput, add more information to the edge
+                th, rst = weight.split("-", 1)
+                newEdge = edge("owl:ObjectProperty", th, rst,1, str(id1), str(id2))
+            else:#only throughput
+                th = weight
+                newEdge = edge("owl:ObjectProperty", th,0,1, str(id1), str(id2))
+            if newEdge not in edges.values():#add new edge
+                edges[len(edges)] = newEdge
+            else:
+                for key in edges:#if edge in graph, add throughput to existed edge and increment connection
+                    if edges[key] == newEdge:
+                        edges[key].TH = str(int(edges[key].TH) + int(th))
+                        edges[key].C = str(int(edges[key].C) + 1)
+                        if rst:
+                            # print(str(edges[key]) + str(rst))
+                            oRST = float(edges[key].RST)
+                            oC = int(edges[key].C)
+                            edges[key].RST = str((oRST*(oC-1) + float(rst))/oC)
+            rst = 0
+            newNode1 = None
+            newNode2 = None
+            id1 = None
+            id2 = None
+    data.close()
+
+def generate_graph_from_file(fname:str):
+    data = open("logs/" + fname, "r")#input
+
+    newNode1 = None
+    newNode2 = None
+    id1 = None
+    id2 = None
+
+    for line in data:#read edge information
+        if len(line.strip().split(" ")) == 4:
+            node1, node2, service_type, weight = line.strip().split(" ")#node1: the first node; node2: the second node; weight: information
+            node12=node1.split(":")[1]#seperate port and ip address
+            node22=node2.split(":")[1]
+            if service_type[-1] == 'C':#node 1 is client and node2 is server
+    #            newNode1 = node("owl:Class", node1, node1.split(":")[0], randomColor())
+                newNode1 = node("owl:Class", "Client", node1.split(":")[0], node12, randomColor())
+                newNode2 = node("owl:equivalentClass", service_type[0:-2], node2.split(":")[0], node22,randomColor())
+            elif service_type[-1] == 'S':#node 1 is server and node2 is client
+                newNode1 = node("owl:equivalentClass", service_type[0:-2], (node1.split(":")[0]), node12,randomColor())
+                newNode2 = node("owl:Class", "Client", node2.split(":")[0], node22, randomColor())
+            else:#both nodes are not server
                 newNode1 = node("owl:Class", "Unknown", node1.split(":")[0], node12,randomColor())
                 newNode2 = node("owl:Class", "Unknown", node2.split(":")[0], node22,randomColor())
             if newNode1 not in nodes.values():#if node 1 is not included in graph

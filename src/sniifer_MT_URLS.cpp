@@ -13,6 +13,9 @@
 #include <ctime>
 #include <sniffer.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
+using namespace std;
+using namespace boost::filesystem;
+
 
 std::mutex mtx;
 vector<struct flow*> flowarray;
@@ -32,45 +35,31 @@ void GetURLs( std::vector<char*> Packets)
 
 file.open("URLS",  std::ios_base::app);
     
-    int methodCode,line_cnt,lnl;
-    char *uri, *dataend;
+    int methodCode;
+    char *uri;
 
-char *eoh, *eol, *linesp, *lineep;
 for (int i=0; i<Packets.size(); i++)
 {
 
-	line_cnt = 0; lnl = 0;
-        dataend=Packets[i]+strlen(Packets[i])-1;
-	eoh =find_header_end(Packets[i], dataend, &line_cnt);
-	/* Parse first line of http request */
-        if(eoh!=NULL){
-	linesp = (char*)  Packets[i];
-	lineep = find_line_end(linesp, eoh, (const char**)&eol);
-        if(lineep!=NULL){
-	lnl = lineep - linesp + 1;
-	methodCode = parseMethod(linesp, lnl);
+         methodCode = parseMethod(Packets[i], strlen(Packets[i]));
 
 	if (methodsName[methodCode] != "NONE"){
        
 
-	uri = parseUri(linesp, lnl);
+   uri = parseUri(Packets[i], strlen(Packets[i]));
         if (uri !=NULL)
         {
          char * token = strtok(uri, "?");
         if (token!=NULL)
         {file << token << "\n";
-        //printf("%s \n",token); 
+        printf("%s \n",token); 
 }
 } 
 }
 }
-}
-        
-}
 file.close();
 
 }
-
 void *process_packet_queue(void*) {
 
 
@@ -182,6 +171,7 @@ while (true) {
                     flowarray.push_back(f);
                     Pfound = false;
                     foundIndex = flowarray.size() - 1;
+
                 }
                 if (tcp_hdr != NULL) {
                     if (tcp_hdr->th_flags == TH_ACK) {
@@ -193,42 +183,81 @@ while (true) {
                 }
                
 
-                    if (flowarray[foundIndex]->Packets.size() < 100) { flowarray[foundIndex]->Packets.push_back(cp);}
+if (flowarray[foundIndex]->Packets.size() < 100 && tcp_dl > 0)
+{
+char *linesp, *lineep, *dataend, *eol;
+int lnl=0;
+linesp = (char*)  cp;
+dataend= cp +tcp_dl;
+	lineep = find_line_end(linesp, dataend, (const char**)&eol);
+        if(lineep!=NULL){
+	lnl = lineep - linesp + 1;
+        char *array = new char[lnl];
+        strncpy(array,cp,lnl);
+flowarray[foundIndex]->Packets.push_back(array);
 
+}
+else
+{
+char *array = new char[36];
+
+if ( tcp_dl >= 36&& flowarray[foundIndex]->Packets.size() < 100)
+ {        
+                        strncpy(array, cp, 36);
+                        flowarray[foundIndex]->Packets.push_back(array);
+ } 
+else if ( tcp_dl > 0&& tcp_dl<36 && flowarray[foundIndex]->Packets.size() < 100 )
+            {
+             int d=36-tcp_dl;int index=tcp_dl;
+             strncpy(array,cp,index);
+             for (int j=0; j<d; j++)
+              {array[index]='0'; index++;}
+
+flowarray[foundIndex]->Packets.push_back(array);
+}
+}
+}
                 
 // here is the service identification module. This is the one should be replaced by calling the python script with flows.csv as an input
 
                 if ((!Pfound)) {
                     if (dport == 80 || dport == 8080 || dport == 8000 || dport == 8079) {
-                        flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "http"));
+                        //flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "http"));
                         flowarray[foundIndex]->protof = true;
- 			//flowarray[foundIndex]->proto=  strdup("HTTP");
                         Pfound = true;
+ 			snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-C");
                     }
                     else if (sport == 80 || sport == 8080 || sport == 8000 || sport == 8079) {
-                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "http"));
-                        flowarray[foundIndex]->protof = false;
+//                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "http"));
+                        flowarray[foundIndex]->protof = true;
                         Pfound = true;
- 			//flowarray[foundIndex]->proto=  strdup("HTTP");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-S");
+
                     }
                     else if (dport == 3306) {
-                        flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "mysql"));
-                        flowarray[foundIndex]->protof = false;
+  //                      flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "mysql"));
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","MySQL-C");
+
+                        flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
                     else if (sport == 3306) {
-                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "mysql"));
-                        flowarray[foundIndex]->protof = false;
+    //                    flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "mysql"));
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","MySQL-S");
+
+                        flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
                     else if (dport == 11211) {
-                        flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "memcached"));
-                        flowarray[foundIndex]->protof = false;
+      //                  flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "memcached"));
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcached-C");
+                        flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
                     else if (sport == 11211) {
-                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "memcached"));
-                        flowarray[foundIndex]->protof = false;
+        //                flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "memcached"));
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcached-S");
+                        flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
 
@@ -312,7 +341,6 @@ capture_main(void *) {
         pcap_close(cap);
 }
 
-
 /***********************************
  
  ***********************************
@@ -322,18 +350,19 @@ capture_main(void *) {
  ***********************************
 
 ***********************************/
-
 int main(int argc, char *argv[]){
     std::ofstream myfile, FP, file;
+    std::ifstream infile("services.txt");
     int b = 0; 	int opt;
     void *thread_result;
     pthread_t job_pkt_q;
     pthread_t capture;
+    char ID[28];
 
 
 
-InitMethodName();
-while((opt = getopt(argc, argv, "i:f:p")) != -1){ // runs if no opt used as well
+InitMethodName();    
+while((opt = getopt(argc, argv, "i:f:p")) != -1){
 		switch(opt){
 			case 'i':
 				interface = optarg; break;
@@ -364,13 +393,12 @@ if(argc == 1){
 } else {
     log[0] = '\0';
 }
-//printf("mode: %c, arg: %s, log: %s, trace: %s, int: %s\n", mode_buf[0], arg, log, tracefile, interface);
 
- if (interface != NULL) { 
-    LiveMode=true;}
+ if (interface != NULL)
+    LiveMode=true;
         
-	    /* Start packet receiving thread */
-	    pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
+	/* Start packet receiving thread */
+	pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
         /* Start main capture in live or offline mode */
         pthread_create(&capture, NULL, &capture_main, NULL);
 
@@ -379,6 +407,39 @@ if(argc == 1){
     pthread_join(capture, &thread_result);
 
     printf("enq: %d Deq: %d\n", enq,deq);
+std::string line;
+   int index=0;
+/*while (std::getline(infile, line))
+{
+    std::istringstream iss(line);
+    //std::string token1;
+    char *token1;
+    double token2;
+    bool found=false;
+    if (!(iss >> token1 >> token2)) { break; } // error
+//      if (token2<1.0)
+//{
+         snprintf(ID, sizeof(ID), "%s%s", flowarray[index]->saddr,flowarray[index]->sport);  
+        for (int i = 0; i < Nodes.size(); i++) {
+                    if (Nodes[i]->NodeID == NULL) continue;
+                    if (strstr(ID, Nodes[i]->NodeID) != NULL) {
+                           if (token2 > Nodes[i]->score ) {
+                          Nodes[i]->service= strdup(token1);
+                          Nodes[i]->score= token2;
+                          flowarray[index]->proto=strdup(token1);
+                     
+                    }
+else 
+   flowarray[index]->proto=strdup(Nodes[i]->service);
+found=true;
+break;
+                }              
+
+}
+ if(!found)
+flowarray[index]->proto=strdup(token1);
+index++;
+}*/
     myfile.open("flows/flows.csv", std::ios_base::out);
 
     printf("flowarray size is %lu\n",flowarray.size());
@@ -415,18 +476,18 @@ if(argc == 1){
         }
     }
     myfile.close();
-     double diff, RST;
 
+     double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
-    // performance metrics clacualation and dumping into file
-    string log_str = "logs/";
-    if(strlen(log) == 0){
-        log_str.append("log.txt");
-    } else {
-        log_str.append(log);
-    }
-    FP.open(log_str, std::ios_base::out); // using standard ports
-    printf("Writing to log\n");
+        string log_str = "logs/";
+        if(strlen(log) == 0){
+            log_str.append("log.txt");
+        } else {
+            log_str.append(log);
+        }
+         // performance metrics clacualation and dumping into file
+        FP.open(log_str, std::ios_base::out); // using standard ports
+        printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
              if (flowarray[i]->Ack_times.size() > 1) {
@@ -439,15 +500,15 @@ if(argc == 1){
                  }
                  RST = abs(diff / (flowarray[i]->Ack_times.size() - 1));
                  FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
-                    << flowarray[i]->dport << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
+                    << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
              } else {
                  FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
-                    << flowarray[i]->dport << " " << flowarray[i]->NumBytes / 30 << "\n";
+                    << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
              }
          }
      }
      FP.close();
-     stop_server();
+    stop_server();
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
             if (flowarray[i]->Packets.size() == 100 ) {
@@ -475,13 +536,19 @@ if(argc == 1){
         send_message(flowarray);
     }
 
-
      for(int i = 0; i < flowarray.size(); i++)
      {
         for (int j=0; j<flowarray[i]->Ack_times.size(); j++)
              free(flowarray[i]->Ack_times[j]);
          free(flowarray[i]);
      }
+
+/* for(int i = 0; i < Nodes.size(); i++)
+     {
+         // printf("%s %s %f\n",Nodes[i]->NodeID, Nodes[i]->service, Nodes[i]->score); 
+         free(Nodes[i]);
+     }*/
+
 
 
     return 0;

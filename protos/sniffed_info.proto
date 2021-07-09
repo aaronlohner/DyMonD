@@ -7,9 +7,8 @@ message Flow {
   string d_port = 4;
   int32 num_bytes = 5; // throughput -- calculation done in Python for now
   bool is_server = 6;
-  double rst = 7; // technically not part of flow struct -- not for client connections
-  string service_type = 8;
-
+  string service_type = 7;
+  double rst = 8; // technically not part of flow struct -- not for client connections
 }
 
 message FlowArray {
