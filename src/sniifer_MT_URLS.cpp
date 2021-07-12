@@ -250,13 +250,13 @@ flowarray[foundIndex]->Packets.push_back(array);
                     }
                     else if (dport == 11211) {
       //                  flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcached-C");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Mcach-C");
                         flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
                     else if (sport == 11211) {
         //                flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcached-S");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Mcach-S");
                         flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
