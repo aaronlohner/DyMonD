@@ -38,7 +38,7 @@ def setup_client(mode:str, arg:str, log:str):
     send_message(arg)
     sleep(0.2)
     send_message(log)
-'''''''
+''''''
 
 '''NEW VERSION'''
 # SEND MODE, LOG, ARG IN THIS ORDER

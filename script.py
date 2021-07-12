@@ -329,7 +329,7 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-    '''''''''
+    ''''''
 
     '''NEW VERSION
     setup_client(sys.argv[1][1])

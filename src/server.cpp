@@ -5,7 +5,7 @@ struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0};
-char service[32] = {0};
+char service[32];
 FlowArray flow_array = FlowArray();
 
 /*
@@ -98,9 +98,9 @@ void add_to_flow_array(flow *flow) {
 	//get_service_type(flow, service);
 	int i = 0;
 	while(flow->proto[i] != '-'){
-		service[i] = flow->proto[i];
 		i++;
 	}
+	strncpy(service, flow->proto, i);
 	flow_proto->set_service_type(service);
 	memset(service, 0, sizeof(service));
 }
