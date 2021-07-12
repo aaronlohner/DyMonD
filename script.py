@@ -316,7 +316,7 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
 
-    '''ORIGINAL VERSION
+    '''ORIGINAL VERSION'''
     setup_client(str(sys.argv[1][1]), str(arg), log)
 
     if log == "*": # special char to denote that there is no log to read from
@@ -329,9 +329,9 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-    '''
+    '''''''''
 
-    '''NEW VERSION'''
+    '''NEW VERSION
     setup_client(sys.argv[1][1])
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg, log)
@@ -375,7 +375,7 @@ if __name__ == '__main__':
                 for elem in ips:
                     q.append(elem)
             generate_graph_from_file(log)
-        ''''''
+        '''
 
     write_json_output("out")
     print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
