@@ -20,6 +20,10 @@ void add_to_flow_array(flow *flow);
 
 void add_to_flow_array(flow *flow, double RST);
 
+bool is_server(flow *flow);
+
+void get_service_type(flow *flow, char service[]);
+
 void send_message(vector<struct flow*> flowarray);
 
 void receive_message(char *inputBuffer);

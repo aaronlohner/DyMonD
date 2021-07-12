@@ -178,10 +178,10 @@ class Flow final :
     kSPortFieldNumber = 2,
     kDAddrFieldNumber = 3,
     kDPortFieldNumber = 4,
-    kServiceTypeFieldNumber = 8,
+    kServiceTypeFieldNumber = 7,
     kNumBytesFieldNumber = 5,
     kIsServerFieldNumber = 6,
-    kRstFieldNumber = 7,
+    kRstFieldNumber = 8,
   };
   // string s_addr = 1;
   void clear_s_addr();
@@ -239,7 +239,7 @@ class Flow final :
   std::string* _internal_mutable_d_port();
   public:
 
-  // string service_type = 8;
+  // string service_type = 7;
   void clear_service_type();
   const std::string& service_type() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -271,7 +271,7 @@ class Flow final :
   void _internal_set_is_server(bool value);
   public:
 
-  // double rst = 7;
+  // double rst = 8;
   void clear_rst();
   double rst() const;
   void set_rst(double value);
@@ -670,27 +670,7 @@ inline void Flow::set_is_server(bool value) {
   // @@protoc_insertion_point(field_set:Flow.is_server)
 }
 
-// double rst = 7;
-inline void Flow::clear_rst() {
-  rst_ = 0;
-}
-inline double Flow::_internal_rst() const {
-  return rst_;
-}
-inline double Flow::rst() const {
-  // @@protoc_insertion_point(field_get:Flow.rst)
-  return _internal_rst();
-}
-inline void Flow::_internal_set_rst(double value) {
-  
-  rst_ = value;
-}
-inline void Flow::set_rst(double value) {
-  _internal_set_rst(value);
-  // @@protoc_insertion_point(field_set:Flow.rst)
-}
-
-// string service_type = 8;
+// string service_type = 7;
 inline void Flow::clear_service_type() {
   service_type_.ClearToEmpty();
 }
@@ -733,6 +713,26 @@ inline void Flow::set_allocated_service_type(std::string* service_type) {
   service_type_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), service_type,
       GetArenaForAllocation());
   // @@protoc_insertion_point(field_set_allocated:Flow.service_type)
+}
+
+// double rst = 8;
+inline void Flow::clear_rst() {
+  rst_ = 0;
+}
+inline double Flow::_internal_rst() const {
+  return rst_;
+}
+inline double Flow::rst() const {
+  // @@protoc_insertion_point(field_get:Flow.rst)
+  return _internal_rst();
+}
+inline void Flow::_internal_set_rst(double value) {
+  
+  rst_ = value;
+}
+inline void Flow::set_rst(double value) {
+  _internal_set_rst(value);
+  // @@protoc_insertion_point(field_set:Flow.rst)
 }
 
 // -------------------------------------------------------------------

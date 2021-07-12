@@ -93,6 +93,36 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_d_addr(flow->daddr);
 	flow_proto->set_d_port(flow->dport);
 	flow_proto->set_num_bytes(flow->NumBytes/30);
+	flow_proto->set_is_server(is_server(flow));
+	char service[8];
+	get_service_type(flow, service);
+	flow_proto->set_service_type(service);
+}
+
+/*
+ * Determine if the first component in the flow is a server or not
+ */
+bool is_server(flow *flow){
+	char *proto = flow->proto;
+	int i = 0;
+	while(proto[i] != '\0'){
+		i++;
+	}
+	if(proto[i-1] == 'S') return true;
+	return false;
+}
+
+/*
+ * Populate the service field with the name of the service type in the flow
+ */
+void get_service_type(flow *flow, char service[]){
+	memset(service, 0, sizeof(service));
+	char *proto = flow->proto;
+	int i = 0;
+	while(proto[i] != '-'){
+		service[i] = proto[i];
+		i++;
+	}
 }
 
 /*

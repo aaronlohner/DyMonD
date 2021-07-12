@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12sniffed_info.proto\"\x8f\x01\n\x04\x46low\x12\x0e\n\x06s_addr\x18\x01 \x01(\t\x12\x0e\n\x06s_port\x18\x02 \x01(\t\x12\x0e\n\x06\x64_addr\x18\x03 \x01(\t\x12\x0e\n\x06\x64_port\x18\x04 \x01(\t\x12\x11\n\tnum_bytes\x18\x05 \x01(\x05\x12\x11\n\tis_server\x18\x06 \x01(\x08\x12\x0b\n\x03rst\x18\x07 \x01(\x01\x12\x14\n\x0cservice_type\x18\x08 \x01(\t\"!\n\tFlowArray\x12\x14\n\x05\x66lows\x18\x01 \x03(\x0b\x32\x05.Flowb\x06proto3'
+  serialized_pb=b'\n\x12sniffed_info.proto\"\x8f\x01\n\x04\x46low\x12\x0e\n\x06s_addr\x18\x01 \x01(\t\x12\x0e\n\x06s_port\x18\x02 \x01(\t\x12\x0e\n\x06\x64_addr\x18\x03 \x01(\t\x12\x0e\n\x06\x64_port\x18\x04 \x01(\t\x12\x11\n\tnum_bytes\x18\x05 \x01(\x05\x12\x11\n\tis_server\x18\x06 \x01(\x08\x12\x14\n\x0cservice_type\x18\x07 \x01(\t\x12\x0b\n\x03rst\x18\x08 \x01(\x01\"!\n\tFlowArray\x12\x14\n\x05\x66lows\x18\x01 \x03(\x0b\x32\x05.Flowb\x06proto3'
 )
 
 
@@ -76,16 +76,16 @@ _FLOW = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rst', full_name='Flow.rst', index=6,
-      number=7, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
+      name='service_type', full_name='Flow.service_type', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='service_type', full_name='Flow.service_type', index=7,
-      number=8, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='rst', full_name='Flow.rst', index=7,
+      number=8, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),

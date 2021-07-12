@@ -63,8 +63,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_sniffed_5finfo_2eproto::offset
   PROTOBUF_FIELD_OFFSET(::Flow, d_port_),
   PROTOBUF_FIELD_OFFSET(::Flow, num_bytes_),
   PROTOBUF_FIELD_OFFSET(::Flow, is_server_),
-  PROTOBUF_FIELD_OFFSET(::Flow, rst_),
   PROTOBUF_FIELD_OFFSET(::Flow, service_type_),
+  PROTOBUF_FIELD_OFFSET(::Flow, rst_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::FlowArray, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -86,8 +86,8 @@ const char descriptor_table_protodef_sniffed_5finfo_2eproto[] PROTOBUF_SECTION_V
   "\n\022sniffed_info.proto\"\217\001\n\004Flow\022\016\n\006s_addr\030"
   "\001 \001(\t\022\016\n\006s_port\030\002 \001(\t\022\016\n\006d_addr\030\003 \001(\t\022\016\n"
   "\006d_port\030\004 \001(\t\022\021\n\tnum_bytes\030\005 \001(\005\022\021\n\tis_s"
-  "erver\030\006 \001(\010\022\013\n\003rst\030\007 \001(\001\022\024\n\014service_type"
-  "\030\010 \001(\t\"!\n\tFlowArray\022\024\n\005flows\030\001 \003(\0132\005.Flo"
+  "erver\030\006 \001(\010\022\024\n\014service_type\030\007 \001(\t\022\013\n\003rst"
+  "\030\010 \001(\001\"!\n\tFlowArray\022\024\n\005flows\030\001 \003(\0132\005.Flo"
   "wb\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sniffed_5finfo_2eproto_once;
@@ -260,20 +260,20 @@ const char* Flow::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inter
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // double rst = 7;
+      // string service_type = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 57)) {
-          rst_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
-          ptr += sizeof(double);
-        } else goto handle_unusual;
-        continue;
-      // string service_type = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           auto str = _internal_mutable_service_type();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Flow.service_type"));
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // double rst = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 65)) {
+          rst_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
         } else goto handle_unusual;
         continue;
       default: {
@@ -357,20 +357,20 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(6, this->_internal_is_server(), target);
   }
 
-  // double rst = 7;
-  if (!(this->rst() <= 0 && this->rst() >= 0)) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(7, this->_internal_rst(), target);
-  }
-
-  // string service_type = 8;
+  // string service_type = 7;
   if (!this->service_type().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_service_type().data(), static_cast<int>(this->_internal_service_type().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "Flow.service_type");
     target = stream->WriteStringMaybeAliased(
-        8, this->_internal_service_type(), target);
+        7, this->_internal_service_type(), target);
+  }
+
+  // double rst = 8;
+  if (!(this->rst() <= 0 && this->rst() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(8, this->_internal_rst(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -417,7 +417,7 @@ size_t Flow::ByteSizeLong() const {
         this->_internal_d_port());
   }
 
-  // string service_type = 8;
+  // string service_type = 7;
   if (!this->service_type().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
@@ -436,7 +436,7 @@ size_t Flow::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
-  // double rst = 7;
+  // double rst = 8;
   if (!(this->rst() <= 0 && this->rst() >= 0)) {
     total_size += 1 + 8;
   }
