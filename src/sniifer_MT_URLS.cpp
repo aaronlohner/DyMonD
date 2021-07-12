@@ -508,7 +508,7 @@ index++;
          }
      }
      FP.close();
-    stop_server();
+     if(argc == 1) stop_server();
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
             if (flowarray[i]->Packets.size() == 100 ) {
