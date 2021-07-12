@@ -513,19 +513,17 @@ index++;
         for(int i = 0; i < flowarray.size(); i++) {
             if (flowarray[i]->Packets.size() == 100 ) {
                 if(flowarray[i]->Ack_times.size()>1){
-                diff=0.0;
-                for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
+                    diff=0.0;
+                    for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                         if (j!=flowarray[i]->Ack_times.size()-1)
                             diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
-                }
-                RST= abs(diff/( flowarray[i]->Ack_times.size() -1)); 
-                add_to_flow_array(flowarray[i], RST);
-
-                }
-                else
-                    {
-                    add_to_flow_array(flowarray[i]);
                     }
+                    RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
+                    add_to_flow_array(flowarray[i], RST);
+                }
+                else {
+                    add_to_flow_array(flowarray[i]);
+                }
             }
         }
         send_message(flowarray);

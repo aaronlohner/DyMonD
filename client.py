@@ -30,7 +30,7 @@ def recv_message(msg_type) -> FlowArray:
     msg.ParseFromString(data)
     return msg
 
-'''OLD VERSION'''
+'''OLD VERSION
 def setup_client(mode:str, arg:str, log:str):
     s.connect((HOST, PORT))
     send_message(mode)
@@ -38,10 +38,9 @@ def setup_client(mode:str, arg:str, log:str):
     send_message(arg)
     sleep(0.2)
     send_message(log)
-''''''
+'''
 
-'''NEW VERSION
-
+'''NEW VERSION'''
 # SEND MODE, LOG, ARG IN THIS ORDER
 def setup_client(mode:str):
     s.connect((HOST, PORT))
@@ -52,7 +51,7 @@ def sniff(arg:str, log:str):
     send_message(arg)
     sleep(0.2)
     send_message(log)
-'''
+
 
 def stop_client():
     s.close()

@@ -5,6 +5,7 @@ struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0};
+char service[32];
 FlowArray flow_array = FlowArray();
 
 /*
@@ -94,7 +95,6 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_d_port(flow->dport);
 	flow_proto->set_num_bytes(flow->NumBytes/30);
 	flow_proto->set_is_server(is_server(flow));
-	char service[8];
 	get_service_type(flow, service);
 	flow_proto->set_service_type(service);
 }
@@ -113,7 +113,7 @@ bool is_server(flow *flow){
 }
 
 /*
- * Populate the service field with the name of the service type in the flow
+ * Populate the service parameter with the name of the service type in the flow
  */
 void get_service_type(flow *flow, char service[]){
 	memset(service, 0, sizeof(service));

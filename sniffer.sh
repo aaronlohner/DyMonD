@@ -11,4 +11,3 @@ case $1 in
 	-p) sudo ./sniffer $1;;
 	*) sudo ./sniffer;;
 esac
-#sudo ./sniffer $1 $2
