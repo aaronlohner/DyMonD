@@ -1,7 +1,9 @@
+from io import TextIOWrapper
 import sys
 import re
 import time
 import random
+from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray
@@ -289,8 +291,23 @@ def write_json_output(fname:str):
     output.write("]\n}")
     output.close()  
 
-def next_hop_extractor(f, ip):# -> List[T]: # make two functions, one for logfile, one for interface?
-    return
+def load_interfaces_dictionary() -> Dict[str:str]:
+    interfaces = {}
+    with open("Interfaces.txt", "r") as f:
+        for line in f:
+            k, v = line.split()
+            interfaces[k] = v
+    return interfaces
+
+def next_hop_extractor(f:TextIOWrapper, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]: # make two functions, one for logfile, one for interface?
+    ips = []
+    for line in f:
+        if line.split(':')[0] == ip: # if flow has current ip as saddr
+            new_ip = line.split(' ')[1].split(':')[0]
+            if new_ip not in visited:
+                ips.append(new_ip)
+                visited.append(new_ip)
+    return (ips, visited)
 
 if __name__ == '__main__':
     arg_line = " ".join(sys.argv[1:])
@@ -316,7 +333,7 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
 
-    '''ORIGINAL VERSION'''
+    '''ORIGINAL VERSION
     setup_client(str(sys.argv[1][1]), str(arg), log)
 
     if log == "*": # special char to denote that there is no log to read from
@@ -329,12 +346,17 @@ if __name__ == '__main__':
         recv_message(None) 
         print("Reading from file")
         generate_graph_from_file(log)
-    ''''''
+    '''
 
-    '''NEW VERSION
-    setup_client(sys.argv[1][1])
+    '''NEW VERSION'''
+    # Temporary implementation: dictionary mapping interfaces to ips,
+    # use 'interfaces' dictionary to add ip of input interface to q,
+    # reverse-lookup interface from new found ips to pass in to sniff()
+    interfaces = load_interfaces_dictionary()
+
+    setup_client(sys.argv[1][1], log)
     if sys.argv[1] == "-f": # reading from pcap file
-        sniff(arg, log)
+        sniff(arg)
         if log == "*": # special char to denote that there is no log to read from
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
@@ -346,37 +368,42 @@ if __name__ == '__main__':
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
-        # setup_client(log)
-        q = [arg]
-        f = None
+        q, visited = [interfaces[arg]], []
         if log == "*":
             l = FlowArray()
             while len(q) > 0:
                 ip = q.pop(0)
-                # instead of starting sniffing immediately after setup_client() data is received,
-                # interface should be sent from here
                 # sniff()
                 f = recv_message(sniffed_info_pb2.FlowArray)
                 l.add(f) # see how to do this in API - only add unique flows
-                ips = next_hop_extractor(f, ip)
+                ips, visited = next_hop_extractor(f, ip, visited)
                 for elem in ips:
                     q.append(elem)
             generate_graph(l)
         else:
-            l = None # open a new master list txt file
+            open("logs/full-log.txt", "w")
             while len(q) > 0:
                 ip = q.pop(0)
-                # instead of starting sniffing immediately after setup_client() data is received,
-                # interface should be sent from here
-                # sniff()
-                recv_message(None)
-                l = None # append contents of file represented by l to f (then remove f?) - only add unique flows
-                ips = next_hop_extractor(f, ip)
-                for elem in ips:
-                    q.append(elem)
+                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
+                print(recv_message(None))
+                with open("logs/full-log.txt", "a") as l, open("logs/" + log, "r") as f:
+                    for new_line in f:
+                        for line in l:
+                            exists = False
+                            if ' '.join(new_line.split(' ')[0:3]) in line:
+                                exists = True
+                                break
+                            if not exists:
+                                l.write(new_line)
+                            # else: overwrite existing line with sum of throughput, avg rst?
+                            # doesn't that get done later anyway? maybe just append all new lines
+                            # to master list, regardless of repeated lines? 
+                    ips, visited = next_hop_extractor(f, ip, visited)
+                q.extend(ips)
+            stop_client()
             generate_graph_from_file(log)
-        '''
+        ''''''
 
     write_json_output("out")
     print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
-    stop_client()
+    # stop_client()

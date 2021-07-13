@@ -4,7 +4,7 @@ int server_fd, client_fd, valread;
 struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
-char buffer[1024] = {0};
+char buffer[1024] = {0}, empty_buf[0];
 char service[32] = {0};
 FlowArray flow_array = FlowArray();
 
@@ -65,10 +65,9 @@ void stop_server(){
 /*
  * Read incoming message into input buffer
  */
-void receive_message(char *inputBuffer) {
+void receive_message(char inputBuffer[]) {
 	printf("Waiting for a message from client...\n");
 	int mesg_len_buf, mesg_length;
-	
 	// Expect to receive message length first in a 4-byte block immediate followed by the message
 	// Only continue once message is received
 	while (!valread) valread = recv(client_fd, &mesg_len_buf, 4, 0);
@@ -96,13 +95,7 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_num_bytes(flow->NumBytes/30);
 	flow_proto->set_is_server(is_server(flow));
 	get_service_type(flow, service);
-	// int i = 0;
-	// while(flow->proto[i] != '-'){
-	// 	i++;
-	// }
-	// strncpy(service, flow->proto, i);
 	flow_proto->set_service_type(service);
-	// memset(service, 0, sizeof(service));
 }
 
 /*
@@ -121,7 +114,7 @@ bool is_server(flow *flow){
 /*
  * Populate the service parameter with the name of the service type in the flow
  */
-void get_service_type(flow *flow, char service[]){
+void get_service_type(flow *flow, char *service){
 	memset(service, 0, sizeof(service));
 	int i = 0;
 	while(flow->proto[i] != '-'){
@@ -152,4 +145,9 @@ void send_message(vector<struct flow*> flowarray){
 	printf("Flows sent to client\n");
 	// Reset flow_array global variable for future use
 	flow_array.clear_flows();
+}
+
+void send_message(){
+	send(client_fd, empty_buf, 0, 0);
+	printf("Message sent to client\n");
 }

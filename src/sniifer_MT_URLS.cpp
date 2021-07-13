@@ -52,7 +52,7 @@ for (int i=0; i<Packets.size(); i++)
          char * token = strtok(uri, "?");
         if (token!=NULL)
         {file << token << "\n";
-        printf("%s \n",token); 
+        //printf("%s \n",token); 
 }
 } 
 }
@@ -291,7 +291,6 @@ flowarray[foundIndex]->Packets.push_back(array);
 void *
 capture_main(void *) {
 
-
     char errbuf[PCAP_ERRBUF_SIZE];
     memset(errbuf, 0, PCAP_ERRBUF_SIZE);
     struct pcap_pkthdr pkthdr;
@@ -339,6 +338,7 @@ capture_main(void *) {
 
     if (cap != NULL)
         pcap_close(cap);
+
 }
 
 /***********************************
@@ -373,13 +373,14 @@ while((opt = getopt(argc, argv, "i:f:p")) != -1){
 		}
 	}
 
-char mode_buf[1], arg[32], log[32];
+char mode_buf[64], log[64], arg[64];
+bool sniff_more = true;
 string capture_dir = "captures/";
 if(argc == 1){
     setup_server(); // prepare server for incoming client tcp connection
     receive_message(mode_buf); // receive indication if using interface or reading from file
-    receive_message(arg);  // receive network interface name or name of pcap file
     receive_message(log); // receive indication if sending via tcp or writing to logfile
+    receive_message(arg);  // receive network interface name or name of pcap file
     opt = mode_buf[0];
     capture_dir.append(arg);
     switch(opt){
@@ -393,10 +394,10 @@ if(argc == 1){
 } else {
     log[0] = '\0';
 }
-
  if (interface != NULL)
     LiveMode=true;
         
+    while(sniff_more){
 	/* Start packet receiving thread */
 	pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
         /* Start main capture in live or offline mode */
@@ -407,8 +408,8 @@ if(argc == 1){
     pthread_join(capture, &thread_result);
 
     printf("enq: %d Deq: %d\n", enq,deq);
-std::string line;
-   int index=0;
+//std::string line;
+//   int index=0;
 /*while (std::getline(infile, line))
 {
     std::istringstream iss(line);
@@ -441,7 +442,6 @@ flowarray[index]->proto=strdup(token1);
 index++;
 }*/
     myfile.open("flows/flows.csv", std::ios_base::out);
-
     printf("flowarray size is %lu\n",flowarray.size());
      char *array = new char[36];
 
@@ -508,7 +508,7 @@ index++;
          }
      }
      FP.close();
-     if(argc == 1) stop_server();
+     if(argc == 1) send_message();
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
             if (flowarray[i]->Packets.size() == 100 ) {
@@ -528,13 +528,20 @@ index++;
         }
         send_message(flowarray);
     }
-
      for(int i = 0; i < flowarray.size(); i++)
      {
         for (int j=0; j<flowarray[i]->Ack_times.size(); j++)
              free(flowarray[i]->Ack_times[j]);
          free(flowarray[i]);
      }
+     if(mode_buf[0] == 'i'){
+        flowarray.clear();
+        receive_message(arg);
+        if(!strcmp(arg, "stop")) sniff_more = false;
+     } else {
+         sniff_more = false;
+     }
+    }
 
 /* for(int i = 0; i < Nodes.size(); i++)
      {
