@@ -291,7 +291,7 @@ def write_json_output(fname:str):
     output.write("]\n}")
     output.close()  
 
-def load_interfaces_dictionary() -> Dict[str:str]:
+def load_interfaces_dictionary() -> Dict[str, str]:
     interfaces = {}
     with open("Interfaces.txt", "r") as f:
         for line in f:
@@ -385,7 +385,7 @@ if __name__ == '__main__':
             while len(q) > 0:
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                print(recv_message(None))
+                print(f"Received: {recv_message(None)}")
                 with open("logs/full-log.txt", "a") as l, open("logs/" + log, "r") as f:
                     # Add new flows to the main list
                     for new_line in f:

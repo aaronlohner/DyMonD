@@ -148,6 +148,6 @@ void send_message(vector<struct flow*> flowarray){
 }
 
 void send_message(){
-	send(client_fd, empty_buf, 0, 0);
+	send(client_fd, empty_buf, 4, 0);
 	printf("Message sent to client\n");
 }
