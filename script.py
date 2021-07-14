@@ -304,7 +304,6 @@ def next_hop_extractor(log:str, ip:str, visited:List[str]) -> Tuple[List[str], L
     ips = []
     with open("logs/" + log, "r") as f:
         for line in f:
-            print(f"line: {line.split(':')[0]}")
             if line.split(':')[0] == ip: # if flow has current ip as saddr
                 new_ip = line.split(' ')[1].split(':')[0]
                 if new_ip not in visited:
@@ -385,11 +384,12 @@ if __name__ == '__main__':
             generate_graph(l)
         else:
             open("logs/full-log.txt", "w").close()
+            lines_to_write = []
             while len(q) > 0:
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                print(f"Received: {recv_message(None)}")
-                with open("logs/full-log.txt", "a") as l, open("logs/" + log, "r") as f:
+                recv_message(None)
+                with open("logs/full-log.txt", "r") as l, open("logs/" + log, "r") as f:
                     # Add new flows to the main list
                     if os.stat("logs/full-log.txt").st_size == 0:
                             l.writelines(f)
@@ -401,12 +401,14 @@ if __name__ == '__main__':
                                     exists = True
                                     break
                                 if not exists:
-                                    l.write(new_line)
+                                    lines_to_write.append(new_line)
                                 # else: overwrite existing line with sum of throughput, avg rst?
                                 # doesn't that get done later anyway? maybe just append all new lines
-                                # to master list, regardless of repeated lines? 
+                                # to master list, regardless of repeated lines?
+                open("logs/full-log.txt", "a").writelines(lines_to_write).close()
                 ips, visited = next_hop_extractor(log, ip, visited)
                 q.extend(ips)
+                lines_to_write.clear()
             stop_client()
             generate_graph_from_file(log)
         ''''''
