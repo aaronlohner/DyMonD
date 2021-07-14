@@ -350,7 +350,7 @@ if __name__ == '__main__':
 
     '''NEW VERSION'''
     # Temporary implementation: dictionary mapping interfaces to ips,
-    # use 'interfaces' dictionary to add ip of input interface to q,
+    # use 'interfaces' dictionary to add ip of input interface to q and visited,
     # reverse-lookup interface from new found ips to pass in to sniff()
     interfaces = load_interfaces_dictionary()
 
@@ -368,7 +368,7 @@ if __name__ == '__main__':
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
-        q, visited = [interfaces[arg]], []
+        q, visited = [interfaces[arg]], [interfaces[arg]]
         if log == "*":
             l = FlowArray()
             while len(q) > 0:
@@ -387,6 +387,7 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 print(recv_message(None))
                 with open("logs/full-log.txt", "a") as l, open("logs/" + log, "r") as f:
+                    # Add new flows to the main list
                     for new_line in f:
                         for line in l:
                             exists = False
