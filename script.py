@@ -1,8 +1,9 @@
-from io import TextIOWrapper
+import os
 import sys
 import re
 import time
 import random
+from io import TextIOWrapper
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
@@ -381,24 +382,27 @@ if __name__ == '__main__':
                     q.append(elem)
             generate_graph(l)
         else:
-            open("logs/full-log.txt", "w")
+            open("logs/full-log.txt", "w").close()
             while len(q) > 0:
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 print(f"Received: {recv_message(None)}")
                 with open("logs/full-log.txt", "a") as l, open("logs/" + log, "r") as f:
                     # Add new flows to the main list
-                    for new_line in f:
-                        for line in l:
-                            exists = False
-                            if ' '.join(new_line.split(' ')[0:3]) in line:
-                                exists = True
-                                break
-                            if not exists:
-                                l.write(new_line)
-                            # else: overwrite existing line with sum of throughput, avg rst?
-                            # doesn't that get done later anyway? maybe just append all new lines
-                            # to master list, regardless of repeated lines? 
+                    if os.stat("logs/full-log.txt").st_size == 0:
+                            l.writelines(f)
+                    else:
+                        for new_line in f:
+                            for line in l:
+                                exists = False
+                                if ' '.join(new_line.split(' ')[0:3]) in line:
+                                    exists = True
+                                    break
+                                if not exists:
+                                    l.write(new_line)
+                                # else: overwrite existing line with sum of throughput, avg rst?
+                                # doesn't that get done later anyway? maybe just append all new lines
+                                # to master list, regardless of repeated lines? 
                     ips, visited = next_hop_extractor(f, ip, visited)
                 q.extend(ips)
             stop_client()
