@@ -396,7 +396,8 @@ if(argc == 1){
 }
  if (interface != NULL)
     LiveMode=true;
-        
+    
+    printf("Starting to sniff...\n");
     while(sniff_more){
 	/* Start packet receiving thread */
 	pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);

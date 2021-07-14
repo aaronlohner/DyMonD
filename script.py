@@ -300,14 +300,16 @@ def load_interfaces_dictionary() -> Dict[str, str]:
             interfaces[k] = v
     return interfaces
 
-def next_hop_extractor(f:TextIOWrapper, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]: # make two functions, one for logfile, one for interface?
+def next_hop_extractor(log:str, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]: # make two functions, one for logfile, one for interface?
     ips = []
-    for line in f:
-        if line.split(':')[0] == ip: # if flow has current ip as saddr
-            new_ip = line.split(' ')[1].split(':')[0]
-            if new_ip not in visited:
-                ips.append(new_ip)
-                visited.append(new_ip)
+    with open("logs/" + log, "r") as f:
+        for line in f:
+            print(f"line: {line.split(':')[0]}")
+            if line.split(':')[0] == ip: # if flow has current ip as saddr
+                new_ip = line.split(' ')[1].split(':')[0]
+                if new_ip not in visited:
+                    ips.append(new_ip)
+                    visited.append(new_ip)
     return (ips, visited)
 
 if __name__ == '__main__':
@@ -403,7 +405,7 @@ if __name__ == '__main__':
                                 # else: overwrite existing line with sum of throughput, avg rst?
                                 # doesn't that get done later anyway? maybe just append all new lines
                                 # to master list, regardless of repeated lines? 
-                    ips, visited = next_hop_extractor(f, ip, visited)
+                ips, visited = next_hop_extractor(log, ip, visited)
                 q.extend(ips)
             stop_client()
             generate_graph_from_file(log)
