@@ -392,20 +392,23 @@ if __name__ == '__main__':
                 with open("logs/full-log.txt", "r") as l, open("logs/" + log, "r") as f:
                     # Add new flows to the main list
                     if os.stat("logs/full-log.txt").st_size == 0:
-                            l.writelines(f)
+                            lines_to_write.extend(f)
                     else:
                         for new_line in f:
                             for line in l:
                                 exists = False
                                 if ' '.join(new_line.split(' ')[0:3]) in line:
                                     exists = True
+                                    print("exists")
                                     break
-                                if not exists:
-                                    lines_to_write.append(new_line)
-                                # else: overwrite existing line with sum of throughput, avg rst?
-                                # doesn't that get done later anyway? maybe just append all new lines
-                                # to master list, regardless of repeated lines?
-                open("logs/full-log.txt", "a").writelines(lines_to_write).close()
+                            if not exists:
+                                print("new")
+                                lines_to_write.append(new_line)
+                            # else: overwrite existing line with sum of throughput, avg rst?
+                            # doesn't that get done later anyway? maybe just append all new lines
+                            # to master list, regardless of repeated lines?
+                with open("logs/full-log.txt", "a") as f:
+                    f.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(log, ip, visited)
                 q.extend(ips)
                 lines_to_write.clear()
