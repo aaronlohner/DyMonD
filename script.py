@@ -7,7 +7,7 @@ from io import TextIOWrapper
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
-from proto_gen.sniffed_info_pb2 import FlowArray
+from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 # THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
 
@@ -300,15 +300,31 @@ def load_interfaces_dictionary() -> Dict[str, str]:
             interfaces[k] = v
     return interfaces
 
-def next_hop_extractor(log:str, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]: # make two functions, one for logfile, one for interface?
+def equal_flows(new_flow:Flow, flow:Flow) -> bool:
+    if new_flow.s_addr == flow.s_addr and new_flow.s_port == flow.s_port and \
+        new_flow.d_addr == flow.d_addr and new_flow.d_port == flow.d_port and \
+            new_flow.is_server == flow.is_server and new_flow.service_type == flow.service_type:
+            print("exists")
+            return True
+    return False
+
+def next_hop_extractor(new_flows, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
-    with open(log, "r") as f:
-        for line in f:
-            if line.split(':')[0] == ip: # if flow has current ip as saddr
-                new_ip = line.split(' ')[1].split(':')[0]
+    if new_flows is not str:
+        for flow in new_flows:
+            if flow.s_addr == ip:
+                new_ip = flow.d_addr
                 if new_ip not in visited:
                     ips.append(new_ip)
                     visited.append(new_ip)
+    else:
+        with open(new_flows, "r") as f:
+            for line in f:
+                if line.split(':')[0] == ip: # if flow has current ip as saddr
+                    new_ip = line.split(' ')[1].split(':')[0]
+                    if new_ip not in visited:
+                        ips.append(new_ip)
+                        visited.append(new_ip)
     return (ips, visited)
 
 if __name__ == '__main__':
@@ -378,19 +394,31 @@ if __name__ == '__main__':
         if log == "*":
             l = FlowArray()
             while len(q) > 0:
+                print(f"ips in q: {q}")
                 ip = q.pop(0)
-                # sniff()
+                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 f = recv_message(sniffed_info_pb2.FlowArray)
-                l.add(f) # see how to do this in API - only add unique flows
+                print(f"num flows: {len(l.flows)}")
+                if len(l.flows) == 0:
+                    l.flows.extend(f.flows)
+                else:
+                    for new_flow in f.flows:
+                        for flow in l.flows:
+                            exists = False
+                            if equal_flows(new_flow, flow):
+                                exists = True
+                                break
+                        if not exists:
+                            l.flows.add(new_flow)
                 ips, visited = next_hop_extractor(f, ip, visited)
-                for elem in ips:
-                    q.append(elem)
+                q.extend(ips)
+            stop_client()
             generate_graph(l)
         else:
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
-                print(f"ips in q: {q}")
+                #print(f"ips in q: {q}")
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
@@ -402,21 +430,18 @@ if __name__ == '__main__':
                         for new_line in f:
                             for line in l:
                                 exists = False
-                                print(f"sub: {' '.join(new_line.split(' ')[0:3])}")
-                                print(f"line: {line}")
                                 if ' '.join(new_line.split(' ')[0:3]) in line:
                                     exists = True
-                                    print("exists")
                                     break
                             if not exists:
-                                print("new")
                                 lines_to_write.append(new_line)
                             # else: overwrite existing line with sum of throughput, avg rst?
                             # doesn't that get done later anyway? maybe just append all new lines
                             # to master list, regardless of repeated lines?
+                            l.seek(0)
                 with open(log, "a") as f:
                     f.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(log, ip, visited)
+                ips, visited = next_hop_extractor(temp_log, ip, visited)
                 q.extend(ips)
                 lines_to_write.clear()
             stop_client()
