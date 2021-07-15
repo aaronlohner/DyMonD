@@ -304,21 +304,20 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
     if new_flow.s_addr == flow.s_addr and new_flow.s_port == flow.s_port and \
         new_flow.d_addr == flow.d_addr and new_flow.d_port == flow.d_port and \
             new_flow.is_server == flow.is_server and new_flow.service_type == flow.service_type:
-            print("exists")
             return True
     return False
 
-def next_hop_extractor(new_flows, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
-    if new_flows is not str:
-        for flow in new_flows:
+    if type(new_flows_container) is not str:
+        for flow in new_flows_container.flows:
             if flow.s_addr == ip:
                 new_ip = flow.d_addr
                 if new_ip not in visited:
                     ips.append(new_ip)
                     visited.append(new_ip)
     else:
-        with open(new_flows, "r") as f:
+        with open(new_flows_container, "r") as f:
             for line in f:
                 if line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
@@ -375,8 +374,8 @@ if __name__ == '__main__':
         setup_client(sys.argv[1][1], log)
     else:
         setup_client(sys.argv[1][1], "temp-log.txt")
+        log = "logs/" + log
         temp_log = "logs/temp-log.txt"
-    log = "logs/" + log
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg)
         if log == "*": # special char to denote that there is no log to read from
@@ -409,7 +408,7 @@ if __name__ == '__main__':
                                 exists = True
                                 break
                         if not exists:
-                            l.flows.add(new_flow)
+                            l.flows.append(new_flow)
                 ips, visited = next_hop_extractor(f, ip, visited)
                 q.extend(ips)
             stop_client()
