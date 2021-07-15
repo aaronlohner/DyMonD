@@ -355,8 +355,12 @@ if __name__ == '__main__':
     # use 'interfaces' dictionary to add ip of input interface to q and visited,
     # reverse-lookup interface from new found ips to pass in to sniff()
     interfaces = load_interfaces_dictionary()
-
-    setup_client(sys.argv[1][1], log)
+    if log == "*":
+        setup_client(sys.argv[1][1], log)
+    else:
+        setup_client(sys.argv[1][1], "temp-log.txt")
+        temp_log = "logs/temp-log.txt"
+    log = "logs/" + log
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg)
         if log == "*": # special char to denote that there is no log to read from
@@ -383,20 +387,23 @@ if __name__ == '__main__':
                     q.append(elem)
             generate_graph(l)
         else:
-            open("logs/full-log.txt", "w").close()
+            open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
+                print(f"ips in q: {q}")
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
-                with open("logs/full-log.txt", "r") as l, open("logs/" + log, "r") as f:
+                with open(log, "r") as l, open(temp_log, "r") as f:
                     # Add new flows to the main list
-                    if os.stat("logs/full-log.txt").st_size == 0:
+                    if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
                         for new_line in f:
                             for line in l:
                                 exists = False
+                                print(f"sub: {' '.join(new_line.split(' ')[0:3])}")
+                                print(f"line: {line}")
                                 if ' '.join(new_line.split(' ')[0:3]) in line:
                                     exists = True
                                     print("exists")
@@ -407,7 +414,7 @@ if __name__ == '__main__':
                             # else: overwrite existing line with sum of throughput, avg rst?
                             # doesn't that get done later anyway? maybe just append all new lines
                             # to master list, regardless of repeated lines?
-                with open("logs/full-log.txt", "a") as f:
+                with open(log, "a") as f:
                     f.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(log, ip, visited)
                 q.extend(ips)
