@@ -67,8 +67,8 @@ def getName(label):#get the IPaddress of a node from name
     return label[0:counter1], label[counter1:len(label)].upper() # (port, service type)
 
 
-def generate_graph_from_file(fname:str):
-    data = open("logs/" + fname, "r")#input
+def generate_graph_from_file(log:str):
+    data = open(log, "r")#input
 
     newNode1 = None
     newNode2 = None
@@ -302,7 +302,7 @@ def load_interfaces_dictionary() -> Dict[str, str]:
 
 def next_hop_extractor(log:str, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]: # make two functions, one for logfile, one for interface?
     ips = []
-    with open("logs/" + log, "r") as f:
+    with open(log, "r") as f:
         for line in f:
             if line.split(':')[0] == ip: # if flow has current ip as saddr
                 new_ip = line.split(' ')[1].split(':')[0]
