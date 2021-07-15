@@ -74,7 +74,7 @@ void *process_packet_queue(void*) {
     double run_duration ;
     clock_t begin = clock();
 if(LiveMode)
-  run_duration=30.1;
+  run_duration=5.1; //30.1
 else
   run_duration=2.0;
 while (true) {
@@ -299,7 +299,7 @@ capture_main(void *) {
     raw_pkt *pkt = NULL;
     clock_t begin, end;
     double elapsed_time;
-    double sniff_duration = 30.0;
+    double sniff_duration = 5.0; //30.0
     if (!LiveMode)
     cap = pcap_open_offline(tracefile, errbuf);
     else
