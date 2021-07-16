@@ -13,7 +13,7 @@ The sniffer program will sniff the given interface/file, produces the `logs/log.
 ### Interface Mode
 The instructions below indicate how to run the application while monitoring the connections for a running YCSB client container. Running the application for a different container would be similar.
 
-1. Open three shell windows on the compute-04 node
+1. Open three shell windows on the `compute-04` node.
 
 In the first shell:
 
@@ -34,7 +34,7 @@ In the second shell:
 The sniffer program will sniff the given interface and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
 
 ### File Mode
-1. Open two shell windows on the compute-04 node
+1. Open two shell windows on the `compute-04` node.
 2. In the first shell, in the `DyMonD` repository, run the bash script `sniffer.sh` *without* any options to compile and run the sniffer.
 3. In the second shell, in the `DyMonD` repository, run the client with the pcap file option by running `python3 script.py -f <filename> [-w <log>]`. Note that omitting the `<filename>` argument will use the default file `teastoreall.pcap` located in the `captures` folder. Note: when running this script in file mode using the default for the first time, the `captures` directory must first be created in the root of the repository and the file must be placed in that directory (it is not part of this repository).
 

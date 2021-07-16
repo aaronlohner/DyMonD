@@ -4,7 +4,7 @@ from time import sleep
 from proto_gen.sniffed_info_pb2 import FlowArray
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8080         # The port used by the server
+PORT = 9080         # The port used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def send_message(mesg:str) -> None:

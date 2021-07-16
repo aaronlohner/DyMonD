@@ -370,12 +370,15 @@ if __name__ == '__main__':
     # use 'interfaces' dictionary to add ip of input interface to q and visited,
     # reverse-lookup interface from new found ips to pass in to sniff()
     interfaces = load_interfaces_dictionary()
-    if log == "*":
-        setup_client(sys.argv[1][1], log)
-    else:
+
+    if log != "*" and sys.argv[1] == "-i": # if using log and sniffing interface
+        # Sniffer will write to a temp log
         setup_client(sys.argv[1][1], "temp-log.txt")
         log = "logs/" + log
         temp_log = "logs/temp-log.txt"
+    else:
+        setup_client(sys.argv[1][1], log)
+        
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg)
         if log == "*": # special char to denote that there is no log to read from
