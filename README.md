@@ -2,49 +2,38 @@
 
 DyMonD is a framework that **Dy**namically **Mon**itors an application, **D**iscovers its service components and visualizes them together with some performance metrics in the form of a call graph.
 
-## Run in live mode
+## As standalone
+1. Run the bash script `sniffer.sh` with desired options to compile and run the sniffer. Once compiled, future runs can be made on the executable `sniffer` instead, with the ability to use the same options.
+
+The sniffer program will sniff the given interface/file, produces the `logs/log.txt` and `flows/flows.csv` files and ends.
+
+## Using client-server structure
+### Run in live mode
+The instructions below indicate how to run the application while monitoring the connections for a running YCSB client container. Running the application for a different container would be similar.
+
 1. Open three shell windows on the compute-04 node
-2. In the first shell, execute the following commands:
-    - `sudo docker exec -it ycsbclient bash`
-    - `cd YCSBCLIENT/bin`
 
-*Steps 2-7* are all done in the second shell
+In the first shell:
 
-3. In the second shell, grab the network interface of the YCSB webserver to sniff. To do so, run `sudo docker exec -it webserver ip a`
-The output should be two interfaces: the loopback interface a second interface written in the format of <number>: <interface name>@<letters><number>.
-4. Exit the docker container (should be done automatically) and run `ip a|grep ^<number>` using the final <number> portion from the output above.
-The output shows the localhost's interface name connected to the YCSB webserver container in the same format as above.
-5. Run `cd /home/alohne/DyMonD` then compile the server code by running `cat sniffer.sh` and then by running all the lines of code in this script except the first and last ones.
-6. Copy the compiled sniffer code into the shared folder by running `cp sniffer ../../shared`. Then run `cd ../../shared`
-7. Start the server with `sudo ./sniffer`
-8. In the third shell, run `cd /home/alohne/DyMonD`
-then start the client by running `python3 script.py` with the appropriate options
-9. In the first shell, run the YCSB workload by using the following command:
+2. Grab the network interface of the YCSB webserver to sniff. To do so, run `sudo docker exec -it webserver ip a`
+The output should be two interfaces: the loopback interface a second interface written in the format of `<number>: <interface name>@<letters><number>`.
+3. Exit the docker container (should be done automatically) and run `ip a|grep ^<number>` using the final `<number>` portion from the output above. The output shows the localhost's interface name connected to the YCSB webserver container in the same format as above.
+4. In the `DyMonD` repository, run the bash script `sniffer.sh` *without* any options to compile and run the sniffer.
+
+In the second shell:
+
+5. Enter the following command to open the YCSB container: `sudo docker exec -it ycsbclient bash`
+6. Run `cd YCSBCLIENT/bin`, then run the YCSB workload by using the following command (note that once this command is entered, the workload will run for 60 seconds, so the next step (step 7) should be executed immediately after this step):
 
 `./ycsb run jdbc  -P ../workloads/workloadc  -p jdbc.driver=com.mysql.jdbc.Driver  -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB  -p db.user=root  -p db.passwd=root  -s  -threads 20  -target 0  -p measurementtype=timeseries  -p timeseries.granularity=20000`
 
-10. In the third shell, enter the information prompted by the client to start sniffing the workload
+8. In the third shell, in the `DyMonD` repository, run the client with the interface option by running `python3 script.py -i <interface> [-w <log>]`. Note that omitting the `<interface>` argument will use the default interface `e69b93ccc8384_l`.
 
-The sniffer program will sniff the given interface for 30 seconds and then produces the "log.txt" & "flows.csv" files and ends.
+The sniffer program will sniff the given interface and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
 
-## Run in offline mode
+### Run in offline mode
 1. Open two shell windows on the compute-04 node
-2. In both shells, run `cd /home/alohne/DyMonD`
-3. In the first shell, compile and run the server with `sudo ./sniffer.sh`
-4. In the second shell, run the client with `python3 script.py` with the appropriate options
+2. In the first shell, in the `DyMonD` repository, run the bash script `sniffer.sh` *without* any options to compile and run the sniffer.
+3. In the second shell, in the `DyMonD` repository, run the client with the pcap file option by running `python3 script.py -f <filename> [-w <log>]`. Note that omitting the `<filename>` argument will use the default file `teastoreall.pcap`.
 
-The sniffer program will sniff the given file and then produces the "log.txt" & "flows.csv" files and ends.
-
-To run new sniffer:
-`g++ -g -o sniffer2 sniifer_MT_URLS.cpp -lpcap -lboost_filesystem -lboost_system -pthread -Iinclude`
-
-
-## Next hop extractor
-A file named as "Interfaces.txt" in the shared document at "compute-04" node for mapping IPs of YCSB components to the host's virtual network interfaces. As we discussed in today's meeting, you can use this file for testing purposes of the "Next-hop' algorithm in the controller until I get this part integrated into the sniffer.
-
-1. Add the queuing pseudocode from the paper into the controller script (script.py). The list F generated by “FLOWS DETECTED FOR IP*”  is equivalent to the log.txt or protobuf FlowArray that is sent to the controller after calling the sniffer script on an IP (or network interface for now), which is already implemented.
-2. Add the code for next hop extraction, which looks through the flows F for new IPs, not including the current one or IPs of previously explored components.
-    - Once all these points are done, I will look into adding a max depth input parameter.
-3. Call the sniffer again using the new IPs as input (using the Interfaces.txt file to map the IPs to corresponding network interfaces).
-    - I will try at first to make sequential calls to the sniffer for each new interface, then I will look into allowing the sniffer to accept multiple interfaces at once using multiple threads.
-4. Produce the call graph from a consolidated list of all flows.
+The sniffer program will sniff the given file and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).

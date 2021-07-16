@@ -390,7 +390,7 @@ if __name__ == '__main__':
             generate_graph_from_file(log)
     else: # sniffing network interface
         q, visited = [interfaces[arg]], [interfaces[arg]]
-        if log == "*":
+        if log == "*": # if using tcp
             l = FlowArray()
             while len(q) > 0:
                 print(f"ips in q: {q}")
@@ -413,7 +413,7 @@ if __name__ == '__main__':
                 q.extend(ips)
             stop_client()
             generate_graph(l)
-        else:
+        else: # if using log
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
