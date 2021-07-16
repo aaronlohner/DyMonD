@@ -373,13 +373,16 @@ if __name__ == '__main__':
     interfaces = load_interfaces_dictionary()
 
     if log != "*" and sys.argv[1] == "-i": # if using log and sniffing interface
-        # Sniffer will write to a temp log
-        setup_client(sys.argv[1][1], "temp-log.txt")
-        log = "logs/" + log
         temp_log = "logs/temp-log.txt"
-    else:
+        # Sniffer will write to a temp log
+        setup_client(sys.argv[1][1], temp_log)
+        log = "logs/" + log
+    elif log != "*": # if using log and sniffing pcap file
         setup_client(sys.argv[1][1], log)
-        
+        log = "logs/" + log
+    else: # using tcp
+        setup_client(sys.argv[1][1], log)
+    
     if sys.argv[1] == "-f": # reading from pcap file
         sniff(arg)
         if log == "*": # special char to denote that there is no log to read from
