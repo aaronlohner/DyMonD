@@ -329,7 +329,8 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[
 if __name__ == '__main__':
     arg_line = " ".join(sys.argv[1:])
     if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
-        raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
+        #raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
+        raise SystemExit("Usage: {} (-i | -f) <argument> <-w> <logfile>".format(sys.argv[0]))
 
     arg = None
     if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
@@ -396,11 +397,11 @@ if __name__ == '__main__':
         if log == "*": # if using tcp
             l = FlowArray()
             while len(q) > 0:
-                print(f"ips in q: {q}")
+                print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 f = recv_message(sniffed_info_pb2.FlowArray)
-                print(f"num flows: {len(l.flows)}")
+                print("num flows: {}".format(len(l.flows)))
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
                 else:
@@ -451,5 +452,6 @@ if __name__ == '__main__':
         ''''''
 
     write_json_output("out")
-    print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
+    #print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
+    print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
     # stop_client()
