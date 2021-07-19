@@ -477,7 +477,7 @@ index++;
         }
     }
     myfile.close();
-
+    int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
@@ -506,22 +506,23 @@ index++;
                  FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
              }
+             printf("%d, ", ++counter);
          }
      }
      FP.close();
 
-    std::ifstream logfile(log_str);
+    // std::ifstream logfile(log_str);
 
-    // new lines will be skipped unless we stop it from happening:    
-    logfile.unsetf(std::ios_base::skipws);
+    // // new lines will be skipped unless we stop it from happening:    
+    // logfile.unsetf(std::ios_base::skipws);
 
-    // count the newlines with an algorithm specialized for counting:
-    unsigned line_count = std::count(
-        std::istream_iterator<char>(logfile),
-        std::istream_iterator<char>(), 
-        '\n');
+    // // count the newlines with an algorithm specialized for counting:
+    // unsigned line_count = std::count(
+    //     std::istream_iterator<char>(logfile),
+    //     std::istream_iterator<char>(), 
+    //     '\n');
 
-    std::cout << "Lines: " << line_count << "\n";
+    // std::cout << "Lines: " << line_count << "\n";
 
      if(argc == 1) send_message();
     } else { // use tcp
@@ -539,6 +540,7 @@ index++;
                 else {
                     add_to_flow_array(flowarray[i]);
                 }
+                printf("%d, ", ++counter);
             }
         }
         send_message(flowarray);

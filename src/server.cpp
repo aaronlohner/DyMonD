@@ -2,7 +2,7 @@
 
 int server_fd, client_fd, valread;
 struct sockaddr_in address;
-int opt = 1, counter = 0;
+int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0}, empty_buf[0];
 char service[32] = {0};
@@ -96,8 +96,6 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_is_server(is_server(flow));
 	get_service_type(flow, service);
 	flow_proto->set_service_type(service);
-	
-	printf("%d, ", ++counter);
 }
 
 /*
