@@ -250,13 +250,13 @@ flowarray[foundIndex]->Packets.push_back(array);
                     }
                     else if (dport == 11211) {
       //                  flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Mcach-C");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcache-C");
                         flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
                     else if (sport == 11211) {
         //                flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Mcach-S");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcache-S");
                         flowarray[foundIndex]->protof = true;
                         Pfound = true;
                     }
@@ -510,20 +510,6 @@ index++;
          }
      }
      FP.close();
-
-    // std::ifstream logfile(log_str);
-
-    // // new lines will be skipped unless we stop it from happening:    
-    // logfile.unsetf(std::ios_base::skipws);
-
-    // // count the newlines with an algorithm specialized for counting:
-    // unsigned line_count = std::count(
-    //     std::istream_iterator<char>(logfile),
-    //     std::istream_iterator<char>(), 
-    //     '\n');
-
-    // std::cout << "Lines: " << line_count << "\n";
-
      if(argc == 1) send_message();
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
@@ -532,7 +518,9 @@ index++;
                     diff=0.0;
                     for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                         if (j!=flowarray[i]->Ack_times.size()-1)
-                            diff+=(flowarray[i]->Ack_times[j+1]->sec+flowarray[i]->Ack_times[j+1]->usec*0.000001)-(flowarray[i]->Ack_times[j]->sec+flowarray[i]->Ack_times[j]->usec*0.000001);
+                            diff += (flowarray[i]->Ack_times[j + 1]->sec +
+                                  flowarray[i]->Ack_times[j + 1]->usec * 0.000001) -
+                                 (flowarray[i]->Ack_times[j]->sec + flowarray[i]->Ack_times[j]->usec * 0.000001);
                     }
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
                     add_to_flow_array(flowarray[i], RST);

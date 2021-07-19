@@ -116,10 +116,14 @@ bool is_server(flow *flow){
  */
 void get_service_type(flow *flow, char *service){
 	memset(service, 0, sizeof(service));
-	int i = 0;
-	while(flow->proto[i] != '-'){
-		service[i] = flow->proto[i];
-		i++;
+	if(strstr(flow->proto, "Unknown") != NULL) {
+		strcpy(service, flow->proto);
+	} else {
+		int i = 0;
+		while(flow->proto[i] != '-'){
+			service[i] = flow->proto[i];
+			i++;
+		}
 	}
 }
 
