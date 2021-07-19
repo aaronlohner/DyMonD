@@ -35,7 +35,7 @@ struct flow {
  char *daddr;
  char *sport;
  char *dport;
- char *proto; //proto[32]
+ char proto[32];
  int NumBytes;
  bool protof;
  std::vector<char*> Packets;

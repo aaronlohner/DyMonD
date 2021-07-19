@@ -167,7 +167,7 @@ while (true) {
                     sprintf(f->dport, "%u", dport);
                     f->NumBytes = tcp_dl;
                     f->protof = false;
-                    f->proto = strdup("Unknown");
+                    strncpy(f->proto, "Unknown", 32);//f->proto = strdup("Unknown");
                     flowarray.push_back(f);
                     Pfound = false;
                     foundIndex = flowarray.size() - 1;
@@ -509,6 +509,20 @@ index++;
          }
      }
      FP.close();
+
+    std::ifstream logfile(log_str);
+
+    // new lines will be skipped unless we stop it from happening:    
+    logfile.unsetf(std::ios_base::skipws);
+
+    // count the newlines with an algorithm specialized for counting:
+    unsigned line_count = std::count(
+        std::istream_iterator<char>(logfile),
+        std::istream_iterator<char>(), 
+        '\n');
+
+    std::cout << "Lines: " << line_count << "\n";
+
      if(argc == 1) send_message();
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {

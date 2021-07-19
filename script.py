@@ -388,6 +388,13 @@ if __name__ == '__main__':
         if log == "*": # special char to denote that there is no log to read from
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
+            with open("logs/gen-log.txt", "w") as f:
+                for flow in response.flows:
+                    if flow.is_server:
+                        is_s = "S"
+                    else:
+                        is_s = "C"
+                    f.writelines(f'{flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.service_type}-{is_s} {flow.num_bytes}-{round(flow.rst, 7)}\n')
             generate_graph(response)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
