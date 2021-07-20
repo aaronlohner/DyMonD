@@ -297,9 +297,9 @@ def write_json_output(fname:str):
     output.write("]\n}")
     output.close()  
 
-def load_interfaces_dictionary() -> Dict[str, str]:
+def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
-    with open("Interfaces.txt", "r") as f:
+    with open("Interfaces{}.txt".format(version), "r") as f:
         for line in f:
             k, v = line.split()
             interfaces[k] = v
@@ -375,7 +375,7 @@ if __name__ == '__main__':
     # Temporary implementation: dictionary mapping interfaces to ips,
     # use 'interfaces' dictionary to add ip of input interface to q and visited,
     # reverse-lookup interface from new found ips to pass in to sniff()
-    interfaces = load_interfaces_dictionary()
+    interfaces = load_interfaces_dictionary(1)
 
     if log != "*" and sys.argv[1] == "-i": # if using log and sniffing interface
         # Sniffer will write to a temp log
