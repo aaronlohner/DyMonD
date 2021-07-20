@@ -184,9 +184,12 @@ def generate_graph(flow_array:FlowArray):
         #     newNode1 = node("owl:Class", "Unknown", flow.s_addr, flow.s_port,randomColor())
         #     newNode2 = node("owl:Class", "Unknown", flow.d_addr, flow.d_port,randomColor())
 
-        # (ptype, pname (c/s), paddress, pPort, pcolor)
+        # (ptype, pname, paddress, pPort, pcolor)
         # (port, service type)
-        if not flow.is_server:#node 1 is client and node2 is server
+        if flow.service_type == "Unknown": # neither node is client or server
+            newNode1 = node("owl:Class", flow.service_type, flow.s_addr, flow.s_port, randomColor())
+            newNode2 = node("owl:Class", flow.service_type, flow.d_addr, flow.d_port, randomColor())
+        elif not flow.is_server:#node 1 is client and node2 is server
             newNode1 = node("owl:Class", "Client", flow.s_addr, flow.s_port, randomColor())
             newNode2 = node("owl:equivalentClass", flow.service_type, flow.d_addr, flow.d_port, randomColor())
         else:#node 1 is server and node2 is client
@@ -198,9 +201,11 @@ def generate_graph(flow_array:FlowArray):
 
             for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                 if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
+                    print("reassigning color")
                     newNode1.color = nodes[key].color
                     edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
                 elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
+                    print("reassigning color")                    
                     newNode1.color = nodes[key].color
                     edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
         else:

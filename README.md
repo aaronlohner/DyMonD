@@ -39,3 +39,10 @@ The sniffer program will sniff the given interface and sends the results to the 
 3. In the second shell, in the `DyMonD` repository, run the client with the pcap file option by running `python3 script.py -f <filename> [-w <log>]`. Note that omitting the `<filename>` argument will use the default file `teastoreall.pcap` located in the `captures` folder. Note: when running this script in file mode using the default for the first time, the `captures` directory must first be created in the root of the repository and the file must be placed in that directory (it is not part of this repository).
 
 The sniffer program will sniff the given file and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
+
+
+sudo docker exec -it generator bash
+java -jar httploadgenerator.jar loadgenerator
+
+sudo docker exec -it generator bash
+java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low.csv -l ./teastore_browse.lua -t 50
