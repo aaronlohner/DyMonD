@@ -417,20 +417,22 @@ if __name__ == '__main__':
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 f = recv_message(sniffed_info_pb2.FlowArray)
+                if f is not None:
+                    print("num received flows: {}".format(len(f.flows)))
+                    if len(l.flows) == 0:
+                        l.flows.extend(f.flows)
+                    else:
+                        for new_flow in f.flows:
+                            for flow in l.flows:
+                                exists = False
+                                if equal_flows(new_flow, flow):
+                                    exists = True
+                                    break
+                            if not exists:
+                                l.flows.append(new_flow)
+                    ips, visited = next_hop_extractor(f, ip, visited)
+                    q.extend(ips)
                 print("num accumulated flows: {}".format(len(l.flows)))
-                if len(l.flows) == 0:
-                    l.flows.extend(f.flows)
-                else:
-                    for new_flow in f.flows:
-                        for flow in l.flows:
-                            exists = False
-                            if equal_flows(new_flow, flow):
-                                exists = True
-                                break
-                        if not exists:
-                            l.flows.append(new_flow)
-                ips, visited = next_hop_extractor(f, ip, visited)
-                q.extend(ips)
             stop_client()
             generate_graph(l)
         else: # if using log
@@ -442,7 +444,7 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("num accumulated flows: {}".format(len(l.readlines())))
+                    print("num received flows: {}".format(len(f.readlines())))
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
@@ -459,8 +461,10 @@ if __name__ == '__main__':
                     l.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(temp_log, ip, visited)
                 q.extend(ips)
+                print("num accumulated flows: {}".format(len(l.readlines())))
                 lines_to_write.clear()
             stop_client()
+            os.remove(temp_log)
             generate_graph_from_file(log)
         ''''''
     #generate_graph_from_file("logs/log-teastore_browse_medium-100sec.txt")
