@@ -44,5 +44,10 @@ The sniffer program will sniff the given file and sends the results to the clien
 sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
-sudo docker exec -it generator bash
 java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low.csv -l ./teastore_browse.lua -t 50
+
+br-39ff5688aa92
+
+telnet 172.17.0.2 11211
+flush_all
+quit

@@ -353,7 +353,7 @@ if __name__ == '__main__':
             log = sys.argv[-1]
         else:
             log = "log.txt"
-
+    
     t = time.perf_counter()
 
     '''ORIGINAL VERSION
@@ -436,12 +436,12 @@ if __name__ == '__main__':
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
-                #print(f"ips in q: {q}")
+                print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    # Add new flows to the main list
+                    print("num flows: {}".format(len(l)))
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
@@ -453,19 +453,16 @@ if __name__ == '__main__':
                                     break
                             if not exists:
                                 lines_to_write.append(new_line)
-                            # else: overwrite existing line with sum of throughput, avg rst?
-                            # doesn't that get done later anyway? maybe just append all new lines
-                            # to master list, regardless of repeated lines?
                             l.seek(0)
-                with open(log, "a") as f:
-                    f.writelines(lines_to_write)
+                with open(log, "a") as l:
+                    l.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(temp_log, ip, visited)
                 q.extend(ips)
                 lines_to_write.clear()
             stop_client()
             generate_graph_from_file(log)
         ''''''
-
+    #generate_graph_from_file("logs/log-teastore_browse_medium-100sec.txt")
     write_json_output("out")
     #print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
