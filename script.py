@@ -461,7 +461,7 @@ if __name__ == '__main__':
                     l.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(temp_log, ip, visited)
                 q.extend(ips)
-                print("num accumulated flows: {}".format(len(l.readlines())))
+                print("num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
             stop_client()
             os.remove(temp_log)
