@@ -409,6 +409,7 @@ if __name__ == '__main__':
             generate_graph_from_file(log)
     else: # sniffing network interface
         q, visited = [interfaces[arg]], [interfaces[arg]]
+        exists = False
         if log == "*": # if using tcp
             l = FlowArray()
             while len(q) > 0:
@@ -416,7 +417,7 @@ if __name__ == '__main__':
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 f = recv_message(sniffed_info_pb2.FlowArray)
-                print("num flows: {}".format(len(l.flows)))
+                print("num accumulated flows: {}".format(len(l.flows)))
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
                 else:
@@ -441,7 +442,7 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("num flows: {}".format(len(l.readlines())))
+                    print("num accumulated flows: {}".format(len(l.readlines())))
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
