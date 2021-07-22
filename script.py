@@ -299,7 +299,7 @@ def write_json_output(fname:str):
 
 def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
-    with open("Interfaces{}.txt".format(version), "r") as f:
+    with open("interfaces/Interfaces{}.txt".format(version), "r") as f:
         for line in f:
             k, v = line.split()
             interfaces[k] = v
@@ -441,7 +441,7 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("num flows: {}".format(len(l)))
+                    print("num flows: {}".format(len(l.readlines())))
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
