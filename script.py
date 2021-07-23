@@ -375,7 +375,7 @@ if __name__ == '__main__':
     # Temporary implementation: dictionary mapping interfaces to ips,
     # use 'interfaces' dictionary to add ip of input interface to q and visited,
     # reverse-lookup interface from new found ips to pass in to sniff()
-    interfaces = load_interfaces_dictionary(1)
+    interfaces = load_interfaces_dictionary(2)
 
     if log != "*" and sys.argv[1] == "-i": # if using log and sniffing interface
         # Sniffer will write to a temp log
@@ -423,6 +423,11 @@ if __name__ == '__main__':
                         l.flows.extend(f.flows)
                     else:
                         for new_flow in f.flows:
+                            if flow.is_server:
+                                is_s = "S"
+                            else:
+                                is_s = "C"
+                            print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, round(flow.rst, 7)))
                             for flow in l.flows:
                                 exists = False
                                 if equal_flows(new_flow, flow):

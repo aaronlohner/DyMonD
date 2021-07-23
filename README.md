@@ -40,14 +40,18 @@ The sniffer program will sniff the given interface and sends the results to the 
 
 The sniffer program will sniff the given file and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
 
+*To clear memcache before running ycsb worload*
+telnet 172.17.0.2 11211
+flush_all
+quit
 
+*To run teastore workload*
 sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
 java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low.csv -l ./teastore_browse.lua -t 50
-
+*gateway interface:*
 br-39ff5688aa92
 
-telnet 172.17.0.2 11211
-flush_all
-quit
+*To filter through a docker container*
+sudo docker inspect 615fcfe8b0fe | grep "IP" | head -n30

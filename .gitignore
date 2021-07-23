@@ -5,7 +5,6 @@ captures/
 flows/
 json/
 logs/
-interfaces/
 test/
 
 *.zip
