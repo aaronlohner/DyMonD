@@ -312,11 +312,11 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
             return True
     return False
 
-def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
     if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
-            if flow.s_addr == ip:
+            if gateway_ip or flow.s_addr == ip:
                 new_ip = flow.d_addr
                 if new_ip not in visited:
                     ips.append(new_ip)
@@ -324,7 +324,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[
     else:
         with open(new_flows_container, "r") as f:
             for line in f:
-                if line.split(':')[0] == ip: # if flow has current ip as saddr
+                if gateway_ip or line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
                     if new_ip not in visited:
                         ips.append(new_ip)
@@ -408,7 +408,7 @@ if __name__ == '__main__':
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
-        q, visited = [interfaces[arg]], [interfaces[arg]]
+        q, visited, ips = [interfaces[arg]], [interfaces[arg]], []
         exists = False
         if log == "*": # if using tcp
             l = FlowArray()
@@ -419,12 +419,12 @@ if __name__ == '__main__':
                 f = recv_message(sniffed_info_pb2.FlowArray)
                 if f is not None:
                     print("num received flows: {}".format(len(f.flows)))
-                    for flow in f.flows:
-                        if flow.is_server:
-                            is_s = "S"
-                        else:
-                            is_s = "C"
-                        print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, round(flow.rst, 7)))
+                    # for flow in f.flows:
+                    #     if flow.is_server:
+                    #         is_s = "S"
+                    #     else:
+                    #         is_s = "C"
+                    #     print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, round(flow.rst, 7)))
                     if len(l.flows) == 0:
                         l.flows.extend(f.flows)
                     else:
@@ -436,7 +436,10 @@ if __name__ == '__main__':
                                     break
                             if not exists:
                                 l.flows.append(new_flow)
-                    ips, visited = next_hop_extractor(f, ip, visited)
+                    if ip == "127.20.0.1": # temporary measure, must know this upon startup of script
+                        ips, visited = next_hop_extractor(f, ip, True, visited)
+                    else:
+                        ips, visited = next_hop_extractor(f, ip, False, visited)
                     q.extend(ips)
                 print("num accumulated flows: {}".format(len(l.flows)))
             stop_client()
@@ -465,7 +468,10 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(temp_log, ip, visited)
+                if ip == "127.20.0.1": # temporary measure, must know this upon startup of script
+                    ips, visited = next_hop_extractor(temp_log, ip, True, visited)
+                else:
+                    ips, visited = next_hop_extractor(temp_log, ip, False, visited)
                 q.extend(ips)
                 print("num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
