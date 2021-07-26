@@ -300,7 +300,7 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
     with open("interfaces/Interfaces{}.txt".format(version), "r") as f:
         for line in f:
-            k, v, _ = line.split()
+            k, v = line.split(maxsplit=1)
             interfaces[k] = v
     return interfaces
 
@@ -349,7 +349,6 @@ if __name__ == '__main__':
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from new found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
-    print(args)
 
     opt, arg = None, None
     if args.interface is not None:
