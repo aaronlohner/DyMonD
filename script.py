@@ -313,7 +313,7 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
 
 def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
-    if type(new_flows_container) is not TextIOWrapper:
+    if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
             if gateway_ip or flow.s_addr == ip:
                 new_ip = flow.d_addr
@@ -385,7 +385,6 @@ if __name__ == '__main__':
         if args.file == "teastoreall.pcap":
             print("Using teastoreall.pcap")
     log = args.log
-    print("log: {}".format(log))
     
     t = time.perf_counter()
 
@@ -493,7 +492,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
+                ips, visited = next_hop_extractor(temp_log, ip, args.gateway, visited)
                 q.extend(ips)
                 print("num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
