@@ -338,7 +338,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed")
-    group.add_argument("-i", "--interface", nargs="?", const="e69b93ccc8384_l", help="perform live sniffing starting with interface")
+    group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-d", "--dictionary", nargs='?', const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
     parser.add_argument("-l", "--log", nargs="?", const="log.txt", help="send results from sniffer using log file")
@@ -376,8 +376,8 @@ if __name__ == '__main__':
     if args.interface is not None:
         opt = "i"
         arg = args.interface
-        if args.interface == "e69b93ccc8384_l":
-            print("Using e69b93ccc8384_l")
+        if args.interface == "br-39ff5688aa92":
+            print("Using br-39ff5688aa92")
     elif args.file is not None:
         opt = "f"
         arg = args.file
@@ -465,10 +465,7 @@ if __name__ == '__main__':
                                     break
                             if not exists:
                                 l.flows.append(new_flow)
-                    if ip == "172.20.0.1": # temporary measure, must know this upon startup of script
-                        ips, visited = next_hop_extractor(f, ip, True, visited)
-                    else:
-                        ips, visited = next_hop_extractor(f, ip, False, visited)
+                    ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
                     q.extend(ips)
                 print("num accumulated flows: {}".format(len(l.flows)))
             stop_client()
@@ -497,10 +494,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                if ip == "172.20.0.1": # temporary measure, must know this upon startup of script
-                    ips, visited = next_hop_extractor(temp_log, ip, True, visited)
-                else:
-                    ips, visited = next_hop_extractor(temp_log, ip, False, visited)
+                ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
                 q.extend(ips)
                 print("num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()

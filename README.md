@@ -49,7 +49,7 @@ quit
 sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
-java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low.csv -l ./teastore_browse.lua -t 50
+java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low2.csv -l ./teastore_browse.lua -t 50
 *gateway interface:*
 br-39ff5688aa92
 
