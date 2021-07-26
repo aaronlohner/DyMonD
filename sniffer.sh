@@ -8,7 +8,7 @@ g++ -o sniffer src/sniffer_MT_URLS.cpp src/server.cpp proto_gen/sniffed_info.pb.
 mkdir -p captures flows json logs
 # Start up sniffer
 case $1 in
-	-i|-f) sudo ./sniffer $1 $2;;
+	-t|-i|-f) sudo ./sniffer $1 $2;;
 	-p) sudo ./sniffer $1;;
 	*) sudo ./sniffer;;
 esac

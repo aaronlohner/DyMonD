@@ -406,12 +406,12 @@ if __name__ == '__main__':
     '''
 
     '''NEW VERSION'''
-    if opt == "i" and args.log is not None: # if sniffing interface and using log
+    if opt == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
         setup_client(opt, "temp-log.txt")
         temp_log = "logs/temp-log.txt"
         log = "logs/" + log
-    elif args.log is not None: # if sniffing file and using log
+    elif log != "*": # if sniffing file and using log
         setup_client(opt, log)
         log = "logs/" + log
     else: # using tcp
@@ -419,7 +419,7 @@ if __name__ == '__main__':
     
     if opt == "f": # reading from pcap file
         sniff(arg)
-        if args.log is None:
+        if log == "*":
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
             # with open("logs/gen-log.txt", "w") as f:
@@ -439,7 +439,7 @@ if __name__ == '__main__':
     else: # sniffing network interface
         q, visited, ips = [interfaces[arg]], [interfaces[arg]], []
         exists = False
-        if args.log is None: # if using tcp
+        if log == "*": # if using tcp
             l = FlowArray()
             while len(q) > 0:
                 print("ips in q: {}".format(q))
@@ -447,7 +447,7 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 f = recv_message(sniffed_info_pb2.FlowArray)
                 if f is not None:
-                    print("num received flows: {}".format(len(f.flows)))
+                    print("Num received flows: {}".format(len(f.flows)))
                     # for flow in f.flows:
                     #     if flow.is_server:
                     #         is_s = "S"
@@ -467,7 +467,7 @@ if __name__ == '__main__':
                                 l.flows.append(new_flow)
                     ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
                     q.extend(ips)
-                print("num accumulated flows: {}".format(len(l.flows)))
+                print("Num accumulated flows: {}".format(len(l.flows)))
             stop_client()
             generate_graph(l)
         else: # if using log
