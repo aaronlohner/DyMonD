@@ -1,9 +1,7 @@
 import os
-import sys
-import re
+import argparse
 import time
 import random
-from io import TextIOWrapper
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
@@ -332,27 +330,63 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
     return (ips, visited)
 
 if __name__ == '__main__':
-    arg_line = " ".join(sys.argv[1:])
-    if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
-        #raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
-        raise SystemExit("Usage: {} (-i | -f) <argument> <-w> <logfile>".format(sys.argv[0]))
+    # arg_line = " ".join(sys.argv[1:])
+    # if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
+    #     #raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
+    #     raise SystemExit("Usage: {} (-i | -f) <argument> <-w> <logfile>".format(sys.argv[0]))
 
-    arg = None
-    if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-        print("Using e69b93ccc8384_l")
-        arg = "e69b93ccc8384_l" # default network interface from compute-04 node
-    elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-        print("Using teastoreall.pcap")
-        arg = "teastoreall.pcap" # default pcap file
-    else:
-        arg = sys.argv[2]
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed")
+    group.add_argument("-i", "--interface", nargs="?", const="e69b93ccc8384_l", help="perform live sniffing starting with interface")
+    parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
+    parser.add_argument("-d", "--dictionary", nargs='?', const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
+    parser.add_argument("-l", "--log", nargs="?", const="log.txt", help="send results from sniffer using log file")
+    args = parser.parse_args()
+    if args.gateway and args.interface is None:
+        parser.error("--gateway requires --interface.")
+    interfaces = None
+    if args.dictionary and args.interface is None:
+        parser.error("--dictionary requires --interface.")
+    elif args.dictionary is not None:
+        # Temporary implementation: dictionary mapping interfaces to ips,
+        # use 'interfaces' dictionary to add ip of input interface to q and visited,
+        # reverse-lookup interface from new found ips to pass in to sniff()
+        interfaces = load_interfaces_dictionary(args.dictionary)
+    print(args)
+
+    # arg = None
+    # if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
+    #     print("Using e69b93ccc8384_l")
+    #     arg = "e69b93ccc8384_l" # default network interface from compute-04 node
+    # elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
+    #     print("Using teastoreall.pcap")
+    #     arg = "teastoreall.pcap" # default pcap file
+    # else:
+    #     arg = sys.argv[2]
+
+    # log = "*"
+    # if "-w" in sys.argv:
+    #     if sys.argv[-1] != "-w":
+    #         log = sys.argv[-1]
+    #     else:
+    #         log = "log.txt"
+
+    opt, arg = None, None
+    if args.interface is not None:
+        opt = "i"
+        arg = args.interface
+        if args.interface == "e69b93ccc8384_l":
+            print("Using e69b93ccc8384_l")
+    elif args.file is not None:
+        opt = "f"
+        arg = args.file
+        if args.file == "teastoreall.pcap":
+            print("Using teastoreall.pcap")
 
     log = "*"
-    if "-w" in sys.argv:
-        if sys.argv[-1] != "-w":
-            log = sys.argv[-1]
-        else:
-            log = "log.txt"
+    if args.log is not None:
+        log = args.log
     
     t = time.perf_counter()
 
@@ -372,25 +406,20 @@ if __name__ == '__main__':
     '''
 
     '''NEW VERSION'''
-    # Temporary implementation: dictionary mapping interfaces to ips,
-    # use 'interfaces' dictionary to add ip of input interface to q and visited,
-    # reverse-lookup interface from new found ips to pass in to sniff()
-    interfaces = load_interfaces_dictionary(2)
-
-    if log != "*" and sys.argv[1] == "-i": # if using log and sniffing interface
+    if opt == "i" and args.log is not None: # if sniffing interface and using log
         # Sniffer will write to a temp log
-        setup_client(sys.argv[1][1], "temp-log.txt")
+        setup_client(opt, "temp-log.txt")
         temp_log = "logs/temp-log.txt"
         log = "logs/" + log
-    elif log != "*": # if using log and sniffing pcap file
-        setup_client(sys.argv[1][1], log)
+    elif args.log is not None: # if sniffing file and using log
+        setup_client(opt, log)
         log = "logs/" + log
     else: # using tcp
-        setup_client(sys.argv[1][1], log)
+        setup_client(opt, log)
     
-    if sys.argv[1] == "-f": # reading from pcap file
+    if opt == "f": # reading from pcap file
         sniff(arg)
-        if log == "*": # special char to denote that there is no log to read from
+        if args.log is None:
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
             # with open("logs/gen-log.txt", "w") as f:
@@ -410,7 +439,7 @@ if __name__ == '__main__':
     else: # sniffing network interface
         q, visited, ips = [interfaces[arg]], [interfaces[arg]], []
         exists = False
-        if log == "*": # if using tcp
+        if args.log is None: # if using tcp
             l = FlowArray()
             while len(q) > 0:
                 print("ips in q: {}".format(q))
@@ -436,7 +465,7 @@ if __name__ == '__main__':
                                     break
                             if not exists:
                                 l.flows.append(new_flow)
-                    if ip == "127.20.0.1": # temporary measure, must know this upon startup of script
+                    if ip == "172.20.0.1": # temporary measure, must know this upon startup of script
                         ips, visited = next_hop_extractor(f, ip, True, visited)
                     else:
                         ips, visited = next_hop_extractor(f, ip, False, visited)
@@ -468,7 +497,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                if ip == "127.20.0.1": # temporary measure, must know this upon startup of script
+                if ip == "172.20.0.1": # temporary measure, must know this upon startup of script
                     ips, visited = next_hop_extractor(temp_log, ip, True, visited)
                 else:
                     ips, visited = next_hop_extractor(temp_log, ip, False, visited)

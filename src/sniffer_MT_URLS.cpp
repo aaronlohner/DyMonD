@@ -27,6 +27,7 @@ char* interface = NULL;
 char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
+double duration=30.0;
 
 
 void GetURLs( std::vector<char*> Packets)
@@ -74,9 +75,9 @@ void *process_packet_queue(void*) {
     double run_duration ;
     clock_t begin = clock();
 if(LiveMode)
-  run_duration=30.1;
+  run_duration=duration+0.1;//30.1;
 else
-  run_duration=100.0;
+  run_duration=duration;//100.0;
 while (true) {
 
     clock_t end = clock();
@@ -299,7 +300,7 @@ capture_main(void *) {
     raw_pkt *pkt = NULL;
     clock_t begin, end;
     double elapsed_time;
-    double sniff_duration = 30.0;
+    double sniff_duration = duration;//30.0;
     if (!LiveMode)
     cap = pcap_open_offline(tracefile, errbuf);
     else
@@ -362,8 +363,14 @@ int main(int argc, char *argv[]){
 
 
 InitMethodName();    
-while((opt = getopt(argc, argv, "i:f:p")) != -1){
+while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
 		switch(opt){
+            case 't':
+                if(atof(optarg) <= 0 || atof(optarg) > 1000) {
+                    printf("Time out of range");
+                    exit(EXIT_FAILURE);
+                } else duration = atof(optarg);
+                break;
 			case 'i':
 				interface = optarg; break;
 			case 'p':
@@ -376,7 +383,7 @@ while((opt = getopt(argc, argv, "i:f:p")) != -1){
 char mode_buf[64], log[64], arg[64];
 bool sniff_more = true;
 string capture_dir = "captures/";
-if(argc == 1){
+if(argc == 1 || strstr(argv[1], "-t") != NULL){
     setup_server(); // prepare server for incoming client tcp connection
     receive_message(mode_buf); // receive indication if using interface or reading from file
     receive_message(log); // receive indication if sending via tcp or writing to logfile
