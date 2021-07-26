@@ -1,3 +1,4 @@
+from io import TextIOWrapper
 import os
 import argparse
 import time
@@ -312,7 +313,7 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
 
 def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
-    if type(new_flows_container) is not str:
+    if type(new_flows_container) is not TextIOWrapper:
         for flow in new_flows_container.flows:
             if gateway_ip or flow.s_addr == ip:
                 new_ip = flow.d_addr
