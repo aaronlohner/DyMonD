@@ -300,8 +300,9 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
     with open("interfaces/Interfaces{}.txt".format(version), "r") as f:
         for line in f:
-            k, v, _ = line.split()
-            interfaces[k] = v
+            # this method works even for lines with more than two whitespace-separated parts
+            split_line = line.split()
+            interfaces[split_line[0]] = split_line[1]
     return interfaces
 
 def equal_flows(new_flow:Flow, flow:Flow) -> bool:
