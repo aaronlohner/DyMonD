@@ -300,7 +300,7 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
     with open("interfaces/Interfaces{}.txt".format(version), "r") as f:
         for line in f:
-            k, v = line.split(maxsplit=1)
+            k, v, _ = line.split()
             interfaces[k] = v
     return interfaces
 

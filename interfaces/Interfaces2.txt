@@ -1,4 +1,4 @@
-br-39ff5688aa92 172.20.0.1 gateway
+br-39ff5688aa92 172.20.0.1
 veth605858d 172.20.0.7 db
 veth7420a93 172.20.0.3 image
 veth28e0786 172.20.0.5 persistence
