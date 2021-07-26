@@ -331,11 +331,6 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
     return (ips, visited)
 
 if __name__ == '__main__':
-    # arg_line = " ".join(sys.argv[1:])
-    # if re.match("-[if](\s+[\w.\-]*)?(\s+-w(\s+[\w.\-]*)?)?$", arg_line) is None:
-    #     #raise SystemExit(f"Usage: {sys.argv[0]} (-i | -f) <argument> <-w> <logfile>")
-    #     raise SystemExit("Usage: {} (-i | -f) <argument> <-w> <logfile>".format(sys.argv[0]))
-
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed")
@@ -354,24 +349,9 @@ if __name__ == '__main__':
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from new found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
+        print("interfaces dict: {}".format(interfaces))
+        print("interfaces: {}".format(list(interfaces.values())))
     print(args)
-
-    # arg = None
-    # if sys.argv[1] == "-i" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-    #     print("Using e69b93ccc8384_l")
-    #     arg = "e69b93ccc8384_l" # default network interface from compute-04 node
-    # elif sys.argv[1] == "-f" and (len(sys.argv) == 2 or sys.argv[2] == "-w"):
-    #     print("Using teastoreall.pcap")
-    #     arg = "teastoreall.pcap" # default pcap file
-    # else:
-    #     arg = sys.argv[2]
-
-    # log = "*"
-    # if "-w" in sys.argv:
-    #     if sys.argv[-1] != "-w":
-    #         log = sys.argv[-1]
-    #     else:
-    #         log = "log.txt"
 
     opt, arg = None, None
     if args.interface is not None:
@@ -474,11 +454,11 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
-                print("interfaces: {}".format(list(interfaces.values())))
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
                     print("Num received flows: {}".format(len(f.readlines())))
+                    f.seek(0)
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
