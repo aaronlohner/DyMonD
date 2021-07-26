@@ -349,8 +349,6 @@ if __name__ == '__main__':
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from new found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
-        print("interfaces dict: {}".format(interfaces))
-        print("interfaces: {}".format(list(interfaces.values())))
     print(args)
 
     opt, arg = None, None
@@ -472,7 +470,6 @@ if __name__ == '__main__':
                                 lines_to_write.append(new_line)
                             l.seek(0)
                 with open(log, "a") as l:
-                    print("num lines: {}".format(len(lines_to_write)))
                     l.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(temp_log, ip, args.gateway, visited)
                 q.extend(ips)
