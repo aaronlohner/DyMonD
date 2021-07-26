@@ -1,10 +1,10 @@
-br-39ff5688aa92 172.20.0.1
-veth605858d 172.20.0.7
-veth7420a93 172.20.0.3
-veth28e0786 172.20.0.5
-veth65a685e 172.20.0.4
-veth0ff65d9 172.20.0.6
-vethaabf019 172.20.0.8
-veth7391042 172.20.0.2
-veth8b1a483 172.20.0.9
-vethbc496af 172.20.0.10
+br-39ff5688aa92 172.20.0.1 gateway
+veth605858d 172.20.0.7 db
+veth7420a93 172.20.0.3 image
+veth28e0786 172.20.0.5 persistence
+veth65a685e 172.20.0.4 webui
+veth0ff65d9 172.20.0.6 auth
+vethaabf019 172.20.0.8 registry
+veth7391042 172.20.0.2 generator
+veth8b1a483 172.20.0.9 recommender
+vethbc496af 172.20.0.10 N/A
