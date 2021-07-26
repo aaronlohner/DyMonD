@@ -474,10 +474,11 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
+                print("interfaces: {}".format(list(interfaces.values())))
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message(None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("num received flows: {}".format(len(f.readlines())))
+                    print("Num received flows: {}".format(len(f.readlines())))
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
                     else:
@@ -491,10 +492,11 @@ if __name__ == '__main__':
                                 lines_to_write.append(new_line)
                             l.seek(0)
                 with open(log, "a") as l:
+                    print("num lines: {}".format(len(lines_to_write)))
                     l.writelines(lines_to_write)
                 ips, visited = next_hop_extractor(temp_log, ip, args.gateway, visited)
                 q.extend(ips)
-                print("num accumulated flows: {}".format(len(open(log, "r").readlines())))
+                print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
             stop_client()
             os.remove(temp_log)
