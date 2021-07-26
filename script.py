@@ -341,7 +341,7 @@ if __name__ == '__main__':
     group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-d", "--dictionary", nargs='?', const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
-    parser.add_argument("-l", "--log", nargs="?", const="log.txt", help="send results from sniffer using log file")
+    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file")
     args = parser.parse_args()
     if args.gateway and args.interface is None:
         parser.error("--gateway requires --interface.")
@@ -383,10 +383,8 @@ if __name__ == '__main__':
         arg = args.file
         if args.file == "teastoreall.pcap":
             print("Using teastoreall.pcap")
-
-    log = "*"
-    if args.log is not None:
-        log = args.log
+    log = args.log
+    print("log: {}".format(log))
     
     t = time.perf_counter()
 
