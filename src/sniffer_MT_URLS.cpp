@@ -506,7 +506,7 @@ index++;
                                   flowarray[i]->Ack_times[j + 1]->usec * 0.000001) -
                                  (flowarray[i]->Ack_times[j]->sec + flowarray[i]->Ack_times[j]->usec * 0.000001);
                  }
-                 RST = abs(diff / (flowarray[i]->Ack_times.size() - 1));
+                 RST = (int)(abs(diff / (flowarray[i]->Ack_times.size() - 1)) * 1000.0)/1000.0;
                  FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
              } else {

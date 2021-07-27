@@ -1,4 +1,3 @@
-from io import TextIOWrapper
 import os
 import argparse
 import time
@@ -105,7 +104,7 @@ def generate_graph_from_file(log:str):
                 newNode2 = node("owl:Class", "Unknown", node2.split(":")[0], node22,randomColor())
             if newNode1 not in nodes.values():#if node 1 is not included in graph
                 id1 = len(nodes)
-                nodes[len(nodes)] = newNode1#expand node list
+                nodes[len(nodes)] = newNode1#expand node dictionary
                 
                 for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                     if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
@@ -124,7 +123,7 @@ def generate_graph_from_file(log:str):
                         
             if newNode2 not in nodes.values():#if node 2 is not included in graph
                 id2 = len(nodes)
-                nodes[len(nodes)] = newNode2#expand node list
+                nodes[len(nodes)] = newNode2#expand node dictionary
                 
                 for key in nodes:#assign same color to nodes with same IPaddress
                     if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
@@ -143,7 +142,7 @@ def generate_graph_from_file(log:str):
                         
             if "-" in weight:#if edge information contains more than throughput, add more information to the edge
                 th, rst = weight.split("-", 1)
-                newEdge = edge("owl:ObjectProperty", th, rst,1, str(id1), str(id2))
+                newEdge = edge("owl:ObjectProperty", th, str(round(float(rst), 3)),1, str(id1), str(id2))
             else:#only throughput
                 th = weight
                 newEdge = edge("owl:ObjectProperty", th,0,1, str(id1), str(id2))
@@ -155,10 +154,9 @@ def generate_graph_from_file(log:str):
                         edges[key].TH = str(int(edges[key].TH) + int(th))
                         edges[key].C = str(int(edges[key].C) + 1)
                         if rst:
-                            # print(str(edges[key]) + str(rst))
                             oRST = float(edges[key].RST)
                             oC = int(edges[key].C)
-                            edges[key].RST = str((oRST*(oC-1) + float(rst))/oC)
+                            edges[key].RST = str(round((oRST*(oC-1) + float(rst))/oC, 3))
             rst = 0
             newNode1 = None
             newNode2 = None
@@ -196,7 +194,7 @@ def generate_graph(flow_array:FlowArray):
             newNode2 = node("owl:Class", "Client", flow.d_addr, flow.d_port, randomColor())
         if newNode1 not in nodes.values():#if node 1 is not included in graph
             id1 = len(nodes)
-            nodes[len(nodes)] = newNode1#expand node list
+            nodes[len(nodes)] = newNode1#expand node dictionary
 
             for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                 if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
@@ -217,7 +215,7 @@ def generate_graph(flow_array:FlowArray):
         
         if newNode2 not in nodes.values():#if node 2 is not included in graph
             id2 = len(nodes)
-            nodes[len(nodes)] = newNode2#expand node list
+            nodes[len(nodes)] = newNode2#expand node dictionary
             
             for key in nodes:#assign same color to nodes with same IPaddress
                 if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
@@ -234,7 +232,7 @@ def generate_graph(flow_array:FlowArray):
                         nodes[key].name = "Client"
                     break
 
-        newEdge = edge("owl:ObjectProperty", str(flow.num_bytes), str(flow.rst), 1, str(id1), str(id2))
+        newEdge = edge("owl:ObjectProperty", str(flow.num_bytes), str(round(flow.rst, 3)), 1, str(id1), str(id2))
         if newEdge not in edges.values():#add new edge
             edges[len(edges)] = newEdge
         else:
@@ -243,10 +241,9 @@ def generate_graph(flow_array:FlowArray):
                     edges[key].TH = str(int(edges[key].TH) + int(flow.num_bytes))
                     edges[key].C = str(int(edges[key].C) + 1)
                     if flow.rst:
-                        # print(str(edges[key]) + str(flow.rst))
                         oRST = float(edges[key].RST)
                         oC = int(edges[key].C)
-                        edges[key].RST = str((oRST*(oC-1) + float(flow.rst))/oC)
+                        edges[key].RST = str(round((oRST*(oC-1) + float(flow.rst))/oC, 3))
         newNode1 = None
         newNode2 = None
         id1 = None
