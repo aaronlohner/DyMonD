@@ -2,6 +2,7 @@ import os
 import argparse
 import time
 import random
+import json
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen import sniffed_info_pb2
@@ -109,9 +110,13 @@ def generate_graph_from_file(log:str):
                 for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                     if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
                         newNode1.color = nodes[key].color
+                        print("same address: {}".format(newNode1.address))
+                        print("colours: {}, {}".format(newNode1.color, nodes[key].color))
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
                     elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
                         newNode1.color = nodes[key].color
+                        print("same address: {}".format(newNode1.address))
+                        print("colours: {}, {}".format(newNode1.color, nodes[key].color))
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
             else:
                 for key in nodes:
@@ -127,10 +132,10 @@ def generate_graph_from_file(log:str):
                 
                 for key in nodes:#assign same color to nodes with same IPaddress
                     if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
-                        newNode2.color = nodes[key].color
+                        #newNode2.color = nodes[key].color
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id2))
                     elif nodes[key].address == newNode2.address and nodes[key].type == "owl:equivalentClass" and newNode2.type == "owl:Class":
-                        newNode2.color = nodes[key].color
+                        #newNode2.color = nodes[key].color
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id2), str(key))
             else:
                 for key in nodes:
@@ -249,7 +254,7 @@ def generate_graph(flow_array:FlowArray):
         id1 = None
         id2 = None
 
-def write_json_output(fname:str):
+def write_json_output_legacy(fname:str):
     print("Writing json output")
     output = open("json/" + fname + ".json", "w")#output
     output.write("{")
@@ -291,7 +296,25 @@ def write_json_output(fname:str):
             else:
                 output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH + ", C: " + (str)(edges[key].C) + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
     output.write("]\n}")
-    output.close()  
+    output.close()
+
+def write_json_output(fname:str):
+    print("Writing json output")
+    json_dict = {}
+    json_dict["class"] = [{"id":str(key), "type":nodes[key].type} for key in nodes]
+    json_dict["classAttribute"] = [{"id":str(key), "label":nodes[key].name, "comment":{"undefined":nodes[key].address + " Port: " + nodes[key].port}, "attributes":[nodes[key].color]} for key in nodes]
+    json_dict["property"] = [{"id":str(key), "type":edges[key].type} for key in edges]
+    json_dict["propertyAttribute"] = [{"id":str(key), "label":edges[key].TH if edges[key].TH == "same address" else "TH: " + edges[key].TH + ", ", "domain":edges[key].domain, "range":edges[key].range} for key in edges]
+    for propAtt in json_dict["propertyAttribute"]:
+        if propAtt["label"] != "same address":
+            key = int(propAtt["id"])
+            if float(edges[key].RST):
+                propAtt["label"] += "RST: " + edges[key].RST
+            else:
+                propAtt["label"] += "C: " + str(edges[key].C)
+    json_obj = json.dumps(json_dict, indent = 4)
+    with open("json/" + fname + ".json", "w") as output:
+        output.write(json_obj)
 
 def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
@@ -336,13 +359,17 @@ if __name__ == '__main__':
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-d", "--dictionary", nargs='?', const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
     parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file")
+    parser.add_argument("-o", "--output", default="out.json", help="name of json output file")
     args = parser.parse_args()
     if args.gateway and args.interface is None:
         parser.error("--gateway requires --interface.")
-    interfaces = None
-    if args.dictionary and args.interface is None:
+    interfaces = {}
+    if args.dictionary is not None and args.interface is None:
         parser.error("--dictionary requires --interface.")
-    elif args.dictionary is not None:
+    # Temporary measure until next hop extractor can match IPs to interfaces automatically
+    elif args.interface is not None and args.dictionary is None:
+        parser.error("--interface requires --dictionary (temporary measure).")
+    if args.dictionary is not None:
         # Temporary implementation: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from new found ips to pass in to sniff()
@@ -477,7 +504,7 @@ if __name__ == '__main__':
             generate_graph_from_file(log)
         ''''''
     #generate_graph_from_file("logs/log-teastore_browse_medium-100sec.txt")
-    write_json_output("out")
+    write_json_output(args.output)
     #print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
     # stop_client()
