@@ -50,6 +50,8 @@ sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
 java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low2.csv -l ./teastore_browse.lua -t 50
+**try with fewer (2) threads**
+
 *gateway interface:*
 br-39ff5688aa92
 

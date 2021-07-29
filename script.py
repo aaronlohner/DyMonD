@@ -110,13 +110,9 @@ def generate_graph_from_file(log:str):
                 for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                     if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
                         newNode1.color = nodes[key].color
-                        print("same address: {}".format(newNode1.address))
-                        print("colours: {}, {}".format(newNode1.color, nodes[key].color))
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
                     elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
                         newNode1.color = nodes[key].color
-                        print("same address: {}".format(newNode1.address))
-                        print("colours: {}, {}".format(newNode1.color, nodes[key].color))
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
             else:
                 for key in nodes:
@@ -132,10 +128,10 @@ def generate_graph_from_file(log:str):
                 
                 for key in nodes:#assign same color to nodes with same IPaddress
                     if nodes[key].address == newNode2.address and nodes[key].type == "owl:Class" and newNode2.type == "owl:equivalentClass":
-                        #newNode2.color = nodes[key].color
+                        newNode2.color = nodes[key].color
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id2))
                     elif nodes[key].address == newNode2.address and nodes[key].type == "owl:equivalentClass" and newNode2.type == "owl:Class":
-                        #newNode2.color = nodes[key].color
+                        newNode2.color = nodes[key].color
                         edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id2), str(key))
             else:
                 for key in nodes:
@@ -203,11 +199,9 @@ def generate_graph(flow_array:FlowArray):
 
             for key in nodes:#assign same color to nodes with same IPaddress; connect nodes with same IPaddress with an edged named "same address"
                 if nodes[key].address == newNode1.address and nodes[key].type == "owl:Class" and newNode1.type == "owl:equivalentClass":
-                    print("reassigning color")
                     newNode1.color = nodes[key].color
                     edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(key), str(id1))
                 elif nodes[key].address == newNode1.address and nodes[key].type == "owl:equivalentClass" and newNode1.type == "owl:Class":
-                    print("reassigning color")                    
                     newNode1.color = nodes[key].color
                     edges[len(edges)] = edge("owl:DatatypeProperty", "same address",0,0, str(id1), str(key))
         else:
@@ -302,7 +296,7 @@ def write_json_output(fname:str):
     print("Writing json output")
     json_dict = {}
     json_dict["class"] = [{"id":str(key), "type":nodes[key].type} for key in nodes]
-    json_dict["classAttribute"] = [{"id":str(key), "label":nodes[key].name, "comment":{"undefined":nodes[key].address + " Port: " + nodes[key].port}, "attributes":[nodes[key].color]} for key in nodes]
+    json_dict["classAttribute"] = [{"id":str(key), "label":nodes[key].name, "comment":{"undefined":nodes[key].address + ", Port: " + nodes[key].port}, "attributes":[nodes[key].color]} for key in nodes]
     json_dict["property"] = [{"id":str(key), "type":edges[key].type} for key in edges]
     json_dict["propertyAttribute"] = [{"id":str(key), "label":edges[key].TH if edges[key].TH == "same address" else "TH: " + edges[key].TH + ", ", "domain":edges[key].domain, "range":edges[key].range} for key in edges]
     for propAtt in json_dict["propertyAttribute"]:
@@ -313,7 +307,7 @@ def write_json_output(fname:str):
             else:
                 propAtt["label"] += "C: " + str(edges[key].C)
     json_obj = json.dumps(json_dict, indent = 4)
-    with open("json/" + fname + ".json", "w") as output:
+    with open("json/" + fname, "w") as output:
         output.write(json_obj)
 
 def load_interfaces_dictionary(version:int) -> Dict[str, str]:
@@ -390,22 +384,6 @@ if __name__ == '__main__':
     
     t = time.perf_counter()
 
-    '''ORIGINAL VERSION
-    setup_client(str(sys.argv[1][1]), str(arg), log)
-
-    if log == "*": # special char to denote that there is no log to read from
-        response = recv_message(sniffed_info_pb2.FlowArray)
-        print("Received response from sniffer")
-        generate_graph(response)
-    else: # read from log
-        # Proceed to read from logfile only when sniffer closes connection and sends a blank message,
-        # indicating it is done writing to logfile
-        recv_message(None) 
-        print("Reading from file")
-        generate_graph_from_file(log)
-    '''
-
-    '''NEW VERSION'''
     if opt == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
         setup_client(opt, "temp-log.txt")
@@ -502,9 +480,7 @@ if __name__ == '__main__':
             stop_client()
             os.remove(temp_log)
             generate_graph_from_file(log)
-        ''''''
-    #generate_graph_from_file("logs/log-teastore_browse_medium-100sec.txt")
+
     write_json_output(args.output)
-    #print(f"Elapsed time: {round(time.perf_counter() - t, 5)} seconds")
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
     # stop_client()
