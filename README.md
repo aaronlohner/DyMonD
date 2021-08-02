@@ -45,15 +45,24 @@ telnet 172.17.0.2 11211
 flush_all
 quit
 
+*To install teastore workload (in my home dir)*
+sudo docker-compose -f ./docker-compose_default.yaml up -d
+
 *To run teastore workload*
 sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
-java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low2.csv -l ./teastore_browse.lua -t 50
-**try with fewer (2) threads**
+java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low2.csv -l ./teastore_browse.lua -t 2
+**changed from 50 threads to 2**
 
 *gateway interface:*
 br-39ff5688aa92
 
 *To filter through a docker container*
 sudo docker inspect 615fcfe8b0fe | grep "IP" | head -n30
+
+*To start up sockshop containers*
+sudo docker start docker-compose_queue-master_1 docker-compose_orders_1 docker-compose_payment_1 docker-compose_orders-db_1 docker-compose_catalogue-db_1 docker-compose_carts-db_1 docker-compose_front-end_1 docker-compose_carts_1 docker-compose_user-db_1 docker-compose_user_1 docker-compose_catalogue_1 docker-compose_edge-router_1 docker-compose_shipping_1 docker-compose_rabbitmq_1
+
+*To run sockshop workload*
+sudo docker run --net=host weaveworksdemos/load-test -h localhost -r 100 -c 2
