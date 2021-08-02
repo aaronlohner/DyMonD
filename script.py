@@ -317,11 +317,12 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--server", nargs="?", const="10.0.1.54", help="server address for sniffer host")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed")
     group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
-    parser.add_argument("-d", "--dictionary", nargs='?', const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
+    parser.add_argument("-d", "--dictionary", nargs="?", const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
     parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file")
     args = parser.parse_args()
@@ -336,7 +337,7 @@ if __name__ == '__main__':
     if args.dictionary is not None:
         # Temporary implementation: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
-        # reverse-lookup interface from new found ips to pass in to sniff()
+        # reverse-lookup interface from newly found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
 
     opt, arg = None, None
@@ -344,6 +345,7 @@ if __name__ == '__main__':
         opt = "i"
         arg = args.interface
         if args.interface == "br-39ff5688aa92":
+            # This is the gateway interface for the teastore application
             print("Using br-39ff5688aa92")
     elif args.file is not None:
         opt = "f"
@@ -356,27 +358,20 @@ if __name__ == '__main__':
 
     if opt == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        setup_client(opt, "temp-log.txt")
+        setup_client(opt, "temp-log.txt", args.server)
         temp_log = "logs/temp-log.txt"
         log = "logs/" + log
     elif log != "*": # if sniffing file and using log
-        setup_client(opt, log)
+        setup_client(opt, log, args.server)
         log = "logs/" + log
     else: # using tcp
-        setup_client(opt, log)
+        setup_client(opt, log, args.server)
     
     if opt == "f": # reading from pcap file
         sniff(arg)
         if log == "*":
             response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
-            # with open("logs/gen-log.txt", "w") as f:
-            #     for flow in response.flows:
-            #         if flow.is_server:
-            #             is_s = "S"
-            #         else:
-            #             is_s = "C"
-            #        f.writelines(f'{flow.s_addr}:{flow.s_port} {flow.d_addr}:{flow.d_port} {flow.service_type}-{is_s} {flow.num_bytes}-{round(flow.rst, 7)}\n')
             generate_graph(response)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
@@ -396,12 +391,6 @@ if __name__ == '__main__':
                 f = recv_message(sniffed_info_pb2.FlowArray)
                 if f is not None:
                     print("Num received flows: {}".format(len(f.flows)))
-                    # for flow in f.flows:
-                    #     if flow.is_server:
-                    #         is_s = "S"
-                    #     else:
-                    #         is_s = "C"
-                    #     print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, round(flow.rst, 7)))
                     if len(l.flows) == 0:
                         l.flows.extend(f.flows)
                     else:
@@ -453,4 +442,3 @@ if __name__ == '__main__':
 
     write_json_output(args.output)
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
-    # stop_client()

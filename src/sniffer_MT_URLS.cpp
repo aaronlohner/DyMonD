@@ -72,7 +72,7 @@ void *process_packet_queue(void*) {
     char* saddr = (char*)malloc(sizeof("aaa.bbb.ccc.ddd"));
     char* daddr = (char*)malloc(sizeof("aaa.bbb.ccc.ddd"));
     raw_pkt *rpkt = NULL;
-    double run_duration ;
+    double run_duration;
     clock_t begin = clock();
 if(LiveMode)
   run_duration=duration+0.1;//30.1;

@@ -30,20 +30,12 @@ def recv_message(msg_type) -> FlowArray:
     msg.ParseFromString(data)
     return msg
 
-
-'''OLD VERSION
-def setup_client(mode:str, arg:str, log:str):
-    s.connect((HOST, PORT))
-    send_message(mode)
-    sleep(0.2)
-    send_message(log)
-    sleep(0.2)
-    send_message(arg)
-'''
-
-'''NEW VERSION'''
-def setup_client(mode:str, log:str):
-    s.connect((HOST, PORT))
+def setup_client(mode:str, log:str, server):
+    if host is None:
+        s.connect((HOST, PORT))
+    else:
+        print("Attempting to connect to sniffer on host address " + server)
+        s.connect((server, PORT))
     send_message(mode)
     sleep(0.2)
     send_message(log)
@@ -54,7 +46,7 @@ def sniff(arg:str):
     
 
 def stop_client():
-    send_message("stop") # temporary stopping signal
+    send_message("stop") # ad hoc stopping signal
     s.close()
     print("Disconnected from server")
 
