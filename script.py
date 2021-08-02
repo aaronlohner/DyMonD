@@ -276,18 +276,18 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     return interfaces
 
 def render_readable(num:int) -> str:
-    if num < 10_000:
+    if num < 10000:
         return "" + num
-    elif num < 100_000:
-        return str(round(num/1_000.0, 1)) + "K"
-    elif num < 1_000_000:
+    elif num < 100000:
+        return str(round(num/1000.0, 1)) + "K"
+    elif num < 1000000:
         return str(num/1_000) + "K"
-    elif num < 10_000_000:
-        return str(round(num/1_000_000, 1)) + "M"
-    elif num < 1_000_000_000:
-        return str(num/1_000_000) + "M"
+    elif num < 10000000:
+        return str(round(num/1000000, 1)) + "M"
+    elif num < 1000000000:
+        return str(num/1000000) + "M"
     else:
-        return str(num/1_000_000_000) + "B"
+        return str(num/1000000000) + "B"
 
 def equal_flows(new_flow:Flow, flow:Flow) -> bool:
     if new_flow.s_addr == flow.s_addr and new_flow.s_port == flow.s_port and \
