@@ -248,57 +248,13 @@ def generate_graph(flow_array:FlowArray):
         id1 = None
         id2 = None
 
-def write_json_output_legacy(fname:str):
-    print("Writing json output")
-    output = open("json/" + fname + ".json", "w")#output
-    output.write("{")
-    output.write("\"class\":[")#write nodes
-    for key in nodes:
-        if key == 0:
-            output.write("{\"id\": \"" + str(key) + "\",\n\"type\": \"" + nodes[key].type + "\"\n}")
-        else:
-            output.write(",\n{\"id\": \"" + str(key) + "\",\n\"type\": \"" + nodes[key].type + "\"\n}")
-    output.write("],")
-    output.write("\"classAttribute\":[")#write node attributes
-    for key in nodes:
-        if key == 0:
-            output.write("{\"id\": \"" + str(key) + "\",\n\"label\": \"" + nodes[key].name + "\",\n\"comment\": {\n\"undefined\":\"" + nodes[key].address +"\\nPort: " + nodes[key].port + "\"\n},\n\"attributes\":[\n\"" + nodes[key].color + "\"\n]\n}")
-        else:
-            output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"" + nodes[key].name + "\",\n\"comment\": {\n\"undefined\":\"" + nodes[key].address +"\\nPort: " + nodes[key].port +"\"\n},\n\"attributes\":[\n\"" + nodes[key].color + "\"\n]\n}")
-    output.write("],")
-    output.write("\"property\":[")#write edge 
-    for key in edges:
-        if key == 0:
-            output.write("{\"id\": \"" + str(key) + "\",\n\"type\": \"" + edges[key].type + "\"\n}")
-        else:
-            output.write(",\n{\"id\": \"" + str(key) + "\",\n\"type\": \"" + edges[key].type + "\"\n}")
-    output.write("],")
-    output.write("\"propertyAttribute\":[")#write edge attributes
-    for key in edges:
-        if key == 0:
-            if edges[key].TH == "same address":
-                output.write("\n{\"id\": \"" + str(key) + "\",\n\"label\": \"" + edges[key].TH + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
-            elif float(edges[key].RST):
-                output.write("{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH + ", RST: " + edges[key].RST + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")            
-            else:
-                output.write("{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH+ ", C: " + (str)(edges[key].C) + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
-        else:
-            if edges[key].TH == "same address":
-                output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"" + edges[key].TH + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
-            elif float(edges[key].RST):
-                output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH + ", RST: " + edges[key].RST + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")  
-            else:
-                output.write(",\n{\"id\": \"" + str(key) + "\",\n\"label\": \"TH: " + edges[key].TH + ", C: " + (str)(edges[key].C) + "\",\n\"domain\": \"" + edges[key].domain + "\",\n\"range\": \"" + edges[key].range + "\"\n}")
-    output.write("]\n}")
-    output.close()
-
 def write_json_output(fname:str):
     print("Writing json output")
     json_dict = {}
     json_dict["class"] = [{"id":str(key), "type":nodes[key].type} for key in nodes]
     json_dict["classAttribute"] = [{"id":str(key), "label":nodes[key].name, "comment":{"undefined":nodes[key].address + ", Port: " + nodes[key].port}, "attributes":[nodes[key].color]} for key in nodes]
     json_dict["property"] = [{"id":str(key), "type":edges[key].type} for key in edges]
-    json_dict["propertyAttribute"] = [{"id":str(key), "label":edges[key].TH if edges[key].TH == "same address" else "TH: " + edges[key].TH + ", ", "domain":edges[key].domain, "range":edges[key].range} for key in edges]
+    json_dict["propertyAttribute"] = [{"id":str(key), "label":edges[key].TH if edges[key].TH == "same address" else "TH: " + render_readable(int(edges[key].TH)) + ", ", "domain":edges[key].domain, "range":edges[key].range} for key in edges]
     for propAtt in json_dict["propertyAttribute"]:
         if propAtt["label"] != "same address":
             key = int(propAtt["id"])
@@ -318,6 +274,20 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
             split_line = line.split()
             interfaces[split_line[0]] = split_line[1]
     return interfaces
+
+def render_readable(num:int) -> str:
+    if num < 10_000:
+        return "" + num
+    elif num < 100_000:
+        return str(round(num/1_000.0, 1)) + "K"
+    elif num < 1_000_000:
+        return str(num/1_000) + "K"
+    elif num < 10_000_000:
+        return str(round(num/1_000_000, 1)) + "M"
+    elif num < 1_000_000_000:
+        return str(num/1_000_000) + "M"
+    else:
+        return str(num/1_000_000_000) + "B"
 
 def equal_flows(new_flow:Flow, flow:Flow) -> bool:
     if new_flow.s_addr == flow.s_addr and new_flow.s_port == flow.s_port and \
