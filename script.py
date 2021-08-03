@@ -317,14 +317,14 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--server", nargs="?", const="10.0.1.54", help="server address for sniffer host")
+    parser.add_argument("-s", "--server", nargs="?", const="10.0.1.54", help="server address for sniffer host (uses 10.0.1.54 if no arg)")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed")
-    group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface")
+    group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed (uses teastoreall.pcap if no arg)")
+    group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface (uses br-39ff5688aa92 if no arg)")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
-    parser.add_argument("-d", "--dictionary", nargs="?", const=1, type=int, choices=[1, 2], help="use specified dictionary mapping from interfaces to IPs")
-    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file")
-    parser.add_argument("-o", "--output", default="out.json", help="name of json output file")
+    parser.add_argument("-d", "--dictionary", nargs="?", const=1, type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs (uses 1 if no arg)")
+    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg")
+    parser.add_argument("-o", "--output", default="out.json", help="name of json output file (uses out.json if no arg)")
     args = parser.parse_args()
     if args.gateway and args.interface is None:
         parser.error("--gateway requires --interface.")
@@ -368,11 +368,15 @@ if __name__ == '__main__':
         setup_client(opt, log, args.server)
     
     if opt == "f": # reading from pcap file
+        flow_array = FlowArray()
         sniff(arg)
         if log == "*":
             response = recv_message(sniffed_info_pb2.FlowArray)
+            while response is not None:
+                flow_array.flows.extend(response.flows)
+                response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
-            generate_graph(response)
+            generate_graph(flow_array)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile

@@ -7,6 +7,7 @@ int addrlen = sizeof(address);
 char buffer[1024] = {0}, empty_buf[0];
 char service[32] = {0};
 FlowArray flow_array = FlowArray();
+FlowArray flow_array_smaller = FlowArray();
 
 /*
  * Set up server socket and wait for client to connect
@@ -81,12 +82,26 @@ void receive_message(char inputBuffer[]) {
 }
 
 /*
+ * Add flow element to flow array with RST
+ */
+void add_to_flow_array(flow *flow, double RST) {
+	add_to_flow_array(flow);
+	flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
+}
+
+/*
  * Add flow element to flow array
  */
 void add_to_flow_array(flow *flow) {
-	// Create a Flow protobuf object
+	string data;
+	flow_array.SerializeToString(&data);
+	size_t length = data.size();
+	if(length > 1380){
+		send_message(flow_array_smaller);
+	} else {
+		flow_array_smaller = FlowArray(flow_array);
+	}
 	Flow *flow_proto = flow_array.add_flows();
-	
 	// Populate fields of protobuf Flow with fields from the inputted flow struct fields
 	flow_proto->set_s_addr(flow->saddr);
 	flow_proto->set_s_port(flow->sport);
@@ -128,14 +143,6 @@ void get_service_type(flow *flow, char *service){
 }
 
 /*
- * Add flow element to flow array with RST
- */
-void add_to_flow_array(flow *flow, double RST) {
-	add_to_flow_array(flow);
-	flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
-}
-
-/*
  * Send array of flows to client
  */
 void send_message(vector<struct flow*> flowarray){
@@ -147,11 +154,27 @@ void send_message(vector<struct flow*> flowarray){
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, data.c_str(), length, 0);
 	printf("Flows sent to client\n");
-	// Reset flow_array global variable for future use
+	// Reset global variables for future use
+	flow_array.clear_flows();
+}
+
+/*
+ * Send array of flows to client
+ */
+void send_message(FlowArray flowarray){
+	string data;
+	flowarray.SerializeToString(&data);
+	size_t length = data.size();
+	uint32_t nlength = htonl(length);
+	// First send message length
+	send(client_fd, &nlength, 4, 0);
+	send(client_fd, data.c_str(), length, 0);
+	printf("Flows sent to client\n");
+	// Reset global variables for future use
 	flow_array.clear_flows();
 }
 
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
-	printf("Message sent to client\n");
+	printf("Empty message sent to client\n");
 }

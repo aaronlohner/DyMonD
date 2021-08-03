@@ -2,13 +2,13 @@ br-5b135f09be01 172.18.0.1 gateway
 veth9c1fbce 172.18.0.2 docker-compose_queue-master_1
 vethb4ac22d 172.18.0.9 docker-compose_carts_1
 veth6e5b725 172.18.0.4 docker-compose_payment_1
-veth61bb170 N/A docker-compose_orders-db_1
+veth61bb170 172.18.0.5 docker-compose_orders-db_1
 veth9b8bc8b 172.18.0.15 docker-compose_rabbitmq_1
 veth9eee78a 172.18.0.12 docker-compose_catalogue_1
 vethba17066 172.18.0.6 docker-compose_catalogue-db_1
 vethae80886 172.18.0.13 docker-compose_edge-router_1 startingpoint
 veth4c3ab97 172.18.0.8 docker-compose_front-end_1 startingpoint
-veth23763ab N/A docker-compose_carts-db_1
+veth23763ab 172.18.0.7 docker-compose_carts-db_1
 veth58c4698 172.18.0.3 docker-compose_orders_1
 vethcc937e8 172.18.0.10 docker-compose_user-db_1
 veth7c39015 172.18.0.14 docker-compose_shipping_1

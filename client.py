@@ -21,6 +21,7 @@ def recv_message(msg_type) -> FlowArray:
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
+    print("size: {}".format(int.from_bytes(size, "big")))
     # Stop waiting for server to send messages when receive an incoming message of '0'
     if int.from_bytes(size, "big") == 0:
         return None

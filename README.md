@@ -29,16 +29,16 @@ In the second shell:
 
 `./ycsb run jdbc  -P ../workloads/workloadc  -p jdbc.driver=com.mysql.jdbc.Driver  -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB  -p db.user=root  -p db.passwd=root  -s  -threads 20  -target 0  -p measurementtype=timeseries  -p timeseries.granularity=20000`
 
-7. In the third shell, in the `DyMonD` repository, run the client with the interface option by running `python3 script.py -i <interface> [-w <log>]`. Note that omitting the `<interface>` argument will use the default interface `e69b93ccc8384_l`.
+7. In the third shell, in the `DyMonD` repository, run the client with the interface option by running `python3 script.py -i [INTERFACE]` (run `python3 script.py -h` for help with this script's options).
 
-The sniffer program will sniff the given interface and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
+The sniffer program will sniff the given interface and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory.
 
 ### File Mode
 1. Open two shell windows on the `compute-04` node.
 2. In the first shell, in the `DyMonD` repository, run the bash script `sniffer.sh` *without* any options to compile and run the sniffer.
-3. In the second shell, in the `DyMonD` repository, run the client with the pcap file option by running `python3 script.py -f <filename> [-w <log>]`. Note that omitting the `<filename>` argument will use the default file `teastoreall.pcap` located in the `captures` folder. Note: when running this script in file mode using the default for the first time, the `captures` directory must first be created in the root of the repository and the file must be placed in that directory (it is not part of this repository).
+3. In the second shell, in the `DyMonD` repository, run the client with the pcap file option by running `python3 script.py -f [FILE]` (run `python3 script.py -h` for help with this script's options). Note: when running this script in file mode using the default for the first time, the `captures` directory must first be created in the root of the repository and the file must be placed in that directory (it is not part of this repository).
 
-The sniffer program will sniff the given file and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory (default name of call graph file is `out.json`).
+The sniffer program will sniff the given file and sends the results to the client, which subsequently produces the call graph for the application being monitored in the `json` directory.
 
 *To clear memcache before running ycsb worload*
 telnet 172.17.0.2 11211

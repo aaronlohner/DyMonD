@@ -26,6 +26,8 @@ void get_service_type(flow *flow, char *service);
 
 void send_message(vector<struct flow*> flowarray);
 
+void send_message(FlowArray flowarray);
+
 void send_message();
 
 void receive_message(char *inputBuffer);
