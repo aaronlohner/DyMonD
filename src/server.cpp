@@ -21,7 +21,7 @@ void setup_server() {
 		exit(EXIT_FAILURE);
 	}
 	
-	// Forcefully attaching socket to the port 8080
+	// Forcefully attaching socket to the port 9080
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
 	{
 		perror("setsockopt");
@@ -30,9 +30,9 @@ void setup_server() {
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;// we bind the server to the localhost,
 	// hence we use INADDR_ANY to allow any client IP address
-	address.sin_port = htons(PORT); // defined as 8080
+	address.sin_port = htons(PORT); // defined as 9080
 	
-	// Forcefully attaching socket to the port 8080
+	// Forcefully attaching socket to the port 9080
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 	{
 		perror("bind failed");

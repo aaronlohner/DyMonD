@@ -357,7 +357,7 @@ webvowl =
 	      var cssClasses = that.collectCssClasses();
 	      that.nodeElement(parentElement);
 	      
-	      var bgColor = that.attributes()[0];
+	      var bgColor = that.backgroundColor();
 	      if ( bgColor === null ) bgColor = undefined;
 	      if ( that.attributes().indexOf("deprecated") > -1 ) {
 	        bgColor = undefined;
@@ -369,7 +369,7 @@ webvowl =
 	      if ( rectangularRepresentation === true ) {
 	        renderingElement = drawTools.appendRectangularClass(parentElement, 80, 80, cssClasses, that.labelForCurrentLanguage(), bgColor);
 	      } else {
-	        renderingElement = drawTools.appendCircularClass(parentElement, that.actualRadius(), cssClasses, that.labelForCurrentLanguage(), bgColor);
+	        renderingElement = drawTools.appendCircularClass(parentElement, that.actualRadius(), cssClasses, that.labelForCurrentLanguage(), that.attributes()[0]);
 	      }
 	      that.postDrawActions(parentElement);
 	    };
@@ -2290,7 +2290,7 @@ webvowl =
 	      
 	      that.nodeElement(parentElement);
 	      renderingElement = parentElement.append("g");
-	      var bgColor = that.attributes()[0];
+	      var bgColor = that.backgroundColor();
 	      if ( that.attributes().indexOf("deprecated") > -1 ) {
 	        bgColor = undefined;
 	      }
@@ -2300,7 +2300,7 @@ webvowl =
 	        drawTools.appendRectangularClass(renderingElement, 80 - CIRCLE_SIZE_DIFFERENCE, 80 - CIRCLE_SIZE_DIFFERENCE, cssClasses, that.labelForCurrentLanguage(), bgColor);
 	      } else {
 	        drawTools.appendCircularClass(renderingElement, that.actualRadius(), ["white", "embedded"]);
-	        drawTools.appendCircularClass(renderingElement, that.actualRadius() - CIRCLE_SIZE_DIFFERENCE, cssClasses, that.labelForCurrentLanguage(), bgColor);
+	        drawTools.appendCircularClass(renderingElement, that.actualRadius() - CIRCLE_SIZE_DIFFERENCE, cssClasses, that.labelForCurrentLanguage(), that.attributes()[0]);
 	        
 	      }
 	      

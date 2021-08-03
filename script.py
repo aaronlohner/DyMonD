@@ -277,11 +277,11 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
 
 def render_readable(num:int) -> str:
     if num < 10000:
-        return "" + num
+        return str(num)
     elif num < 100000:
         return str(round(num/1000.0, 1)) + "K"
     elif num < 1000000:
-        return str(num/1_000) + "K"
+        return str(num/1000) + "K"
     elif num < 10000000:
         return str(round(num/1000000, 1)) + "M"
     elif num < 1000000000:

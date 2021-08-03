@@ -31,7 +31,7 @@ def recv_message(msg_type) -> FlowArray:
     return msg
 
 def setup_client(mode:str, log:str, server):
-    if host is None:
+    if server is None:
         s.connect((HOST, PORT))
     else:
         print("Attempting to connect to sniffer on host address " + server)

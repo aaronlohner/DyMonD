@@ -66,3 +66,12 @@ sudo docker start docker-compose_queue-master_1 docker-compose_orders_1 docker-c
 
 *To run sockshop workload*
 sudo docker run --net=host weaveworksdemos/load-test -h localhost -r 100 -c 2
+
+node: 10.0.1.22
+compute: 10.0.1.54
+
+*printing the length somehow changes it...*
+
+size of 55 flows in flowarray: 3205 bytes
+Limit this to 1380 bytes
+3205 is too big--must cap the size of flowarray and send it off, or create a bunch of flowarrays and send them all off consecutively immediately after sniffing is done (pro: won't miss sniffing packets by wasting time sending flowarrays)
