@@ -539,7 +539,7 @@ index++;
             }
         }
         send_message(flowarray);
-        send_message();
+        if(flowarray.size() > 0) send_message();
     }
      for(int i = 0; i < flowarray.size(); i++)
      {

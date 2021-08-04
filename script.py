@@ -389,7 +389,7 @@ if __name__ == '__main__':
         if log == "*": # if using tcp
             l = FlowArray()
             
-            open("logs/" + args.out[:-4] + ".txt", "w").close()
+            #open("logs/" + args.out[:-4] + "txt", "w").close()
             
             while len(q) > 0:
                 print("ips in q: {}".format(q))
@@ -399,16 +399,14 @@ if __name__ == '__main__':
                 while response is not None:
                     f.flows.extend(response.flows)
                     response = recv_message(sniffed_info_pb2.FlowArray)
-                with open("logs/tcp-log-" + args.out[:-4] + ".txt", "a") as fp:
-                    for flow in f.flows:
-                        if flow.is_server:
-                            is_s = "S"
-                        else:
-                            is_s = "C"
-                        print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
-                        fp.writelines("{}:{} {}:{} {}-{} {}-{}\n".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
-                #f = recv_message(sniffed_info_pb2.FlowArray)
-                #if f is not None:
+                # with open("logs/tcp-log-" + args.out[:-4] + "txt", "a") as fp:
+                #     for flow in f.flows:
+                #         if flow.is_server:
+                #             is_s = "S"
+                #         else:
+                #             is_s = "C"
+                #         print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
+                #         fp.writelines("{}:{} {}:{} {}-{} {}-{}\n".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
                 print("Num received flows: {}".format(len(f.flows)))
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)

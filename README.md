@@ -78,3 +78,5 @@ compute: 10.0.1.54
 describe system architecture in doc, using images+desc
 
 if non-gateway service is provided but hop extractor eventually falls on gateway, all flows that do not contain gateway as server will be omitted
+
+tcp logging can contain repeated flows since it's not what's actually being used, it's just spitting out the captured flows
