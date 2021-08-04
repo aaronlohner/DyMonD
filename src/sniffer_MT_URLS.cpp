@@ -484,7 +484,7 @@ index++;
         }
     }
     myfile.close();
-    //int counter = 0;
+    int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
@@ -535,11 +535,15 @@ index++;
                 else {
                     add_to_flow_array(flowarray[i]);
                 }
+                counter++;
                 //printf("%d, ", ++counter);
             }
         }
         send_message(flowarray);
-        if(flowarray.size() > 0) send_message();
+        if(counter > 0) {
+            send_message();
+            counter = 0;
+        }
     }
      for(int i = 0; i < flowarray.size(); i++)
      {
