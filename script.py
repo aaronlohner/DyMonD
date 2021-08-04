@@ -279,15 +279,15 @@ def render_readable(num:int) -> str:
     if num < 10000:
         return str(num)
     elif num < 100000:
-        return str(round(num/1000.0, 1)) + "K"
+        return str(round(num/1000, 1)) + "K"
     elif num < 1000000:
-        return str(num/1000) + "K"
+        return str(round(num/1000, 0)) + "K"
     elif num < 10000000:
         return str(round(num/1000000, 1)) + "M"
     elif num < 1000000000:
-        return str(num/1000000) + "M"
+        return str(round(num/1000000, 0)) + "M"
     else:
-        return str(num/1000000000) + "B"
+        return str(round(num/1000000000, 0)) + "B"
 
 def equal_flows(new_flow:Flow, flow:Flow) -> bool:
     if new_flow.s_addr == flow.s_addr and new_flow.s_port == flow.s_port and \

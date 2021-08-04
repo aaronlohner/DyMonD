@@ -14,5 +14,3 @@ vethcc937e8 172.18.0.10 docker-compose_user-db_1
 veth7c39015 172.18.0.14 docker-compose_shipping_1
 veth58a932a 172.18.0.11 docker-compose_user_1
 veth07eb787 172.20.0.2 generator
-
-CHANGE TO ACCEPT IP INSTEAD OF INTERFACE??
