@@ -76,3 +76,5 @@ compute: 10.0.1.54
 *printing the length somehow changes it...*
 
 describe system architecture in doc, using images+desc
+
+if non-gateway service is provided but hop extractor eventually falls on gateway, all flows that do not contain gateway as server will be omitted
