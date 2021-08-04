@@ -21,7 +21,7 @@ def recv_message(msg_type) -> FlowArray:
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
-    print("size: {}".format(int.from_bytes(size, "big")))
+    #print("size: {}".format(int.from_bytes(size, "big")))
     # Stop waiting for server to send messages when receive an incoming message of '0'
     if int.from_bytes(size, "big") == 0:
         return None
@@ -31,12 +31,12 @@ def recv_message(msg_type) -> FlowArray:
     msg.ParseFromString(data)
     return msg
 
-def setup_client(mode:str, log:str, server):
-    if server is None:
+def setup_client(mode:str, log:str, host):
+    if host is None:
         s.connect((HOST, PORT))
     else:
-        print("Attempting to connect to sniffer on host address " + server)
-        s.connect((server, PORT))
+        print("Attempting to connect to sniffer on host address " + host)
+        s.connect((host, PORT))
     send_message(mode)
     sleep(0.2)
     send_message(log)

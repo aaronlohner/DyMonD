@@ -317,14 +317,14 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--server", nargs="?", const="10.0.1.54", help="server address for sniffer host (uses 10.0.1.54 if no arg)")
+    parser.add_argument("-H", "--host", nargs="?", const="10.0.1.54", help="address for sniffer host (uses 10.0.1.54 if no arg)")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed (uses teastoreall.pcap if no arg)")
     group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface (uses br-39ff5688aa92 if no arg)")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-d", "--dictionary", nargs="?", const=1, type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs (uses 1 if no arg)")
-    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg")
-    parser.add_argument("-o", "--output", default="out.json", help="name of json output file (uses out.json if no arg)")
+    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
+    parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
     if args.gateway and args.interface is None:
         parser.error("--gateway requires --interface.")
@@ -358,25 +358,25 @@ if __name__ == '__main__':
 
     if opt == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        setup_client(opt, "temp-log.txt", args.server)
+        setup_client(opt, "temp-log.txt", args.host)
         temp_log = "logs/temp-log.txt"
         log = "logs/" + log
     elif log != "*": # if sniffing file and using log
-        setup_client(opt, log, args.server)
+        setup_client(opt, log, args.host)
         log = "logs/" + log
     else: # using tcp
-        setup_client(opt, log, args.server)
+        setup_client(opt, log, args.host)
     
+    f = FlowArray()
     if opt == "f": # reading from pcap file
-        flow_array = FlowArray()
         sniff(arg)
         if log == "*":
             response = recv_message(sniffed_info_pb2.FlowArray)
             while response is not None:
-                flow_array.flows.extend(response.flows)
+                f.flows.extend(response.flows)
                 response = recv_message(sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
-            generate_graph(flow_array)
+            generate_graph(f)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
@@ -392,22 +392,28 @@ if __name__ == '__main__':
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                f = recv_message(sniffed_info_pb2.FlowArray)
-                if f is not None:
-                    print("Num received flows: {}".format(len(f.flows)))
-                    if len(l.flows) == 0:
-                        l.flows.extend(f.flows)
-                    else:
-                        for new_flow in f.flows:
-                            for flow in l.flows:
-                                exists = False
-                                if equal_flows(new_flow, flow):
-                                    exists = True
-                                    break
-                            if not exists:
-                                l.flows.append(new_flow)
-                    ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
-                    q.extend(ips)
+                response = recv_message(sniffed_info_pb2.FlowArray)
+                while response is not None:
+                    f.flows.extend(response.flows)
+                    response = recv_message(sniffed_info_pb2.FlowArray)
+                #f = recv_message(sniffed_info_pb2.FlowArray)
+                #if f is not None:
+                print("Num received flows: {}".format(len(f.flows)))
+                if len(l.flows) == 0:
+                    l.flows.extend(f.flows)
+                else:
+                    for new_flow in f.flows:
+                        for flow in l.flows:
+                            exists = False
+                            if equal_flows(new_flow, flow):
+                                exists = True
+                                break
+                        if not exists:
+                            l.flows.append(new_flow)
+                del f.flows[:]
+                ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
+                q.extend(ips)
+                
                 print("Num accumulated flows: {}".format(len(l.flows)))
             stop_client()
             generate_graph(l)
