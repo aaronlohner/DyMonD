@@ -536,7 +536,6 @@ index++;
                     add_to_flow_array(flowarray[i]);
                 }
                 counter++;
-                //printf("%d, ", ++counter);
             }
         }
         send_message(flowarray);

@@ -281,11 +281,11 @@ def render_readable(num:int) -> str:
     elif num < 100000:
         return str(round(num/1000, 1)) + "K"
     elif num < 1000000:
-        return str(round(num/1000, 0)) + "K"
+        return str(int(num/1000)) + "K"
     elif num < 10000000:
         return str(round(num/1000000, 1)) + "M"
     elif num < 1000000000:
-        return str(round(num/1000000, 0)) + "M"
+        return str(int(num/1000000)) + "M"
     else:
         return str(round(num/1000000000, 0)) + "B"
 
