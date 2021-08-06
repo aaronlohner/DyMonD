@@ -302,7 +302,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], gateway_i
         for flow in new_flows_container.flows:
             if gateway_ip or flow.s_addr == ip:
                 new_ip = flow.d_addr
-                if new_ip not in visited:
+                if new_ip not in visited and new_ip != "10.0.1.1":
                     ips.append(new_ip)
                     visited.append(new_ip)
     else:
@@ -310,7 +310,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], gateway_i
             for line in f:
                 if gateway_ip or line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
-                    if new_ip not in visited:
+                    if new_ip not in visited and new_ip != "10.0.1.1":
                         ips.append(new_ip)
                         visited.append(new_ip)
     return (ips, visited)
