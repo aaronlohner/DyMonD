@@ -396,7 +396,7 @@ if __name__ == '__main__':
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                response = recv_message(sniffed_info_pb2.FlowArray)
+                response, cumm_bytes = recv_message2(sniffed_info_pb2.FlowArray, cumm_bytes)
                 while response is not None:
                     f.flows.extend(response.flows)
                     response, cumm_bytes = recv_message2(sniffed_info_pb2.FlowArray, cumm_bytes)

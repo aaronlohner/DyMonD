@@ -39,7 +39,7 @@ def recv_message2(msg_type, cumm_bytes):
     #print("size: {}".format(int.from_bytes(size, "big")))
     # Stop waiting for server to send messages when receive an incoming message of '0'
     if int.from_bytes(size, "big") == 0:
-        return None
+        return None, cumm_bytes
     data = s.recv(int.from_bytes(size, "big"))
     cumm_bytes += int.from_bytes(size, "big")
     print("cumm bytes : {}".format(cumm_bytes))
