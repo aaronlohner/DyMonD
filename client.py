@@ -16,7 +16,8 @@ def send_message(mesg:str) -> None:
     s.send(mesg)
     print("Sent message")
 
-def recv_message(msg_type) -> FlowArray:
+from script import cumm_bytes
+def recv_message(msg_type, cumm_bytes=0) -> FlowArray:
     """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
@@ -26,6 +27,8 @@ def recv_message(msg_type) -> FlowArray:
     if int.from_bytes(size, "big") == 0:
         return None
     data = s.recv(int.from_bytes(size, "big"))
+    cumm_bytes += int.from_bytes(size, "big")
+    print("cumm bytes : {}".format(cumm_bytes))
     # Create object of specified type to store received data
     msg = msg_type()
     msg.ParseFromString(data)

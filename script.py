@@ -461,3 +461,5 @@ if __name__ == '__main__':
 
     write_json_output(args.output)
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
+
+cumm_bytes = 0
