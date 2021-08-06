@@ -296,7 +296,7 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
             return True
     return False
 
-def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:List[str]) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, visited:List[str], gateway_ip=False) -> Tuple[List[str], List[str]]:
     ips = []
     if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
@@ -324,11 +324,11 @@ if __name__ == '__main__':
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
-    parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
+    #parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
-    if args.gateway and args.interface is None:
-        parser.error("--gateway requires --interface.")
+    # if args.gateway and args.interface is None:
+    #     parser.error("--gateway requires --interface.")
     interfaces = {}
     if args.dictionary is not None and args.interface is None:
         parser.error("--dictionary requires --interface.")
@@ -345,14 +345,14 @@ if __name__ == '__main__':
     if args.interface is not None:
         opt = "i"
         arg = args.interface
-        if args.interface == "br-39ff5688aa92":
-            # This is the gateway interface for the teastore application
-            print("Using br-39ff5688aa92")
+        # if args.interface == "br-39ff5688aa92":
+        #     # This is the gateway interface for the teastore application
+        #     print("Using br-39ff5688aa92")
     elif args.file is not None:
         opt = "f"
         arg = args.file
-        if args.file == "teastoreall.pcap":
-            print("Using teastoreall.pcap")
+        # if args.file == "teastoreall.pcap":
+        #     print("Using teastoreall.pcap")
     log = args.log
     
     t = time.perf_counter()
@@ -420,7 +420,7 @@ if __name__ == '__main__':
                                 break
                         if not exists:
                             l.flows.append(new_flow)
-                ips, visited = next_hop_extractor(f, ip, args.gateway, visited)
+                ips, visited = next_hop_extractor(f, ip, visited)#args.gateway)
                 q.extend(ips)
                 del f.flows[:]
                 print("Num accumulated flows: {}".format(len(l.flows)))
@@ -451,7 +451,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(temp_log, ip, args.gateway, visited)
+                ips, visited = next_hop_extractor(temp_log, ip, visited)#args.gateway)
                 q.extend(ips)
                 print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
