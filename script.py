@@ -317,13 +317,14 @@ def next_hop_extractor(new_flows_container, ip:str, gateway_ip:bool, visited:Lis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-H", "--host", nargs="?", const="10.0.1.22", help="address for sniffer host (uses 10.0.1.54 if no arg)")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-f", "--file", nargs="?", const="teastoreall.pcap", help="read capture file containing flows to be sniffed (uses teastoreall.pcap if no arg)")
-    group.add_argument("-i", "--interface", nargs="?", const="br-39ff5688aa92", help="perform live sniffing starting with interface (uses br-39ff5688aa92 if no arg)")
+    group1 = parser.add_mutually_exclusive_group(required=True)
+    group2 = parser.add_mutually_exclusive_group()
+    group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed (uses teastoreall.pcap if no arg)")
+    group1.add_argument("-i", "--interface", help="perform live sniffing starting with interface (uses br-39ff5688aa92 if no arg)")
+    group2.add_argument("-H", "--host", help="address for sniffer host (uses 10.0.1.54 if no arg)")
+    group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
+    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs (uses 1 if no arg)")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
-    parser.add_argument("-d", "--dictionary", nargs="?", const=1, type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs (uses 1 if no arg)")
-    parser.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
     if args.gateway and args.interface is None:
