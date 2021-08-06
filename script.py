@@ -391,7 +391,7 @@ if __name__ == '__main__':
             l = FlowArray()
             
             #open("logs/" + args.out[:-4] + "txt", "w").close()
-            
+            cumm_bytes = 0
             while len(q) > 0:
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
@@ -399,7 +399,7 @@ if __name__ == '__main__':
                 response = recv_message(sniffed_info_pb2.FlowArray)
                 while response is not None:
                     f.flows.extend(response.flows)
-                    response = recv_message(sniffed_info_pb2.FlowArray)
+                    response, cumm_bytes = recv_message2(sniffed_info_pb2.FlowArray, cumm_bytes)
                 # with open("logs/tcp-log-" + args.out[:-4] + "txt", "a") as fp:
                 #     for flow in f.flows:
                 #         if flow.is_server:
@@ -461,5 +461,3 @@ if __name__ == '__main__':
 
     write_json_output(args.output)
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
-
-cumm_bytes = 0

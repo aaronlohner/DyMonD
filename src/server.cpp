@@ -147,7 +147,7 @@ void get_service_type(flow *flow, char *service){
  * Send array of flows to client
  */
 void send_message(vector<struct flow*> flowarray){
-	if(consec_messages<32){
+	if(consec_messages<10){
 		string data;
 		flow_array.SerializeToString(&data);
 		size_t length = data.size();
@@ -166,7 +166,7 @@ void send_message(vector<struct flow*> flowarray){
  * Send array of flows to client
  */
 void send_message(FlowArray flowarray){
-	if(consec_messages<32){
+	if(consec_messages<10){
 		string data;
 		flowarray.SerializeToString(&data);
 		size_t length = data.size();
