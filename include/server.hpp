@@ -31,3 +31,5 @@ void send_message(FlowArray flowarray);
 void send_message();
 
 void receive_message(char *inputBuffer);
+
+void reset_consec();

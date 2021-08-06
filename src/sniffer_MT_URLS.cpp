@@ -542,6 +542,7 @@ index++;
             send_message();
             counter = 0;
         }
+        reset_consec();
     }
      for(int i = 0; i < flowarray.size(); i++)
      {
