@@ -8,7 +8,6 @@ char buffer[1024] = {0}, empty_buf[0];
 char service[32] = {0};
 FlowArray flow_array = FlowArray();
 FlowArray flow_array_smaller = FlowArray();
-int consec_messages = 0;
 
 /*
  * Set up server socket and wait for client to connect
@@ -147,17 +146,14 @@ void get_service_type(flow *flow, char *service){
  * Send array of flows to client
  */
 void send_message(vector<struct flow*> flowarray){
-	if(consec_messages<10){
-		string data;
-		flow_array.SerializeToString(&data);
-		size_t length = data.size();
-		uint32_t nlength = htonl(length);
-		// First send message length
-		send(client_fd, &nlength, 4, 0);
-		send(client_fd, data.c_str(), length, 0);
-		printf("Flows sent to client\n");
-		consec_messages++;
-	}
+	string data;
+	flow_array.SerializeToString(&data);
+	size_t length = data.size();
+	uint32_t nlength = htonl(length);
+	// First send message length
+	send(client_fd, &nlength, 4, 0);
+	send(client_fd, data.c_str(), length, 0);
+	printf("Flows sent to client\n");
 	// Reset global variables for future use
 	flow_array.clear_flows();
 }
@@ -166,17 +162,14 @@ void send_message(vector<struct flow*> flowarray){
  * Send array of flows to client
  */
 void send_message(FlowArray flowarray){
-	if(consec_messages<10){
-		string data;
-		flowarray.SerializeToString(&data);
-		size_t length = data.size();
-		uint32_t nlength = htonl(length);
-		// First send message length
-		send(client_fd, &nlength, 4, 0);
-		send(client_fd, data.c_str(), length, 0);
-		printf("Flows sent to client\n");
-		consec_messages++;
-	}
+	string data;
+	flowarray.SerializeToString(&data);
+	size_t length = data.size();
+	uint32_t nlength = htonl(length);
+	// First send message length
+	send(client_fd, &nlength, 4, 0);
+	send(client_fd, data.c_str(), length, 0);
+	printf("Flows sent to client\n");
 	// Reset global variables for future use
 	flow_array.clear_flows();
 }
@@ -184,8 +177,4 @@ void send_message(FlowArray flowarray){
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
 	printf("Empty message sent to client\n");
-}
-
-void reset_consec(){
-	consec_messages = 0;
 }

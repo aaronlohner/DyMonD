@@ -391,15 +391,14 @@ if __name__ == '__main__':
             l = FlowArray()
             
             #open("logs/" + args.out[:-4] + "txt", "w").close()
-            cumm_bytes = 0
             while len(q) > 0:
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                response, cumm_bytes = recv_message2(sniffed_info_pb2.FlowArray, cumm_bytes)
+                response = recv_message(sniffed_info_pb2.FlowArray)
                 while response is not None:
                     f.flows.extend(response.flows)
-                    response, cumm_bytes = recv_message2(sniffed_info_pb2.FlowArray, cumm_bytes)
+                    response = recv_message(sniffed_info_pb2.FlowArray)
                 # with open("logs/tcp-log-" + args.out[:-4] + "txt", "a") as fp:
                 #     for flow in f.flows:
                 #         if flow.is_server:
