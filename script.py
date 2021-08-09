@@ -320,21 +320,21 @@ if __name__ == '__main__':
     group1 = parser.add_mutually_exclusive_group(required=True)
     group2 = parser.add_mutually_exclusive_group()
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
-    group1.add_argument("-i", "--interface", help="perform live sniffing starting with interface")
+    group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
     parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
-    if args.gateway and args.interface is None:
-        parser.error("--gateway requires --interface.")
+    if args.gateway and args.IP is None:
+        parser.error("--gateway requires --IP.")
     interfaces = {}
-    if args.dictionary is not None and args.interface is None:
-        parser.error("--dictionary requires --interface.")
+    if args.dictionary is not None and args.IP is None:
+        parser.error("--dictionary requires --IP.")
     # Temporary measure until next hop extractor can match IPs to interfaces automatically
-    elif args.interface is not None and args.dictionary is None:
-        parser.error("--interface requires --dictionary (temporary measure).")
+    elif args.IP is not None and args.dictionary is None:
+        parser.error("--IP requires --dictionary (temporary measure).")
     if args.dictionary is not None:
         # Temporary implementation: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
@@ -342,9 +342,9 @@ if __name__ == '__main__':
         interfaces = load_interfaces_dictionary(args.dictionary)
 
     opt, arg = None, None
-    if args.interface is not None:
+    if args.IP is not None:
         opt = "i"
-        arg = args.interface
+        arg = args.IP#interface
         # if args.interface == "br-39ff5688aa92":
         #     # This is the gateway interface for the teastore application
         #     print("Using br-39ff5688aa92")
@@ -385,7 +385,7 @@ if __name__ == '__main__':
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
-        q, visited, ips = [interfaces[arg]], [interfaces[arg]], []
+        q, visited, ips = [arg], [arg], [] #[interfaces[arg]], [interfaces[arg]], []
         exists = False
         if log == "*": # if using tcp
             l = FlowArray()

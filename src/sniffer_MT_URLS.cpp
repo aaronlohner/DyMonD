@@ -541,6 +541,8 @@ index++;
         if(counter > 0) {
             send_message();
             counter = 0;
+        } else {
+            printf("Flows sent to controller\n");
         }
     }
      for(int i = 0; i < flowarray.size(); i++)

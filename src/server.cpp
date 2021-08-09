@@ -56,7 +56,7 @@ void setup_server() {
 }
 
 /*
- * Close the socket conection with client
+ * Close the socket conection
  */
 void stop_server(){
 	close(client_fd);
@@ -143,7 +143,7 @@ void get_service_type(flow *flow, char *service){
 }
 
 /*
- * Send array of flows to client
+ * Send array of flows
  */
 void send_message(vector<struct flow*> flowarray){
 	string data;
@@ -153,13 +153,13 @@ void send_message(vector<struct flow*> flowarray){
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, data.c_str(), length, 0);
-	printf("Flows sent to client\n");
+	//printf("Flows sent to client\n");
 	// Reset global variables for future use
 	flow_array.clear_flows();
 }
 
 /*
- * Send array of flows to client
+ * Send array of flows
  */
 void send_message(FlowArray flowarray){
 	string data;
@@ -169,12 +169,12 @@ void send_message(FlowArray flowarray){
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, data.c_str(), length, 0);
-	printf("Flows sent to client\n");
+	//printf("Flows sent to client\n");
 	// Reset global variables for future use
 	flow_array.clear_flows();
 }
 
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
-	printf("Empty message sent to client\n");
+	printf("Empty message sent to controller\n");
 }
