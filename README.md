@@ -13,7 +13,7 @@ sudo docker-compose -f ./docker-compose_default.yaml up -d
 sudo docker exec -it generator bash
 java -jar httploadgenerator.jar loadgenerator
 
-java -jar httploadgenerator.jar director -s 172.20.0.2 -a ./low.csv -l ./teastore_browse.lua -t 2
+java -jar httploadgenerator.jar director -s 172.20.0.4 -a ./low.csv -l ./teastore_browse.lua -t 2
 **changed from 50 threads to 2**
 
 *gateway interface:*
