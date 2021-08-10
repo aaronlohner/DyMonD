@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-//#include <sniffed_info.pb.h>
+#include <sniffed_info.pb.h>
 #include <string>
 #include <sniffer.hpp> // needed for flow struct defn
 // #include <Utils.hpp>
@@ -26,7 +26,7 @@ void get_service_type(flow *flow, char *service);
 
 void send_message(vector<struct flow*> flowarray);
 
-//void send_message(FlowArray flowarray);
+void send_message(FlowArray flowarray);
 
 void send_message();
 
