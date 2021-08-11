@@ -295,11 +295,11 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
             return True
     return False
 
-def next_hop_extractor(new_flows_container, ip:str, visited:List[str], gateway_ip=False) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
     if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
-            if gateway_ip or flow.s_addr == ip:
+            if flow.s_addr == ip:
                 new_ip = flow.d_addr
                 if new_ip not in visited and new_ip != "10.0.1.1":
                     ips.append(new_ip)
@@ -307,7 +307,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], gateway_i
     else:
         with open(new_flows_container, "r") as f:
             for line in f:
-                if gateway_ip or line.split(':')[0] == ip: # if flow has current ip as saddr
+                if line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
                     if new_ip not in visited and new_ip != "10.0.1.1":
                         ips.append(new_ip)
@@ -323,11 +323,8 @@ if __name__ == '__main__':
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
-    parser.add_argument("-g", "--gateway", action="store_true", help="initial interface is a gateway")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
-    if args.gateway and args.IP is None:
-        parser.error("--gateway requires --IP.")
     interfaces = {}
     if args.dictionary is not None and args.IP is None:
         parser.error("--dictionary requires --IP.")
@@ -413,7 +410,7 @@ if __name__ == '__main__':
                                 break
                         if not exists:
                             l.flows.append(new_flow)
-                ips, visited = next_hop_extractor(f, ip, visited, args.gateway)
+                ips, visited = next_hop_extractor(f, ip, visited)
                 q.extend(ips)
                 del f.flows[:]
                 print("Num accumulated flows: {}".format(len(l.flows)))
@@ -444,7 +441,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(temp_log, ip, visited, args.gateway)
+                ips, visited = next_hop_extractor(temp_log, ip, visited)
                 q.extend(ips)
                 print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
