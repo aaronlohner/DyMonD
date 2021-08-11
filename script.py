@@ -12,7 +12,6 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 #the script is to generate a json file that can be used in webvowl1.1.7SE
 #input file is csv containing edges in the format of (Node1, Node2, connection information)
-#change input on line #58 and output on line #59
 
 nodes = {}
 edges = {}
@@ -53,17 +52,17 @@ def randomColor(): #generate random light colors
 
 
 
-def getName(label):#get the IPaddress of a node from name
-    counter1 = 0
-    counter2 = 0
-    for counter1 in range(len(label)):
-        if not label[counter1].isdigit():
-            break
-    for counter2 in range(len(label)):
-        if label[counter2] == '/':
-            break
-    if counter2 == len(label)-1: counter2 = len(label)
-    return label[0:counter1], label[counter1:len(label)].upper() # (port, service type)
+# def getName(label):#get the IPaddress of a node from name
+#     counter1 = 0
+#     counter2 = 0
+#     for counter1 in range(len(label)):
+#         if not label[counter1].isdigit():
+#             break
+#     for counter2 in range(len(label)):
+#         if label[counter2] == '/':
+#             break
+#     if counter2 == len(label)-1: counter2 = len(label)
+#     return label[0:counter1], label[counter1:len(label)].upper() # (port, service type)
 
 
 def generate_graph_from_file(log:str):
@@ -344,15 +343,10 @@ if __name__ == '__main__':
     opt, arg = None, None
     if args.IP is not None:
         opt = "i"
-        arg = args.IP#interface
-        # if args.interface == "br-39ff5688aa92":
-        #     # This is the gateway interface for the teastore application
-        #     print("Using br-39ff5688aa92")
+        arg = args.IP
     elif args.file is not None:
         opt = "f"
         arg = args.file
-        # if args.file == "teastoreall.pcap":
-        #     print("Using teastoreall.pcap")
     log = args.log
     
     t = time.perf_counter()
@@ -385,7 +379,7 @@ if __name__ == '__main__':
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
-        q, visited, ips = [arg], [arg], [] #[interfaces[arg]], [interfaces[arg]], []
+        q, visited, ips = [arg], [arg], []
         exists = False
         if log == "*": # if using tcp
             l = FlowArray()

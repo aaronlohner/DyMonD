@@ -6,14 +6,17 @@ int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0}, empty_buf[0];
 char service[32] = {0};
-FlowArray flow_array = FlowArray();
-FlowArray flow_array_smaller = FlowArray();
+//FlowArray flow_array = FlowArray();
+//FlowArray flow_array_smaller = FlowArray();
+string flow_string = "";
+string flow_string_smaller = "";
+string flow_last = "";
 
 /*
  * Set up server socket and wait for client to connect
  */
 void setup_server() {
-	GOOGLE_PROTOBUF_VERIFY_VERSION;
+	//GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	// Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -85,15 +88,33 @@ void receive_message(char inputBuffer[]) {
  * Add flow element to flow array with RST
  */
 void add_to_flow_array(flow *flow, double RST) {
-	add_to_flow_array(flow);
-	flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
+	//add_to_flow_array(flow);
+	//flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
+
+	size_t length = flow_string.size();
+	if(length > 1380){
+		send_message(flow_string_smaller);
+	}
+	flow_string_smaller.clear();
+	flow_string_smaller = flow_string;
+	flow_last.clear();
+	flow_last.append(flow->saddr).append(" ");
+	flow_last.append(flow->sport).append(" ");
+	flow_last.append(flow->daddr).append(" ");
+	flow_last.append(flow->dport).append(" ");
+	flow_last.append(to_string(flow->NumBytes/30)).append(" ");
+	flow_last.append(to_string(is_server(flow))).append(" ");
+	get_service_type(flow, service);
+	flow_last.append(service).append(" ");
+	flow_last.append(to_string(RST)).append("\n");
+	flow_string.append(flow_last);
 }
 
 /*
  * Add flow element to flow array
  */
 void add_to_flow_array(flow *flow) {
-	string data;
+	/*string data;
 	flow_array.SerializeToString(&data);
 	size_t length = data.size();
 	if(length > 1380){
@@ -110,7 +131,7 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_num_bytes(flow->NumBytes/30);
 	flow_proto->set_is_server(is_server(flow));
 	get_service_type(flow, service);
-	flow_proto->set_service_type(service);
+	flow_proto->set_service_type(service);*/
 }
 
 /*
@@ -143,25 +164,34 @@ void get_service_type(flow *flow, char *service){
 }
 
 /*
- * Send array of flows
+ * Send string of flows
  */
 void send_message(vector<struct flow*> flowarray){
-	string data;
-	flow_array.SerializeToString(&data);
-	size_t length = data.size();
+	// string data;
+	// flow_array.SerializeToString(&data);
+	// size_t length = data.size();
+	// uint32_t nlength = htonl(length);
+	// // First send message length
+	// send(client_fd, &nlength, 4, 0);
+	// send(client_fd, data.c_str(), length, 0);
+	// // Reset global variable for future use
+	// flow_array.clear_flows();
+
+	size_t length = flow_string.size();
 	uint32_t nlength = htonl(length);
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
-	send(client_fd, data.c_str(), length, 0);
-	//printf("Flows sent to client\n");
-	// Reset global variables for future use
-	flow_array.clear_flows();
+	send(client_fd, flow_string.c_str(), length, 0);
+	//printf("flow_string: %s", flow_string.c_str());
+	// Prepare global variable for future use
+	flow_string.clear();
+	flow_string.append(flow_last);
 }
 
 /*
  * Send array of flows
  */
-void send_message(FlowArray flowarray){
+/*void send_message(FlowArray flowarray){
 	string data;
 	flowarray.SerializeToString(&data);
 	size_t length = data.size();
@@ -169,9 +199,23 @@ void send_message(FlowArray flowarray){
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, data.c_str(), length, 0);
-	//printf("Flows sent to client\n");
-	// Reset global variables for future use
+	// Reset global variable for future use
 	flow_array.clear_flows();
+}*/
+
+/*
+ * Send string of flows
+ */
+void send_message(string flowarray){
+	size_t length = flowarray.size();
+	uint32_t nlength = htonl(length);
+	// First send message length
+	send(client_fd, &nlength, 4, 0);
+	send(client_fd, flowarray.c_str(), length, 0);
+	//printf("flow_string: %s", flow_string.c_str());
+	// Prepare global variable for future use
+	flow_string.clear();
+	flow_string.append(flow_last);
 }
 
 void send_message(){

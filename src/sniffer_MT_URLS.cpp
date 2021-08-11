@@ -498,7 +498,7 @@ index++;
         printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
-            // if (flowarray[i]->Ack_times.size() > 1) {
+            if (flowarray[i]->Ack_times.size() > 1) {
                  diff = 0.0;
                  for (int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                      if (j != flowarray[i]->Ack_times.size() - 1)
@@ -512,14 +512,14 @@ index++;
              } else {
                  FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
-             //}
+             }
          }
      }
      FP.close();
      if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
-           // if (flowarray[i]->Packets.size() == 100 ) {
+           if (flowarray[i]->Packets.size() == 100 ) {
                 if(flowarray[i]->Ack_times.size()>1){
                     diff=0.0;
                     for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
@@ -532,10 +532,10 @@ index++;
                     add_to_flow_array(flowarray[i], RST);
                 }
                 else {
-                    add_to_flow_array(flowarray[i]);
+                    add_to_flow_array(flowarray[i], 0.0);
                 }
                 counter++;
-           // }
+           }
         }
         send_message(flowarray);
         if(counter > 0) {

@@ -1,7 +1,7 @@
 import sys
 import socket
 from time import sleep
-from proto_gen.sniffed_info_pb2 import FlowArray
+from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 9080         # The port used by the server
@@ -26,10 +26,25 @@ def recv_message(msg_type) -> FlowArray:
     if int.from_bytes(size, "big") == 0:
         return None
     data = s.recv(int.from_bytes(size, "big"))
-    # Create object of specified type to store received data
-    msg = msg_type()
-    sleep(0.1)
-    msg.ParseFromString(data)
+    data = data.decode("utf-8").split("\n")
+    # # Create object of specified type to store received data
+    # msg = msg_type()
+    # sleep(0.1) -- MAY NEED TO INCLUDE
+    # msg.ParseFromString(data)
+    msg = FlowArray()
+    for line in data:
+        if len(line) > 0:
+            flow = Flow()
+            line = line.split()
+            flow.s_addr, flow.s_port, flow.d_addr, flow.d_port = line[0:4]
+            flow.num_bytes = int(line[4])
+            if line[5] == "1":
+                flow.is_server = True
+            else:
+                flow.is_server = False
+            flow.service_type = line[6]
+            flow.rst = float(line[7])
+            msg.flows.append(flow)
     return msg
 
 def setup_client(mode:str, log:str, host):
