@@ -10,6 +10,7 @@ test/
 webvowl*/
 DyMonD.wiki/
 
+*.pcap
 *.zip
 *.pyc
 *-old*

@@ -5,5 +5,5 @@ veth4bb8e1a 172.26.0.4 persistence
 vethb640fb3 172.26.0.6 webui
 veth4d657d3 172.26.0.5 auth
 veth7386a51 172.26.0.2 registry
-veth3b4dfe7 172.26.0.9 generator
+veth2cf3f1e 172.26.0.9 generator
 veth9129ccf 172.26.0.3 recommender
