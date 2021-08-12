@@ -11,12 +11,15 @@
 #include <queue>
 #include <Utils.hpp> // modified
 #include <ctime>
+#include <time.h>
+#include <vector>
+#include "/home/shared/packages/anaconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/Python.h"
 #include <sniffer.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;
 
-
+//add post-validation code 
 std::mutex mtx;
 vector<struct flow*> flowarray;
 queue<raw_pkt*> Que;
@@ -28,7 +31,28 @@ char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
 double duration=30.0;
+vector<vector<string>> strTo2DStr(const string& str, const int& r, const int& c)
+{
+    vector<vector<string>> mat;
+    int rows(r), cols(c);
+    vector<string> words;
+    istringstream ss(str);
+    copy(istream_iterator<string>(ss),istream_iterator<string>(),back_inserter(words));
 
+    int counter(0);
+    for ( int i(0); i < rows; ++i ){
+        vector<string> temp;
+        for ( int j(0); j < cols; ++j){
+            if ( counter < words.size() )
+                temp.push_back(words[counter++]);
+            else
+                temp.push_back("");
+        }
+        mat.push_back(temp);
+    }
+
+    return mat;
+}
 
 void GetURLs( std::vector<char*> Packets)
 
@@ -44,7 +68,7 @@ for (int i=0; i<Packets.size(); i++)
 
          methodCode = parseMethod(Packets[i], strlen(Packets[i]));
 
-	if (methodsName[methodCode] != "NONE"){
+        if (methodsName[methodCode] != "NONE"){
        
 
    uri = parseUri(Packets[i], strlen(Packets[i]));
@@ -190,9 +214,9 @@ char *linesp, *lineep, *dataend, *eol;
 int lnl=0;
 linesp = (char*)  cp;
 dataend= cp +tcp_dl;
-	lineep = find_line_end(linesp, dataend, (const char**)&eol);
+        lineep = find_line_end(linesp, dataend, (const char**)&eol);
         if(lineep!=NULL){
-	lnl = lineep - linesp + 1;
+        lnl = lineep - linesp + 1;
         char *array = new char[lnl];
         strncpy(array,cp,lnl);
 flowarray[foundIndex]->Packets.push_back(array);
@@ -226,7 +250,7 @@ flowarray[foundIndex]->Packets.push_back(array);
                         //flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "http"));
                         flowarray[foundIndex]->protof = true;
                         Pfound = true;
- 			snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-C");
+                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-C");
                     }
                     else if (sport == 80 || sport == 8080 || sport == 8000 || sport == 8079) {
 //                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "http"));
@@ -327,7 +351,7 @@ capture_main(void *) {
 
        if (LiveMode)
 { 
-	end = clock();
+        end = clock();
         elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
         if (elapsed_time >= sniff_duration) {
             break;
@@ -354,31 +378,64 @@ capture_main(void *) {
 int main(int argc, char *argv[]){
     std::ofstream myfile, FP, file;
     std::ifstream infile("services.txt");
-    int b = 0; 	int opt;
+    int b = 0;  int opt;
     void *thread_result;
     pthread_t job_pkt_q;
     pthread_t capture;
     char ID[28];
 
+wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
+    for (int i=0; i<argc; i++) {
+    wchar_t* arg = Py_DecodeLocale(argv[i], NULL);
+    _argv[i] = arg;
+    }
+    clock_t start1 = clock();
+    Py_Initialize();
+    PyObject * pModule = NULL;
+    PyObject * pFunc = NULL;
+    PyObject *pDict = NULL;
+    PyObject *pReturn = NULL;
+   Py_SetProgramName(_argv[0]); 
+  PySys_SetArgv(argc, _argv); // must call this to get sys.argv and relative imports
+    pModule = PyImport_ImportModule("Model");
+        if(pModule==NULL){
+                printf("no module is found\n");
+                PyErr_Print();}
+                else{printf("module is found\n");}
+        pDict = PyModule_GetDict(pModule); 
+    pFunc = PyDict_GetItemString(pDict, "prediction");
+    if(!pFunc ||!(PyCallable_Check(pFunc))){
+        if (PyErr_Occurred())
+                            PyErr_Print();
+                        fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
+        Py_XDECREF(pFunc);
+                Py_DECREF(pModule);
+        return 0;
+    }
+    PyObject *PyList  = PyList_New(0);
+    PyObject *ArgList = PyTuple_New(1);
 
+    clock_t end1 = clock();
+    double elapsed1 = double(end1 - start1)/CLOCKS_PER_SEC;
+    printf("Time measured for initialization and finding the target python program and function: %.3f seconds.\n", elapsed1);
 
 InitMethodName();    
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
-		switch(opt){
+                switch(opt){
             case 't':
                 if(atof(optarg) <= 0 || atof(optarg) > 1000) {
                     printf("Time out of range");
                     exit(EXIT_FAILURE);
                 } else duration = atof(optarg);
                 break;
-			case 'i':
-				interface = optarg; break;
-			case 'p':
-		                ipaddress = optarg; break;
-			case 'f':
-			        tracefile = optarg; break;
-		}
-	}
+                        case 'i':
+                                interface = optarg; break;
+                        case 'p':
+                                ipaddress = optarg; break;
+                        case 'f':
+                                tracefile = optarg; break;
+                }
+        }
 
 char mode_buf[64], log[64], arg[64];
 bool sniff_more = true;
@@ -406,13 +463,13 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     
     printf("Starting to sniff...\n");
     while(sniff_more){
-	/* Start packet receiving thread */
-	pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
+        /* Start packet receiving thread */
+        pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
         /* Start main capture in live or offline mode */
         pthread_create(&capture, NULL, &capture_main, NULL);
 
-	// Wait for all threads to finish
-	pthread_join(job_pkt_q, &thread_result);
+        // Wait for all threads to finish
+        pthread_join(job_pkt_q, &thread_result);
     pthread_join(capture, &thread_result);
 
     printf("enq: %d Deq: %d\n", enq,deq);
@@ -449,7 +506,7 @@ break;
 flowarray[index]->proto=strdup(token1);
 index++;
 }*/
-    myfile.open("flows/flows.csv", std::ios_base::out);
+ /*   myfile.open("flows/flows.csv", std::ios_base::out);
     printf("flowarray size is %lu\n",flowarray.size());
      char *array = new char[36];
 
@@ -461,7 +518,7 @@ index++;
              for (int j = 0; j < 100; j++) {     
                  if( strlen(flowarray[i]->Packets[j]) >= 36)
                        strncpy(array, flowarray[i]->Packets[j], 36);
-		else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
+                else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
                     int d = 36 - strlen(flowarray[i]->Packets[j]);
                     int index = strlen(flowarray[i]->Packets[j]);
                     strncpy(array, flowarray[i]->Packets[j], index);
@@ -483,7 +540,103 @@ index++;
            
         }
     }
-    myfile.close();
+    myfile.close();*/
+    clock_t start2 = clock();
+    char *array = new char[36];
+    int rownum = 0;
+    for (int i = 0; i < flowarray.size(); i++) {
+           if (flowarray[i]->Packets.size() == 100 ) {
+               rownum++;
+           }
+    }
+    //printf("2darray rownum is %d",rownum);
+    int *arr_2d=new int[rownum*3600];
+    int(*p)[3600]=(int(*)[3600])arr_2d; 
+
+    int itr_row = 0;
+    int itr_col = 0;
+
+    for (int i = 0; i < flowarray.size(); i++) {
+       
+        if (flowarray[i]->Packets.size() == 100 ) {
+              if ( flowarray[i]->protof)
+                {  GetURLs(flowarray[i]->Packets); }
+             for (int j = 0; j < 100; j++) {     
+                 if( strlen(flowarray[i]->Packets[j]) >= 36)
+                       strncpy(array, flowarray[i]->Packets[j], 36);
+                else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
+                    int d = 36 - strlen(flowarray[i]->Packets[j]);
+                    int index = strlen(flowarray[i]->Packets[j]);
+                    strncpy(array, flowarray[i]->Packets[j], index);
+                    for (int j = 0; j < d; j++) {
+                        array[index] = '0';
+                        index++;
+                    }
+}
+                for (int l = 0; l < 36; l++) {   
+                        int b = (unsigned char)array[l]; 
+                        p[itr_row][itr_col+l]= b;
+                    }
+                    itr_col = itr_col + 36;
+                    
+                }
+                itr_row++;
+                itr_col=0;
+            }
+           
+    }
+    clock_t end2 = clock();
+    double elapsed2 = double(end2 - start2)/CLOCKS_PER_SEC;
+    printf("Time measured for set up 2d array: %.3f seconds.\n", elapsed2);
+    printf("2d array creation finished. rownum is %d, column num is 3600\n",itr_row);
+       std::string str;
+   for (int x =0;x<rownum;x++) {
+       for(int y = 0;y<3600;y++){
+        str += std::to_string(p[x][y]);
+        str += " ";
+    }
+   }
+    clock_t start3 = clock();
+    PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
+    pReturn=PyObject_CallObject(pFunc, ArgList);
+    clock_t end3 = clock();
+    double elapsed3 = double(end3 - start3)/CLOCKS_PER_SEC;
+    printf("Time measured from sending to receiving: %.3f seconds.\n", elapsed3);
+
+
+    char* result;
+    PyArg_Parse(pReturn,"s",&result);
+    printf("result from python is");
+    printf("%s\n",result);
+
+    //int rows=rownum
+    int cols=2;
+    vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
+
+    char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-c", "MYSQL-S", "MYSQL-c", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
+int counter_mat = 0;
+
+for (int i = 0; i < flowarray.size(); i++) {
+       
+        if (flowarray[i]->Packets.size() == 100 ) {
+            int index = stoi(mat[counter_mat][0]);
+            char* lab=label[index];
+            printf("%s",lab);
+            //flowarray[i]->proto=label[index];
+           // mat[counter][0]=lab;
+           // printf("%s\n",mat[counter][0]);
+            //flowarray[i]->proto=const_cast<char *>(mat[counter][0].c_str());
+           // printf("%s ",flowarray[i]->proto);
+           // printf("%s\n",mat[counter][0]);
+            double score_double = std::stod(mat[counter_mat][1]);
+            //flowarray[i]->score=score_double;
+            //printf("%f\n",flowarray[i]->score);
+            printf("%f\n",score_double);
+            counter_mat++;
+        }
+
+}
+
     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
@@ -558,7 +711,21 @@ index++;
          sniff_more = false;
      }
     }
-
+        clock_t start4 = clock();
+        Py_DECREF(ArgList);
+        Py_DECREF(PyList);
+        Py_DECREF(pReturn);
+        Py_DECREF(pFunc);
+        Py_DECREF(pModule);
+        Py_XDECREF(pDict);
+        Py_Finalize();
+        clock_t end4 = clock();
+        
+        double elapsed4 = double(end4 - start4)/CLOCKS_PER_SEC;
+        printf("Time measured for finalization: %.3f seconds.\n", elapsed4);
+    
+  
+  
 /* for(int i = 0; i < Nodes.size(); i++)
      {
          // printf("%s %s %f\n",Nodes[i]->NodeID, Nodes[i]->service, Nodes[i]->score); 
