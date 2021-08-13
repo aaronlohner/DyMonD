@@ -320,9 +320,9 @@ if __name__ == '__main__':
     group2 = parser.add_mutually_exclusive_group()
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
+    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
-    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
     interfaces = {}
@@ -330,7 +330,7 @@ if __name__ == '__main__':
         parser.error("--dictionary requires --IP.")
     # Temporary measure until next hop extractor can match IPs to interfaces automatically
     elif args.IP is not None and args.dictionary is None:
-        parser.error("--IP requires --dictionary (temporary measure).")
+        parser.error("--IP requires --dictionary.")
     if args.dictionary is not None:
         # Temporary implementation: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,

@@ -29,7 +29,7 @@ def recv_message(msg_type) -> FlowArray:
     data = data.decode("utf-8").split("\n")
     # # Create object of specified type to store received data
     # msg = msg_type()
-    # sleep(0.1) -- MAY NEED TO INCLUDE
+    # sleep(0.1) -- MAY NEED TO INCLUDE IF EXPERIENCING PARSING/DECODE ERRORS
     # msg.ParseFromString(data)
     msg = FlowArray()
     for line in data:
