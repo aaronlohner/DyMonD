@@ -18,6 +18,14 @@
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;
+struct service
+{
+  char ID[32];
+  char label[32];
+  float score;
+  
+};
+float threshold = 0.98;
 
 //add post-validation code 
 std::mutex mtx;
@@ -613,7 +621,7 @@ index++;
     int cols=2;
     vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
 
-    char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-c", "MYSQL-S", "MYSQL-c", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
+    char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
 int counter_mat = 0;
 
 for (int i = 0; i < flowarray.size(); i++) {
@@ -637,6 +645,203 @@ for (int i = 0; i < flowarray.size(); i++) {
 
 }
 
+vector < struct service *>services;
+/******************validate label**********************/
+printf("first for loop....\n");
+
+int counter_f = 0;
+for(int i = 0; i < flowarray.size(); i++)
+  {
+     
+      if(flowarray[i]->Packets.size() == 100 )
+      {
+        int ind = std::stoi(mat[counter_f][0]);
+        string lab =label[ind];
+        string lab_del = lab.substr(0, lab.size()-2);
+        char * mat_lab = const_cast<char*>(lab_del.c_str());
+            float mat_score = std::stod(mat[counter_f][1]);
+            char *ip;
+            char *port;
+            int cassMN=0;
+            if(lab.back()=='S')
+            {
+              ip = flowarray[i]->saddr;
+              port = flowarray[i]->sport;
+              flowarray[i]->isServer=1;
+        }
+            else if(lab.back()=='C')
+            {
+              ip = flowarray[i]->daddr;
+              port = flowarray[i]->dport;
+              flowarray[i]->isServer=0;
+            }
+            else if(lab.back()=='N')
+            {
+              ip = flowarray[i]->daddr;
+              port = flowarray[i]->dport;
+              flowarray[i]->isServer=0;
+              cassMN=1;
+            }
+            char ID [32];
+            strncpy (ID, ip,32);
+            strncat (ID, port,32);
+        
+            int found = 0;
+            int pos = 0;
+            //check if server IP/port number is in services;
+            for (int j = 0; j < services.size (); j++)
+            {
+              if (strcmp(services[j]->ID,ID)==0)
+                {
+                  found = 1;
+                  pos = j;
+                  break;
+                }
+            }
+          if (found == 0 && mat_score >= threshold)
+            {
+              printf("create service\n");
+              struct service *ser =(struct service *) calloc (sizeof (struct service), 1);
+              strncpy(ser->ID,ID,32);
+              if(cassMN==0){
+              strncpy(ser->label,mat_lab,32);}
+              else{
+                  strncpy(ser->label,const_cast<char*>(lab.c_str()),32);}
+              ser->score = mat_score;
+              services.push_back (ser);
+            }
+          else if(found==1){
+          if (mat_score > services[pos]->score)
+            { 
+            if(cassMN==0){strncpy(services[pos]->label,mat_lab,32);}
+            else{strncpy(services[pos]->label,const_cast<char*>(lab.c_str()),32);}
+          services[pos]->score = mat_score;
+            }
+        }
+      
+    counter_f++;
+//    free(ID);
+        }
+    
+    
+}
+//test services
+for(int j = 0;j<services.size();j++){
+    cout<< j <<":ID "<<services[j]->ID <<" lab:"<<services[j]->label<<endl;
+}
+
+/*for all flows
+1 packets.size!=100 --> label unknown
+2 packets.size =100 -->
+                    1) found services.ID=flows.ID, update label if not equal
+                    2) not found service.ID = flows.ID, label as unknown.
+
+*/
+
+/**************/
+
+
+int count = 0;
+printf("iterate through flows...\n");
+for (int i = 0; i < flowarray.size(); i++)
+    {
+      if (flowarray[i]->Packets.size() != 100 )  {          
+          strncpy(flowarray[i]->proto,"Unknown",32);   
+      }
+
+      else if (flowarray[i]->Packets.size() == 100 )
+        {
+        
+        int ind = std::stoi(mat[count][0]);
+        //   cout<< ind << endl;
+        string flab =label[ind];
+        string flab_del = flab.substr(0, flab.size()-2);
+        char * mat_lab = const_cast<char*>(flab_del.c_str());
+            char *ip;
+            char *port;
+
+          if(flab.back()=='S')  
+          {   
+              ip = flowarray[i]->saddr;
+              port = flowarray[i]->sport;
+          //printf("server ip: %s server port: %s",ip,port);
+            }
+          else
+            {
+              ip = flowarray[i]->daddr;
+              port = flowarray[i]->dport;
+            }
+          
+          char ID[32];
+       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
+          strncpy (ID, ip,32);
+          strncat (ID, port,32);
+      //printf("%d",i);
+          printf("%s\n",ID);
+          int pos=-1;
+          int found=0;
+          for (int j = 0; j < services.size(); j++)
+            {
+              if (strcmp(services[j]->ID,ID)==0)
+                {
+                  pos = j;
+                  found = 1;
+                  break;
+                }
+            }
+        //replace with counter;
+            if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
+                    strncpy(flowarray[i]->proto,services[pos]->label,32);
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0){
+                        flowarray[i]->specialType=2;
+                    }
+                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+            }
+            if(found==0){
+            flowarray[i]->specialType=3;
+            }
+       count ++;
+        }
+
+
+        
+    }
+//test result
+
+
+int test_counter=0;
+for(int i = 0; i < flowarray.size (); i++){
+    if(flowarray[i]->Packets.size()==100){
+            printf("flow array %d \n",test_counter);
+            cout << "proto before concatenation: "<< flowarray[i]->proto<< endl;
+    if(flowarray[i]->specialType==2){
+        cout << "proto after concatenation: "<< flowarray[i]->proto<< endl;
+    }
+    else if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
+            char new_proto[32];
+            const char *type = "-S";
+            strncpy (new_proto, flowarray[i]->proto,32);
+            strncat (new_proto, type,32);
+        strncpy(flowarray[i]->proto,new_proto,32);
+    cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;}
+    else if (flowarray[i]->isServer==0&&flowarray[i]->specialType!=3){
+        char new_proto[32];
+        const char *type = "-C";
+            strncpy (new_proto, flowarray[i]->proto,32);
+            strncat (new_proto, type,32);
+        strncpy(flowarray[i]->proto,new_proto,32);
+        cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;
+    }
+    else if(flowarray[i]->specialType==3){
+            strncpy(flowarray[i]->proto, "Unknown", 32);
+        cout << "proto after concatenation: " << flowarray[i]->proto<< endl;
+        }
+    test_counter++;
+    printf("\n");
+    }
+}
+
+/*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
