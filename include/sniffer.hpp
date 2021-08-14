@@ -36,6 +36,9 @@ struct flow {
  char *sport;
  char *dport;
  char proto[32];
+ int isServer;
+ int specialType;
+ float score;
  int NumBytes;
  bool protof;
  std::vector<char*> Packets;
@@ -46,9 +49,9 @@ struct flow {
 typedef struct ethernet_header ethhdr;
 struct ethernet_header
 {
-  u_int8_t  ether_dhost[6];		/* Destination addr	*/
-  u_int8_t  ether_shost[6];		/* Source addr */
-  u_int16_t ether_type;			/* Packet type */
+  u_int8_t  ether_dhost[6];             /* Destination addr     */
+  u_int8_t  ether_shost[6];             /* Source addr */
+  u_int16_t ether_type;                 /* Packet type */
 };
 
 /* IP header structure */
@@ -61,10 +64,10 @@ struct ip_header
     u_int16_t tot_len;
     u_int16_t id;
     u_int16_t frag_off;
-#define	IP_RF 0x8000			/* Reserved fragment flag */
-#define	IP_DF 0x4000			/* Dont fragment flag */
-#define	IP_MF 0x2000			/* More fragments flag */
-#define	IP_OFFMASK 0x1fff		/* Mask for fragmenting bits */
+#define IP_RF 0x8000                    /* Reserved fragment flag */
+#define IP_DF 0x4000                    /* Dont fragment flag */
+#define IP_MF 0x2000                    /* More fragments flag */
+#define IP_OFFMASK 0x1fff               /* Mask for fragmenting bits */
     u_int8_t ttl;
     u_int8_t protocol;
     u_int16_t check;
@@ -87,7 +90,7 @@ struct tcp_header
 #  define TH_FIN        0x01
 #  define TH_SYN        0x02
 #  define TH_RST        0x04
-#  define TH_PUSH	0x08
+#  define TH_PUSH       0x08
 #  define TH_ACK        0x10
 #  define TH_URG        0x20
     u_int16_t th_win;           /* Window */
@@ -97,9 +100,9 @@ struct tcp_header
 
 typedef struct udp_header udphdr;
 struct udp_header {
-u_short	uh_sport;		/* source port */
-	u_short	uh_dport;		/* destination port */
-	u_short	uh_len;		/* datagram length */
-	u_short	uh_sum;			/* datagram checksum */
+u_short uh_sport;               /* source port */
+        u_short uh_dport;               /* destination port */
+        u_short uh_len;         /* datagram length */
+        u_short uh_sum;                 /* datagram checksum */
 };
 #endif /* SNIFFER_HPP */
