@@ -366,7 +366,7 @@ if __name__ == '__main__':
                         response = recv_message_test()
                     with open("logs/model_string.txt", "a") as ft:
                         ft.writelines(to_write)
-                        ft.write("\n\n")
+                        ft.write("\n\n\nNext component\n")
 
                 response = recv_message()#sniffed_info_pb2.FlowArray)
                 while response is not None:
