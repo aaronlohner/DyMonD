@@ -5,19 +5,10 @@
 #include <ctime>
 #include <time.h>
 #include <vector>
-#include "/home/shared/packages/anaconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/Python.h"
 #include <sniffer.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;
-struct service
-{
-  char ID[32];
-  char label[32];
-  float score;
-  
-};
-float threshold = 0.98;
 
 //add post-validation code 
 std::mutex mtx;
@@ -373,7 +364,6 @@ capture_main(void *) {
  **** MAIN STARTS HERE ****
  
  ***********************************
-
 ***********************************/
 int main(int argc, char *argv[]){
     std::ofstream myfile, FP, file;
@@ -383,41 +373,6 @@ int main(int argc, char *argv[]){
     pthread_t job_pkt_q;
     pthread_t capture;
     char ID[28];
-
-wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
-    for (int i=0; i<argc; i++) {
-    wchar_t* arg = Py_DecodeLocale(argv[i], NULL);
-    _argv[i] = arg;
-    }
-    clock_t start1 = clock();
-    Py_Initialize();
-    PyObject * pModule = NULL;
-    PyObject * pFunc = NULL;
-    PyObject *pDict = NULL;
-    PyObject *pReturn = NULL;
-   Py_SetProgramName(_argv[0]); 
-  PySys_SetArgv(argc, _argv); // must call this to get sys.argv and relative imports
-    pModule = PyImport_ImportModule("Model");
-        if(pModule==NULL){
-                printf("no module is found\n");
-                PyErr_Print();}
-                else{printf("module is found\n");}
-        pDict = PyModule_GetDict(pModule); 
-    pFunc = PyDict_GetItemString(pDict, "prediction");
-    if(!pFunc ||!(PyCallable_Check(pFunc))){
-        if (PyErr_Occurred())
-                            PyErr_Print();
-                        fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
-        Py_XDECREF(pFunc);
-                Py_DECREF(pModule);
-        return 0;
-    }
-    PyObject *PyList  = PyList_New(0);
-    PyObject *ArgList = PyTuple_New(1);
-
-    clock_t end1 = clock();
-    double elapsed1 = double(end1 - start1)/CLOCKS_PER_SEC;
-    printf("Time measured for initialization and finding the target python program and function: %.3f seconds.\n", elapsed1);
 
 InitMethodName();    
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
@@ -500,7 +455,6 @@ else
 found=true;
 break;
                 }              
-
 }
  if(!found)
 flowarray[index]->proto=strdup(token1);
@@ -509,7 +463,6 @@ index++;
  /*   myfile.open("flows/flows.csv", std::ios_base::out);
     printf("flowarray size is %lu\n",flowarray.size());
      char *array = new char[36];
-
     for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) {
@@ -528,8 +481,6 @@ index++;
                     }
 }
                 for (int l = 0; l <36; l++) {    
-
-
                     b = ( unsigned char )array[l];
                     if((j*l)!=3465)
                     myfile << b << ",";
@@ -540,8 +491,7 @@ index++;
            
         }
     }
-    myfile.close();*/
-    clock_t start2 = clock();
+*/
     char *array = new char[36];
     int rownum = 0;
     for (int i = 0; i < flowarray.size(); i++) {
@@ -585,10 +535,10 @@ index++;
             }
            
     }
-    clock_t end2 = clock();
-    double elapsed2 = double(end2 - start2)/CLOCKS_PER_SEC;
-    printf("Time measured for set up 2d array: %.3f seconds.\n", elapsed2);
+    
+   
     printf("2d array creation finished. rownum is %d, column num is 3600\n",itr_row);
+
        std::string str;
    for (int x =0;x<rownum;x++) {
        for(int y = 0;y<3600;y++){
@@ -596,245 +546,9 @@ index++;
         str += " ";
     }
    }
-    clock_t start3 = clock();
-    PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
-    pReturn=PyObject_CallObject(pFunc, ArgList);
-    clock_t end3 = clock();
-    double elapsed3 = double(end3 - start3)/CLOCKS_PER_SEC;
-    printf("Time measured from sending to receiving: %.3f seconds.\n", elapsed3);
 
 
-    char* result;
-    PyArg_Parse(pReturn,"s",&result);
-    printf("result from python is");
-    printf("%s\n",result);
 
-    //int rows=rownum
-    int cols=2;
-    vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
-
-    char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
-int counter_mat = 0;
-
-for (int i = 0; i < flowarray.size(); i++) {
-       
-        if (flowarray[i]->Packets.size() == 100 ) {
-            int index = stoi(mat[counter_mat][0]);
-            char* lab=label[index];
-            printf("%s",lab);
-            //flowarray[i]->proto=label[index];
-           // mat[counter][0]=lab;
-           // printf("%s\n",mat[counter][0]);
-            //flowarray[i]->proto=const_cast<char *>(mat[counter][0].c_str());
-           // printf("%s ",flowarray[i]->proto);
-           // printf("%s\n",mat[counter][0]);
-            double score_double = std::stod(mat[counter_mat][1]);
-            //flowarray[i]->score=score_double;
-            //printf("%f\n",flowarray[i]->score);
-            printf("%f\n",score_double);
-            counter_mat++;
-        }
-
-}
-
-vector < struct service *>services;
-/******************validate label**********************/
-printf("first for loop....\n");
-
-int counter_f = 0;
-for(int i = 0; i < flowarray.size(); i++)
-  {
-     
-      if(flowarray[i]->Packets.size() == 100 )
-      {
-        int ind = std::stoi(mat[counter_f][0]);
-        string lab =label[ind];
-        string lab_del = lab.substr(0, lab.size()-2);
-        char * mat_lab = const_cast<char*>(lab_del.c_str());
-            float mat_score = std::stod(mat[counter_f][1]);
-            char *ip;
-            char *port;
-            int specialType=0;
-            if(lab.back()=='S')
-            {
-              ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-              flowarray[i]->isServer=1;
-        }
-            else if(lab.back()=='C')
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-              flowarray[i]->isServer=0;
-            }
-            else if(lab.back()=='N'||lab.back()=='W')
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-              flowarray[i]->isServer=0;
-              specialType=1;
-            }
-            char ID [32];
-            strncpy (ID, ip,32);
-            strncat (ID, port,32);
-        
-            int found = 0;
-            int pos = 0;
-            //check if server IP/port number is in services;
-            for (int j = 0; j < services.size (); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  found = 1;
-                  pos = j;
-                  break;
-                }
-            }
-          if (found == 0 && mat_score >= threshold)
-            {
-              printf("create service\n");
-              struct service *ser =(struct service *) calloc (sizeof (struct service), 1);
-              strncpy(ser->ID,ID,32);
-              if(specialType==0){
-              strncpy(ser->label,mat_lab,32);}
-              else{
-                  strncpy(ser->label,const_cast<char*>(lab.c_str()),32);}
-              ser->score = mat_score;
-              services.push_back (ser);
-            }
-          else if(found==1){
-          if (mat_score > services[pos]->score)
-            { 
-            if(specialType==0){strncpy(services[pos]->label,mat_lab,32);}
-            else{strncpy(services[pos]->label,const_cast<char*>(lab.c_str()),32);}
-          services[pos]->score = mat_score;
-            }
-        }
-      
-    counter_f++;
-//    free(ID);
-        }
-    
-    
-}
-//test services
-for(int j = 0;j<services.size();j++){
-    cout<< j <<":ID "<<services[j]->ID <<" lab:"<<services[j]->label<<endl;
-}
-
-/*for all flows
-1 packets.size!=100 --> label unknown
-2 packets.size =100 -->
-                    1) found services.ID=flows.ID, update label if not equal
-                    2) not found service.ID = flows.ID, label as unknown.
-
-*/
-
-/**************/
-
-
-int count = 0;
-printf("iterate through flows...\n");
-for (int i = 0; i < flowarray.size(); i++)
-    {
-      if (flowarray[i]->Packets.size() != 100 )  {          
-          strncpy(flowarray[i]->proto,"Unknown",32);   
-      }
-
-      else if (flowarray[i]->Packets.size() == 100 )
-        {
-        
-        int ind = std::stoi(mat[count][0]);
-        //   cout<< ind << endl;
-        string flab =label[ind];
-        string flab_del = flab.substr(0, flab.size()-2);
-        char * mat_lab = const_cast<char*>(flab_del.c_str());
-            char *ip;
-            char *port;
-
-          if(flab.back()=='S')  
-          {   
-              ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-          //printf("server ip: %s server port: %s",ip,port);
-            }
-          else
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-            }
-          
-          char ID[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID, ip,32);
-          strncat (ID, port,32);
-      //printf("%d",i);
-          printf("%s\n",ID);
-          int pos=-1;
-          int found=0;
-          for (int j = 0; j < services.size(); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  pos = j;
-                  found = 1;
-                  break;
-                }
-            }
-        //replace with counter;
-            if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
-                    strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-            }
-            if(found==0){
-            flowarray[i]->specialType=3;
-            }
-       count ++;
-        }
-
-
-        
-    }
-//test result
-
-
-int test_counter=0;
-for(int i = 0; i < flowarray.size (); i++){
-    if(flowarray[i]->Packets.size()==100){
-            printf("flow array %d \n",test_counter);
-            cout << "proto before concatenation: "<< flowarray[i]->proto<< endl;
-    if(flowarray[i]->specialType==2){
-        cout << "proto after concatenation: "<< flowarray[i]->proto<< endl;
-    }
-    else if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
-            char new_proto[32];
-            const char *type = "-S";
-            strncpy (new_proto, flowarray[i]->proto,32);
-            strncat (new_proto, type,32);
-        strncpy(flowarray[i]->proto,new_proto,32);
-    cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;}
-    else if (flowarray[i]->isServer==0&&flowarray[i]->specialType!=3){
-        char new_proto[32];
-        const char *type = "-C";
-            strncpy (new_proto, flowarray[i]->proto,32);
-            strncat (new_proto, type,32);
-        strncpy(flowarray[i]->proto,new_proto,32);
-        cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;
-    }
-    else if(flowarray[i]->specialType==3){
-            strncpy(flowarray[i]->proto, "Unknown", 32);
-        cout << "proto after concatenation: " << flowarray[i]->proto<< endl;
-        }
-    test_counter++;
-    printf("\n");
-    }
-}
-
-/*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
@@ -909,19 +623,7 @@ for(int i = 0; i < flowarray.size (); i++){
          sniff_more = false;
      }
     }
-        clock_t start4 = clock();
-        Py_DECREF(ArgList);
-        Py_DECREF(PyList);
-        Py_DECREF(pReturn);
-        Py_DECREF(pFunc);
-        Py_DECREF(pModule);
-        Py_XDECREF(pDict);
-        Py_Finalize();
-        clock_t end4 = clock();
-        
-        double elapsed4 = double(end4 - start4)/CLOCKS_PER_SEC;
-        printf("Time measured for finalization: %.3f seconds.\n", elapsed4);
-    
+
   
   
 /* for(int i = 0; i < Nodes.size(); i++)

@@ -16,7 +16,7 @@ void setup_server();
 
 void stop_server();
 
-void add_to_flow_array(flow *flow);
+//void add_to_flow_array(flow *flow);
 
 void add_to_flow_array(flow *flow, double RST);
 

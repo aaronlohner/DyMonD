@@ -50,21 +50,6 @@ class edge: #attributes of an edge
 def randomColor(): #generate random light colors
     return "#"+''.join([(str)(hex(random.randint(80,255))).split("x")[1], (str)(hex(random.randint(80,255))).split("x")[1], (str)(hex(random.randint(80,255))).split("x")[1]])
 
-
-
-# def getName(label):#get the IPaddress of a node from name
-#     counter1 = 0
-#     counter2 = 0
-#     for counter1 in range(len(label)):
-#         if not label[counter1].isdigit():
-#             break
-#     for counter2 in range(len(label)):
-#         if label[counter2] == '/':
-#             break
-#     if counter2 == len(label)-1: counter2 = len(label)
-#     return label[0:counter1], label[counter1:len(label)].upper() # (port, service type)
-
-
 def generate_graph_from_file(log:str):
     data = open(log, "r")#input
 
@@ -74,20 +59,6 @@ def generate_graph_from_file(log:str):
     id2 = None
 
     for line in data:#read edge information
-    #     if len(line.strip().split(" ")) == 3:
-    #         node1, node2, weight = line.strip().split(" ")#node1: the first node; node2: the second node; weight: information
-    #         node12=node1.split(":")[1]#seperate port and ip address
-    #         node22=node2.split(":")[1]
-    #         if node12.isdigit() and not node22.isdigit():#node 1 is client and node2 is server
-    # #            newNode1 = node("owl:Class", node1, node1.split(":")[0], randomColor())
-    #             newNode1 = node("owl:Class", "Client", node1.split(":")[0], node12, randomColor())
-    #             newNode2 = node("owl:equivalentClass", getName(node22)[1], node2.split(":")[0], getName(node22)[0],randomColor())
-    #         elif not node12.isdigit() and node22.isdigit():#node 1 is server and node2 is client
-    #             newNode1 = node("owl:equivalentClass", getName(node12)[1], (node1.split(":")[0]), getName(node12)[0],randomColor())
-    #             newNode2 = node("owl:Class", "Client", node2.split(":")[0], node22, randomColor())
-    #         elif node12.isdigit() and node22.isdigit():#both nodes are not server
-    #             newNode1 = node("owl:Class", "Unknown", node1.split(":")[0], node12,randomColor())
-    #             newNode2 = node("owl:Class", "Unknown", node2.split(":")[0], node22,randomColor())
         if len(line.strip().split(" ")) == 4:
             node1, node2, service_type, weight = line.strip().split(" ")#node1: the first node; node2: the second node; weight: information
             node12=node1.split(":")[1]#seperate port and ip address
@@ -171,18 +142,6 @@ def generate_graph(flow_array:FlowArray):
     id2 = None
 
     for flow in flow_array.flows:
-        # if flow.s_port.isdigit() and not flow.d_port.isdigit():#node 1 is client and node2 is server
-        #     newNode1 = node("owl:Class", "Client", flow.s_addr, flow.s_port, randomColor())
-        #     newNode2 = node("owl:equivalentClass", getName(flow.d_port)[1], flow.d_addr, getName(flow.d_port)[0],randomColor())
-        # elif not flow.s_port.isdigit() and flow.d_port.isdigit():#node 1 is server and node2 is client
-        #     newNode1 = node("owl:equivalentClass", getName(flow.s_port)[1], (flow.s_addr), getName(flow.s_port)[0],randomColor())
-        #     newNode2 = node("owl:Class", "Client", flow.d_addr, flow.d_port, randomColor())
-        # elif flow.s_port.isdigit() and flow.d_port.isdigit():#both nodes are not server
-        #     newNode1 = node("owl:Class", "Unknown", flow.s_addr, flow.s_port,randomColor())
-        #     newNode2 = node("owl:Class", "Unknown", flow.d_addr, flow.d_port,randomColor())
-
-        # (ptype, pname, paddress, pPort, pcolor)
-        # (port, service type)
         if flow.service_type == "Unknown": # neither node is client or server
             newNode1 = node("owl:Class", flow.service_type, flow.s_addr, flow.s_port, randomColor())
             newNode2 = node("owl:Class", flow.service_type, flow.d_addr, flow.d_port, randomColor())

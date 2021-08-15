@@ -33,7 +33,7 @@ void setup_server() {
 	}
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;// we bind the server to the localhost,
-	// hence we use INADDR_ANY to allow any client IP address
+	// and we use INADDR_ANY to allow any client IP address
 	address.sin_port = htons(PORT); // defined as 9080
 	
 	// Forcefully attaching socket to the port 9080
@@ -113,8 +113,8 @@ void add_to_flow_array(flow *flow, double RST) {
 /*
  * Add flow element to flow array
  */
-void add_to_flow_array(flow *flow) {
-	/*string data;
+/*void add_to_flow_array(flow *flow) {
+	string data;
 	flow_array.SerializeToString(&data);
 	size_t length = data.size();
 	if(length > 1380){
@@ -131,8 +131,8 @@ void add_to_flow_array(flow *flow) {
 	flow_proto->set_num_bytes(flow->NumBytes/30);
 	flow_proto->set_is_server(is_server(flow));
 	get_service_type(flow, service);
-	flow_proto->set_service_type(service);*/
-}
+	flow_proto->set_service_type(service);
+}*/
 
 /*
  * Determine if the first component in the flow is a server or not
@@ -182,7 +182,6 @@ void send_message(vector<struct flow*> flowarray){
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, flow_string.c_str(), length, 0);
-	//printf("flow_string: %s", flow_string.c_str());
 	// Prepare global variable for future use
 	flow_string.clear();
 	flow_string.append(flow_last);
@@ -212,7 +211,6 @@ void send_message(string flowarray){
 	// First send message length
 	send(client_fd, &nlength, 4, 0);
 	send(client_fd, flowarray.c_str(), length, 0);
-	//printf("flow_string: %s", flow_string.c_str());
 	// Prepare global variable for future use
 	flow_string.clear();
 	flow_string.append(flow_last);
