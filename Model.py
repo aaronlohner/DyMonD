@@ -1,21 +1,11 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python3
 import sys
-print(sys.version_info)
+sys.path.insert(0,'/home/melsaa1/anaconda3/lib/python37.zip')
+sys.path.insert(1,'/home/melsaa1/anaconda3/lib/python3.7')
+sys.path.insert(2,'/home/melsaa1/anaconda3/lib/python3.7/lib-dynload')
+sys.path.insert(3,'/home/melsaa1/anaconda3/lib/python3.7/site-packages')
 print(sys.path)
-#print("go")
-
-sys.path.remove('/usr/lib/python37.zip')
-sys.path.remove('/usr/lib/python3.7')
-sys.path.remove('/usr/lib/python3.7/lib-dynload')
-sys.path.remove( '/usr/local/lib/python3.7/dist-packages')
-sys.path.remove('/usr/lib/python3/dist-packages')
-sys.path.append('/home/melsaa1/anaconda3/lib/python37.zip')
-sys.path.append('/home/melsaa1/anaconda3/lib/python3.7')
-sys.path.append('/home/melsaa1/anaconda3/lib/python3.7/lib-dynload')
-sys.path.append('/home/melsaa1/anaconda3/lib/python3.7/site-packages')
-
-#print(sys.path)
 import os
 print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
 print("PATH:", os.environ.get('PATH'))
