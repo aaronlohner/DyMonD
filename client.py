@@ -56,6 +56,7 @@ def recv_message_test() -> str:
         return None
     data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
     print(data)
+    return data
 
 def setup_client(mode:str, log:str, host):
     if host is None:

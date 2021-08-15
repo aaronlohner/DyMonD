@@ -324,11 +324,13 @@ if __name__ == '__main__':
         sniff(arg)
 
         if args.test:
+            to_write = ""
             response = recv_message_test()
             while response is not None:
-                response += recv_message_test()
+                to_write += response
+                response = recv_message_test()
             with open("logs/model_string.txt", "w") as f:
-                f.writelines(response)
+                f.writelines(to_write)
 
         if log == "*":
             response = recv_message()#sniffed_info_pb2.FlowArray)
@@ -357,11 +359,13 @@ if __name__ == '__main__':
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
 
                 if args.test:
+                    to_write = ""
                     response = recv_message_test()
                     while response is not None:
-                        response += recv_message_test()
+                        to_write += response
+                        response = recv_message_test()
                     with open("logs/model_string.txt", "a") as f:
-                        f.writelines(response)
+                        f.writelines(to_write)
                         f.write("\n\n")
 
                 response = recv_message()#sniffed_info_pb2.FlowArray)

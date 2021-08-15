@@ -561,6 +561,7 @@ index++;
    }
 
     send_message_test(str);
+    if(str.size() > 0) send_message();
 
 
     int counter = 0;
