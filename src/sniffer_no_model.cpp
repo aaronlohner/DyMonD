@@ -540,13 +540,27 @@ index++;
     printf("2d array creation finished. rownum is %d, column num is 3600\n",itr_row);
 
        std::string str;
+       string str2 = "", str_last = "";
    for (int x =0;x<rownum;x++) {
        for(int y = 0;y<3600;y++){
-        str += std::to_string(p[x][y]);
-        str += " ";
+
+        if(str.size() > 1380) {
+            send_message_test(str2);
+            str.clear();
+            str.append(str_last);
+        }
+        str2.clear();
+        str2 = str;
+        str_last.clear();
+
+        str_last += std::to_string(p[x][y]);
+        str_last += " ";
+
+        str.append(str_last);
     }
    }
 
+    send_message_test(str);
 
 
     int counter = 0;

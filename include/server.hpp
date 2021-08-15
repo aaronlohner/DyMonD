@@ -30,6 +30,8 @@ void send_message(vector<struct flow*> flowarray);
 
 void send_message(string flowarray);
 
+void send_message_test(string str);
+
 void send_message();
 
 void receive_message(char *inputBuffer);

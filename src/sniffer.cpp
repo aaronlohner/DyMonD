@@ -1,15 +1,7 @@
-// #include <assert.h> /* assert */
-// #include <iostream>
 #include <pthread.h>
-#include <mutex>          // std::mutex
-// #include <bits/stdc++.h>
-// #include <boost/filesystem.hpp>
-// #include <string.h>
-// #include <pcap/pcap.h>
-// #include <netinet/in.h>
-// #include <time.h>
+#include <mutex>
 #include <queue>
-#include <Utils.hpp> // modified
+#include <Utils.hpp>
 #include <ctime>
 #include <time.h>
 #include <vector>

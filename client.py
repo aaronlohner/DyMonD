@@ -16,12 +16,11 @@ def send_message(mesg:str) -> None:
     s.send(mesg)
     print("Sent message")
 
-def recv_message(msg_type) -> FlowArray:
+def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message(mesg_type) -> FlowArray:
     """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
-    #print("size: {}".format(int.from_bytes(size, "big")))
     # Stop waiting for server to send messages when receive an incoming message of '0'
     if int.from_bytes(size, "big") == 0:
         return None
@@ -46,6 +45,17 @@ def recv_message(msg_type) -> FlowArray:
             flow.rst = float(line[7])
             msg.flows.append(flow)
     return msg
+
+def recv_message_test() -> str:
+    data = b''
+    # Convention is that first 4 bytes contain size of message to follow
+    size = s.recv(4)
+    print("size: {}".format(int.from_bytes(size, "big")))
+    # Stop waiting for server to send messages when receive an incoming message of '0'
+    if int.from_bytes(size, "big") == 0:
+        return None
+    data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
+    print(data)
 
 def setup_client(mode:str, log:str, host):
     if host is None:

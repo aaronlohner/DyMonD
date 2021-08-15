@@ -216,6 +216,16 @@ void send_message(string flowarray){
 	flow_string.append(flow_last);
 }
 
+/*
+ * Send string of flows
+ */
+void send_message_test(string str){
+	size_t length = str.size();
+	uint32_t nlength = htonl(length);
+	send(client_fd, &nlength, 4, 0);
+	send(client_fd, str.c_str(), length, 0);
+}
+
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
 	printf("Empty message sent to controller\n");

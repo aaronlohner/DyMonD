@@ -4,7 +4,7 @@ import time
 import random
 import json
 from typing import Dict, Tuple, List
-from client import setup_client, stop_client, recv_message, sniff
+from client import setup_client, stop_client, recv_message, recv_message_test, sniff
 from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
@@ -283,6 +283,7 @@ if __name__ == '__main__':
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
+    parser.add_argument("-t", "--test", action="store_true", help="receive string for input to learning model")
     args = parser.parse_args()
     interfaces = {}
     if args.dictionary is not None and args.IP is None:
@@ -321,42 +322,52 @@ if __name__ == '__main__':
     f = FlowArray()
     if opt == "f": # reading from pcap file
         sniff(arg)
+
+        if args.test:
+            response = recv_message_test()
+            while response is not None:
+                response += recv_message_test()
+            with open("logs/model_string.txt", "w") as f:
+                f.writelines(response)
+
         if log == "*":
-            response = recv_message(sniffed_info_pb2.FlowArray)
+            response = recv_message()#sniffed_info_pb2.FlowArray)
             while response is not None:
                 f.flows.extend(response.flows)
-                response = recv_message(sniffed_info_pb2.FlowArray)
+                response = recv_message()#sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
             generate_graph(f)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
-            recv_message(None)
+            recv_message()#None)
             print("Reading from file")
             generate_graph_from_file(log)
     else: # sniffing network interface
         q, visited, ips = [arg], [arg], []
         exists = False
+
+        open("logs/model_string.txt", "w").close()
+
         if log == "*": # if using tcp
-            l = FlowArray()
-            
-            #open("logs/" + args.out[:-4] + "txt", "w").close()
+            l = FlowArray()            
             while len(q) > 0:
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                response = recv_message(sniffed_info_pb2.FlowArray)
+
+                if args.test:
+                    response = recv_message_test()
+                    while response is not None:
+                        response += recv_message_test()
+                    with open("logs/model_string.txt", "a") as f:
+                        f.writelines(response)
+                        f.write("\n\n")
+
+                response = recv_message()#sniffed_info_pb2.FlowArray)
                 while response is not None:
                     f.flows.extend(response.flows)
-                    response = recv_message(sniffed_info_pb2.FlowArray)
-                # with open("logs/tcp-log-" + args.out[:-4] + "txt", "a") as fp:
-                #     for flow in f.flows:
-                #         if flow.is_server:
-                #             is_s = "S"
-                #         else:
-                #             is_s = "C"
-                #         print("{}:{} {}:{} {}-{} {}-{}".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
-                #         fp.writelines("{}:{} {}:{} {}-{} {}-{}\n".format(flow.s_addr, flow.s_port, flow.d_addr, flow.d_port, flow.service_type, is_s, flow.num_bytes, flow.rst))
+                    response = recv_message()#sniffed_info_pb2.FlowArray)
                 print("Num received flows: {}".format(len(f.flows)))
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
@@ -382,7 +393,7 @@ if __name__ == '__main__':
                 print("ips in q: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
-                recv_message(None)
+                recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
                     print("Num received flows: {}".format(len(f.readlines())))
                     f.seek(0)
