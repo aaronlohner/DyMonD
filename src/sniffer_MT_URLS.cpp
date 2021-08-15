@@ -662,7 +662,7 @@ for(int i = 0; i < flowarray.size(); i++)
             float mat_score = std::stod(mat[counter_f][1]);
             char *ip;
             char *port;
-            int cassMN=0;
+            int specialType=0;
             if(lab.back()=='S')
             {
               ip = flowarray[i]->saddr;
@@ -675,12 +675,12 @@ for(int i = 0; i < flowarray.size(); i++)
               port = flowarray[i]->dport;
               flowarray[i]->isServer=0;
             }
-            else if(lab.back()=='N')
+            else if(lab.back()=='N'||lab.back()=='W')
             {
               ip = flowarray[i]->daddr;
               port = flowarray[i]->dport;
               flowarray[i]->isServer=0;
-              cassMN=1;
+              specialType=1;
             }
             char ID [32];
             strncpy (ID, ip,32);
@@ -703,7 +703,7 @@ for(int i = 0; i < flowarray.size(); i++)
               printf("create service\n");
               struct service *ser =(struct service *) calloc (sizeof (struct service), 1);
               strncpy(ser->ID,ID,32);
-              if(cassMN==0){
+              if(specialType==0){
               strncpy(ser->label,mat_lab,32);}
               else{
                   strncpy(ser->label,const_cast<char*>(lab.c_str()),32);}
@@ -713,7 +713,7 @@ for(int i = 0; i < flowarray.size(); i++)
           else if(found==1){
           if (mat_score > services[pos]->score)
             { 
-            if(cassMN==0){strncpy(services[pos]->label,mat_lab,32);}
+            if(specialType==0){strncpy(services[pos]->label,mat_lab,32);}
             else{strncpy(services[pos]->label,const_cast<char*>(lab.c_str()),32);}
           services[pos]->score = mat_score;
             }
@@ -792,9 +792,10 @@ for (int i = 0; i < flowarray.size(); i++)
         //replace with counter;
             if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
                     strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0){
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
                     }
+                    else{flowarray[i]->specialType=1;}
                     //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
             }
             if(found==0){
