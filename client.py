@@ -28,7 +28,7 @@ def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message
     data = data.decode("utf-8").split("\n")
     # # Create object of specified type to store received data
     # msg = msg_type()
-    # sleep(0.1) -- MAY NEED TO INCLUDE IF EXPERIENCING PARSING/DECODE ERRORS
+    # sleep(0.01) -- MAY NEED TO INCLUDE IF EXPERIENCING PARSING/DECODE ERRORS
     # msg.ParseFromString(data)
     msg = FlowArray()
     for line in data:
@@ -47,15 +47,14 @@ def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message
     return msg
 
 def recv_message_test() -> str:
+    sleep(0.001)
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
-    print("size: {}".format(int.from_bytes(size, "big")))
     # Stop waiting for server to send messages when receive an incoming message of '0'
     if int.from_bytes(size, "big") == 0:
         return None
     data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
-    print(data)
     return data
 
 def setup_client(mode:str, log:str, host):

@@ -329,8 +329,8 @@ if __name__ == '__main__':
             while response is not None:
                 to_write += response
                 response = recv_message_test()
-            with open("logs/model_string.txt", "w") as f:
-                f.writelines(to_write)
+            with open("logs/model_string.txt", "w") as ft:
+                ft.writelines(to_write)
 
         if log == "*":
             response = recv_message()#sniffed_info_pb2.FlowArray)
@@ -364,9 +364,9 @@ if __name__ == '__main__':
                     while response is not None:
                         to_write += response
                         response = recv_message_test()
-                    with open("logs/model_string.txt", "a") as f:
-                        f.writelines(to_write)
-                        f.write("\n\n")
+                    with open("logs/model_string.txt", "a") as ft:
+                        ft.writelines(to_write)
+                        ft.write("\n\n")
 
                 response = recv_message()#sniffed_info_pb2.FlowArray)
                 while response is not None:
