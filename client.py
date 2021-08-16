@@ -47,7 +47,7 @@ def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message
     return msg
 
 def recv_message_test() -> str:
-    sleep(0.001)
+    #sleep(0.01)
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
