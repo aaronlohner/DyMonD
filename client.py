@@ -16,7 +16,7 @@ def send_message(mesg:str) -> None:
     s.send(mesg)
     print("Sent message")
 
-def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message(mesg_type) -> FlowArray:
+def recv_message() -> FlowArray: # if using protobuf to send data, this fcn should have a param called mesg_type
     """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
@@ -26,7 +26,7 @@ def recv_message() -> FlowArray: # IF INCOMING MESSAGE IS PROTOBUF: recv_message
         return None
     data = s.recv(int.from_bytes(size, "big"))
     data = data.decode("utf-8").split("\n")
-    # # Create object of specified type to store received data
+    # If using protobuf: Create object of specified type to store received data
     # msg = msg_type()
     # sleep(0.01) -- MAY NEED TO INCLUDE IF EXPERIENCING PARSING/DECODE ERRORS
     # msg.ParseFromString(data)

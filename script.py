@@ -5,13 +5,10 @@ import random
 import json
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, recv_message_test, sniff
-from proto_gen import sniffed_info_pb2
+#from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 # THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
-
-#the script is to generate a json file that can be used in webvowl1.1.7SE
-#input file is csv containing edges in the format of (Node1, Node2, connection information)
 
 nodes = {}
 edges = {}
@@ -64,7 +61,6 @@ def generate_graph_from_file(log:str):
             node12=node1.split(":")[1]#seperate port and ip address
             node22=node2.split(":")[1]
             if service_type[-1] == 'C':#node 1 is client and node2 is server
-    #            newNode1 = node("owl:Class", node1, node1.split(":")[0], randomColor())
                 newNode1 = node("owl:Class", "Client", node1.split(":")[0], node12, randomColor())
                 newNode2 = node("owl:equivalentClass", service_type[0:-2], node2.split(":")[0], node22,randomColor())
             elif service_type[-1] == 'S':#node 1 is server and node2 is client
@@ -228,7 +224,7 @@ def load_interfaces_dictionary(version:int) -> Dict[str, str]:
     interfaces = {}
     with open("interfaces/Interfaces{}.txt".format(version), "r") as f:
         for line in f:
-            # this method works even for lines with more than two whitespace-separated parts
+            # this technique for splitting works even for lines with more than two whitespace-separated parts
             split_line = line.split()
             interfaces[split_line[0]] = split_line[1]
     return interfaces
@@ -288,11 +284,11 @@ if __name__ == '__main__':
     interfaces = {}
     if args.dictionary is not None and args.IP is None:
         parser.error("--dictionary requires --IP.")
-    # Temporary measure until next hop extractor can match IPs to interfaces automatically
+    # Temporary measure until flow detector module is implement to match IPs to interfaces
     elif args.IP is not None and args.dictionary is None:
         parser.error("--IP requires --dictionary.")
     if args.dictionary is not None:
-        # Temporary implementation: dictionary mapping interfaces to ips,
+        # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from newly found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
