@@ -254,13 +254,13 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
             return True
     return False
 
-def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_ips:List[str]) -> Tuple[List[str], List[str]]:
     ips = []
     if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
             if flow.s_addr == ip:
                 new_ip = flow.d_addr
-                if new_ip not in visited and new_ip != "10.0.1.1":
+                if new_ip not in visited and new_ip in possible_ips:
                     ips.append(new_ip)
                     visited.append(new_ip)
     else:
@@ -268,7 +268,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str]) -> Tuple[
             for line in f:
                 if line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
-                    if new_ip not in visited and new_ip != "10.0.1.1":
+                    if new_ip not in visited and new_ip in possible_ips:
                         ips.append(new_ip)
                         visited.append(new_ip)
     return (ips, visited)
@@ -384,7 +384,7 @@ if __name__ == '__main__':
                                 break
                         if not exists:
                             l.flows.append(new_flow)
-                ips, visited = next_hop_extractor(f, ip, visited)
+                ips, visited = next_hop_extractor(f, ip, visited, list(interfaces.values()))
                 q.extend(ips)
                 del f.flows[:]
                 print("Num accumulated flows: {}".format(len(l.flows)))
@@ -415,7 +415,7 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
-                ips, visited = next_hop_extractor(temp_log, ip, visited)
+                ips, visited = next_hop_extractor(temp_log, ip, visited, list(interfaces.values()))
                 q.extend(ips)
                 print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
