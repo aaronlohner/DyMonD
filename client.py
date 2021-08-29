@@ -28,7 +28,7 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     data = data.decode("utf-8").split("\n")
     # If using protobuf: Create object of specified type to store received data
     # msg = msg_type()
-    # sleep(0.01) -- MAY NEED TO INCLUDE IF EXPERIENCING PARSING/DECODE ERRORS
+    # sleep(0.01) #-- MAY NEED TO MODIFY IF EXPERIENCING DECODE ERRORS
     # msg.ParseFromString(data)
     msg = FlowArray()
     for line in data:
@@ -47,7 +47,7 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     return msg
 
 def recv_message_test() -> str:
-    #sleep(0.01)
+    sleep(0.01) # -- MAY NEED TO MODIFY IF EXPERIENCING DECODE ERRORS
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
