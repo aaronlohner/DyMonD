@@ -373,7 +373,6 @@ capture_main(void *) {
  **** MAIN STARTS HERE ****
  
  ***********************************
-
 ***********************************/
 int main(int argc, char *argv[]){
     std::ofstream myfile, FP, file;
@@ -500,7 +499,6 @@ else
 found=true;
 break;
                 }              
-
 }
  if(!found)
 flowarray[index]->proto=strdup(token1);
@@ -509,7 +507,6 @@ index++;
  /*   myfile.open("flows/flows.csv", std::ios_base::out);
     printf("flowarray size is %lu\n",flowarray.size());
      char *array = new char[36];
-
     for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) {
@@ -528,8 +525,6 @@ index++;
                     }
 }
                 for (int l = 0; l <36; l++) {    
-
-
                     b = ( unsigned char )array[l];
                     if((j*l)!=3465)
                     myfile << b << ",";
@@ -621,7 +616,6 @@ for (int i = 0; i < flowarray.size(); i++) {
         if (flowarray[i]->Packets.size() == 100 ) {
             int index = stoi(mat[counter_mat][0]);
             char* lab=label[index];
-            printf("%s",lab);
             //flowarray[i]->proto=label[index];
            // mat[counter][0]=lab;
            // printf("%s\n",mat[counter][0]);
@@ -631,7 +625,8 @@ for (int i = 0; i < flowarray.size(); i++) {
             double score_double = std::stod(mat[counter_mat][1]);
             //flowarray[i]->score=score_double;
             //printf("%f\n",flowarray[i]->score);
-            printf("%f\n",score_double);
+            cout<<i<<" "<<flowarray[i]->sport<<" "<<flowarray[i]->saddr<<" "<<flowarray[i]->dport <<" "<< flowarray[i]->daddr<<" "<<lab <<" "<< score_double <<endl;
+
             counter_mat++;
         }
 
@@ -651,7 +646,8 @@ for(int i = 0; i < flowarray.size(); i++)
         string lab =label[ind];
         string lab_del = lab.substr(0, lab.size()-2);
         char * mat_lab = const_cast<char*>(lab_del.c_str());
-            float mat_score = std::stod(mat[counter_f][1]);
+        float mat_score = std::stod(mat[counter_f][1]);
+        if(mat_score>=threshold){
             char *ip;
             char *port;
             int specialType=0;
@@ -703,13 +699,14 @@ for(int i = 0; i < flowarray.size(); i++)
               services.push_back (ser);
             }
           else if(found==1){
-          if (mat_score > services[pos]->score)
-            { 
+          if (mat_score > services[pos]->score) { 
             if(specialType==0){strncpy(services[pos]->label,mat_lab,32);}
             else{strncpy(services[pos]->label,const_cast<char*>(lab.c_str()),32);}
           services[pos]->score = mat_score;
             }
         }
+        }
+        else{flowarray[i]->isServer=2;}
       
     counter_f++;
 //    free(ID);
@@ -727,7 +724,6 @@ for(int j = 0;j<services.size();j++){
 2 packets.size =100 -->
                     1) found services.ID=flows.ID, update label if not equal
                     2) not found service.ID = flows.ID, label as unknown.
-
 */
 
 /**************/
@@ -751,19 +747,27 @@ for (int i = 0; i < flowarray.size(); i++)
         char * mat_lab = const_cast<char*>(flab_del.c_str());
             char *ip;
             char *port;
+            char *ip_1;
+            char *port_1;
 
-          if(flab.back()=='S')  
+          if(flowarray[i]->isServer ==1)  
           {   
               ip = flowarray[i]->saddr;
               port = flowarray[i]->sport;
           //printf("server ip: %s server port: %s",ip,port);
             }
-          else
+          else if(flowarray[i]->isServer == 0)
             {
               ip = flowarray[i]->daddr;
               port = flowarray[i]->dport;
             }
-          
+            else if(flowarray[i]->isServer == 2){
+                ip = flowarray[i]->saddr;
+              port = flowarray[i]->sport;
+              ip_1 = flowarray[i]->saddr;
+              port_1 = flowarray[i]->sport;
+            }
+          if(flowarray[i]->isServer ==1||flowarray[i]->isServer ==0){
           char ID[32];
        //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
           strncpy (ID, ip,32);
@@ -782,7 +786,7 @@ for (int i = 0; i < flowarray.size(); i++)
                 }
             }
         //replace with counter;
-            if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
+          if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
                     strncpy(flowarray[i]->proto,services[pos]->label,32);
                     if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
@@ -793,6 +797,98 @@ for (int i = 0; i < flowarray.size(); i++)
             if(found==0){
             flowarray[i]->specialType=3;
             }
+        }
+        else if(flowarray[i]->isServer ==2){
+          char ID[32];
+       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
+          strncpy (ID, ip,32);
+          strncat (ID, port,32);
+          char ID_1[32];
+       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
+          strncpy (ID_1, ip_1,32);
+          strncat (ID_1, port_1,32);
+
+          int pos=-1;
+          int found=0;
+          for (int j = 0; j < services.size(); j++)
+            {
+              if (strcmp(services[j]->ID,ID)==0)
+                {
+                  pos = j;
+                  found = 1;
+                  break;
+                }
+            }
+          int pos_1=-1;
+          int found_1=0;
+          for (int j = 0; j < services.size(); j++)
+            {
+              if (strcmp(services[j]->ID,ID_1)==0)
+                {
+                  pos_1 = j;
+                  found_1 = 1;
+                  break;
+                }
+            }
+            if(found==1&&found_1==0){
+                flowarray[i]->isServer = 1;
+                if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
+                    strncpy(flowarray[i]->proto,services[pos]->label,32);
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
+                        flowarray[i]->specialType=2;
+                    }
+                    else{flowarray[i]->specialType=1;}
+                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+                    }
+                
+            }
+            else if(found==0&&found_1==1){
+                flowarray[i]->isServer = 0;
+                if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
+                    strncpy(flowarray[i]->proto,services[pos_1]->label,32);
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
+                        flowarray[i]->specialType=2;
+                    }
+                    else{flowarray[i]->specialType=1;}
+                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+                    }
+
+            }
+            else if(found==1&&found_1==1){
+                if(services[pos]->score > services[pos_1]->score){
+                    flowarray[i]->isServer = 1;
+                    if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
+                    strncpy(flowarray[i]->proto,services[pos]->label,32);
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
+                        flowarray[i]->specialType=2;
+                    }
+                    else{flowarray[i]->specialType=1;}
+                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+                    }
+                }
+                else if(services[pos]->score <= services[pos_1]->score){
+                     flowarray[i]->isServer = 0;
+                    if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
+                    strncpy(flowarray[i]->proto,services[pos_1]->label,32);
+                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
+                        flowarray[i]->specialType=2;
+                    }
+                    else{flowarray[i]->specialType=1;}
+                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+                    }
+                }
+
+            }
+            else{
+                flowarray[i]->specialType=3;
+            }
+
+
+
+        }
+
+
+
        count ++;
         }
 
