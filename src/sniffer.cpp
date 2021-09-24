@@ -1101,7 +1101,7 @@ std::string label=GetMSLabel(services[j]->URLS);
     } else { // use tcp
 
         string log_str = "logs/log.txt";
-        FP.open(log_str, std::ios_base::out); // using standard ports
+        FP.open(log_str, std::ios_base::app); // using standard ports
         printf("Writing to log\n");
 
         for(int i = 0; i < flowarray.size(); i++) {
@@ -1144,7 +1144,7 @@ std::string label=GetMSLabel(services[j]->URLS);
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
-                    
+
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
