@@ -1047,7 +1047,7 @@ std::string label=GetMSLabel(services[j]->URLS);
      double diff, RST;
     if(true/*log[0] != '*'*/){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
-        if(strlen(log) == 0){
+        if(true/*strlen(log) == 0*/){
             log_str.append("log.txt");
         } else {
             log_str.append(log);
