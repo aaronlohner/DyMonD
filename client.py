@@ -33,7 +33,7 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     msg = FlowArray()
     for line in data:
         if len(line) > 0:
-            if len(line) < 7:
+            if len(line.split()) < 7:
                 print("MISSING DATA: {}".format(line))
                 continue
             flow = Flow()

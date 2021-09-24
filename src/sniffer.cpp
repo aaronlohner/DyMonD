@@ -1097,7 +1097,7 @@ std::string label=GetMSLabel(services[j]->URLS);
          }
      }
      FP.close();
-     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
+    // if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } if(log[0] == '*') /*else*/ { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
