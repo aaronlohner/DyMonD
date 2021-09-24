@@ -24,6 +24,25 @@ using namespace std;
 
 std::vector<char*> methodsName;
 
+std::vector<std::string> StopWords;
+void InitStopWords()
+{
+
+    StopWords.push_back("http");
+    StopWords.push_back("https");           
+    StopWords.push_back("\n");
+    StopWords.push_back("\r");
+    StopWords.push_back("com");
+    StopWords.push_back("rest");
+    StopWords.push_back("asp");
+    StopWords.push_back("html");
+    StopWords.push_back("xml");
+    StopWords.push_back("css");
+    StopWords.push_back("js");
+    StopWords.push_back("aspx");
+    StopWords.push_back("php");         
+   
+}
 void InitMethodName()
 
 {
@@ -465,4 +484,28 @@ char* parseUri(const char *line, int len) {
     }
 
     return uri;
+}
+bool Alpha(std::string str )
+
+{
+  bool AP= true;
+  for (int i=0; i<str.size(); i++)
+ {
+ if (!std::isalpha(str[i]))
+     {AP=false;break;}
+ }
+ return AP;
+}
+
+
+
+bool SearchList(std::vector<std::string> list, std::string str )
+{
+ 
+bool found=false;
+for (int i=0; i<list.size(); i++){
+ if (str.compare(StopWords[i]) == 0)
+     {found=true;break;}
+ }
+ return found;
 }
