@@ -12,7 +12,7 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 nodes = {}
 edges = {}
-
+total_time=0.0
 class node: #attributes of a node
     def __init__(self, ptype, pname, paddress, pPort, pcolor):
         self.type = ptype
@@ -334,12 +334,14 @@ if __name__ == '__main__':
                 f.flows.extend(response.flows)
                 response = recv_message()#sniffed_info_pb2.FlowArray)
             print("Received response from sniffer")
+            tg_start = time.perf_counter()
             generate_graph(f)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
             recv_message()#None)
             print("Reading from file")
+            tg_start = time.perf_counter()
             generate_graph_from_file(log)
     else: # sniffing network interface
         q, visited, ips = [arg], [arg], []
@@ -380,11 +382,15 @@ if __name__ == '__main__':
                                 break
                         if not exists:
                             l.flows.append(new_flow)
+                t1_start = time.perf_counter()
                 ips, visited = next_hop_extractor(f, ip, visited, list(interfaces.values()))
+                end_time=time.perf_counter()-t1_start
+                total_time=total_time+end_time
                 q.extend(ips)
                 del f.flows[:]
                 print("Num accumulated flows: {}".format(len(l.flows)))
             stop_client()
+            tg_start = time.perf_counter()
             generate_graph(l)
         else: # if using log
             open(log, "w").close()
@@ -411,13 +417,21 @@ if __name__ == '__main__':
                             l.seek(0)
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
+                t1_start = time.perf_counter()
                 ips, visited = next_hop_extractor(temp_log, ip, visited, list(interfaces.values()))
+                end_time=time.perf_counter()-t1_start
+                total_time=total_time+end_time
                 q.extend(ips)
                 print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
             stop_client()
             os.remove(temp_log)
+            tg_start = time.perf_counter()
             generate_graph_from_file(log)
 
     write_json_output(args.output)
+    endg_time=time.perf_counter()-tg_start
+    total_time=total_time+endg_time
+    print("Controller time: {} seconds".format(round(total_time, 5)))
+
     print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
