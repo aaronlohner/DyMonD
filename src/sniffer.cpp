@@ -1045,7 +1045,7 @@ std::string label=GetMSLabel(services[j]->URLS);
 /*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
-    if(log[0] != '*'){ // anything but '*' indicates that log should be used
+    if(true/*log[0] != '*'*/){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
         if(strlen(log) == 0){
             log_str.append("log.txt");
@@ -1098,7 +1098,7 @@ std::string label=GetMSLabel(services[j]->URLS);
      }
      FP.close();
      if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
-    } else { // use tcp
+    } if(log[0] == '*') /*else*/ { // use tcp
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
               if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
