@@ -1045,9 +1045,9 @@ std::string label=GetMSLabel(services[j]->URLS);
 /*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
-    if(true/*log[0] != '*'*/){ // anything but '*' indicates that log should be used
+    if(log[0] != '*'){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
-        if(true/*strlen(log) == 0*/){
+        if(strlen(log) == 0){
             log_str.append("log.txt");
         } else {
             log_str.append(log);
@@ -1097,8 +1097,13 @@ std::string label=GetMSLabel(services[j]->URLS);
          }
      }
      FP.close();
-    // if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
-    } if(log[0] == '*') /*else*/ { // use tcp
+    if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
+    } else { // use tcp
+
+        string log_str = "logs/log.txt";
+        FP.open(log_str, std::ios_base::out); // using standard ports
+        printf("Writing to log\n");
+
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
               if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
@@ -1133,13 +1138,22 @@ std::string label=GetMSLabel(services[j]->URLS);
                     }
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
                     add_to_flow_array(flowarray[i], RST);
+
+                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
+                    << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
+                    
+                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
+                    << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
                 counter++;
            }
         }
+
+        FP.close();
+
         send_message(flowarray);
         if(counter > 0) {
             printf("Flows sent to controller\n");
