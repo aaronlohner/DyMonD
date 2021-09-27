@@ -1100,9 +1100,11 @@ std::string label=GetMSLabel(services[j]->URLS);
     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
 
-        string log_str = "logs/log.txt";
+        string log_str = "logs/logging.txt";
+        FP.open(log_str, std::ios_base::out);
+        FP.close();
         FP.open(log_str, ios::app); // using standard ports
-        printf("Writing to log\n");
+        //printf("Writing to log\n");
 
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
