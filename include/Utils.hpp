@@ -22,7 +22,7 @@ using namespace std;
 
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))
 
-std::vector<char*> methodsName;
+std::vector<const char*> methodsName;
 
 std::vector<std::string> StopWords;
 void InitStopWords()

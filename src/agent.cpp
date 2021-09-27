@@ -402,6 +402,7 @@ flowarray[foundIndex]->Packets.push_back(array);
     printf("raw is null \n");
     free(saddr);
     free(daddr);
+return 0;
 }
 
 void *
@@ -454,7 +455,7 @@ capture_main(void *) {
 
     if (cap != NULL)
         pcap_close(cap);
-
+return 0;
 }
 
 /***********************************
@@ -698,14 +699,14 @@ index++;
     int cols=2;
     vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
 
-    char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
+    const char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
 int counter_mat = 0;
 
 for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) {
             int index = stoi(mat[counter_mat][0]);
-            char* lab=label[index];
+            const char* lab=label[index];
             //flowarray[i]->proto=label[index];
            // mat[counter][0]=lab;
            // printf("%s\n",mat[counter][0]);
