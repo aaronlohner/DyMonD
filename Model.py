@@ -5,10 +5,10 @@ sys.path.insert(0,'/home/melsaa1/anaconda3/envs/name/lib/python37.zip')
 sys.path.insert(1,'/home/melsaa1/anaconda3/envs/name/lib/python3.7')
 sys.path.insert(2,'/home/melsaa1/anaconda3/envs/name/lib/python3.7/lib-dynload')
 sys.path.insert(3,'/home/melsaa1/anaconda3/envs/name/lib/python3.7/site-packages')
-print(sys.path)
+#print(sys.path)
 import os
-print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
-print("PATH:", os.environ.get('PATH'))
+#print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
+#print("PATH:", os.environ.get('PATH'))
 import pandas
 import tensorflow as tf
 import time
@@ -64,8 +64,8 @@ def prediction(strinput):
         j = np.argmax(yhat_probs[c])
         y=y+str(j)+" "+str(yhat_probs[c][j])+" "
     execution_time= time.time()-start_time
-    print("execution time for the python script is: ")
-    print(execution_time)
+    #print("execution time for the python script is: ")
+    #print(execution_time)
 
     return y
 
