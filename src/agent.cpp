@@ -1,3 +1,5 @@
+#include <boost/algorithm/string.hpp>
+#include <map>
 #include <pthread.h>
 #include <mutex>
 #include <queue>
@@ -6,7 +8,7 @@
 #include <time.h>
 #include <vector>
 #include "/home/melsaa1/anaconda3/envs/name/include/python3.7m/Python.h"
-#include <sniffer.hpp> // needed for flow struct defn
+#include <agent.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;
@@ -15,6 +17,8 @@ struct service
   char ID[32];
   char label[32];
   float score;
+  std::vector<std::string> URLS;
+  std::string MSlabel;
   
 };
 float threshold = 0.98;
@@ -23,6 +27,7 @@ float threshold = 0.98;
 std::mutex mtx;
 vector<struct flow*> flowarray;
 queue<raw_pkt*> Que;
+vector < struct service *>services;
 int enq=0;
 int deq=0;
 std::ofstream file;
@@ -31,6 +36,21 @@ char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
 double duration=30.0;
+int FindService( char ID [32])
+{
+ int pos=-1;
+ for (int j=0; j< services.size();j++)
+{ 
+if(strcmp(services[j]->ID,ID)==0)
+{
+ 
+ pos=j;
+ break;
+}
+}
+return  pos;
+}
+
 vector<vector<string>> strTo2DStr(const string& str, const int& r, const int& c)
 {
     vector<vector<string>> mat;
@@ -54,37 +74,108 @@ vector<vector<string>> strTo2DStr(const string& str, const int& r, const int& c)
     return mat;
 }
 
-void GetURLs( std::vector<char*> Packets)
+void GetURLs(service* S, std::vector<char*> Packets)
 
 {
 
-file.open("URLS",  std::ios_base::app);
-    
     int methodCode;
     char *uri;
-
+    size_t pos = 0;
+    std::string token;
 for (int i=0; i<Packets.size(); i++)
 {
 
          methodCode = parseMethod(Packets[i], strlen(Packets[i]));
 
         if (methodsName[methodCode] != "NONE"){
-       
+
 
    uri = parseUri(Packets[i], strlen(Packets[i]));
         if (uri !=NULL)
         {
-         char * token = strtok(uri, "?");
+        char * token = strtok(uri, "?");
         if (token!=NULL)
-        {file << token << "\n";
-        //printf("%s \n",token); 
+        {S->URLS.push_back((std::string)token); 
 }
 } 
 }
 }
-file.close();
-
 }
+
+std::string GetMSLabel(std::vector<std::string> URIS){
+std::map<std::string, int> wordcount;
+std::string word, data;
+size_t pos = 0, pos1=0;
+bool Threshold=false;
+std::string MSlabel;
+//float count=0.0;
+InitStopWords();
+for (int i=0; i<URIS.size(); i++)
+{
+//count++;
+boost::to_lower(URIS[i]);
+
+std::string token, token1;
+while ((pos = URIS[i].find( "/")) != std::string::npos) {
+    token = URIS[i].substr(0, pos);
+ if (token.find(".") != std::string::npos)  
+{
+std::vector<std::string> tokens;
+while ((pos1 = token.find(".")) != std::string::npos) {
+ token1 = token.substr(0, pos1);
+    tokens.push_back(token1);
+    token.erase(0, pos1 + 1);
+}//while ((pos = data.find("."))
+if (tokens.size()>0)
+{
+   if (SearchList(StopWords,tokens[tokens.size()-1]))
+    {if (!tokens[tokens.size()-2].empty())word= tokens[tokens.size()-2];}
+  else 
+    word= tokens[tokens.size()-1];
+ }  
+}//if (token.find(".")
+word=token;
+if (!word.empty() && Alpha(word) && !(SearchList(StopWords,word)))
+  {
+    
+if (wordcount.count(word)>0)
+          wordcount[word] += 1;
+else
+  wordcount.insert ( std::pair<std::string,int>(word,1) );
+  }
+    URIS[i].erase(0, pos + 1);
+}//while ((pos = data.find(delimiter))
+}
+for ( auto item : wordcount )
+{
+std::cout<< (float)item.second/URIS.size()<<"\n";
+  if (((float)item.second/URIS.size()) >= 0.5)
+      {std::cout << item.first<<" "<<item.second<<"\n";MSlabel=MSlabel+"/"+item.first; Threshold=true;}
+}
+if(!Threshold)
+
+{
+
+    multimap<int, std::string> MM;
+    for (auto& it : wordcount) {
+        MM.insert({ it.second, it.first });
+    }
+map<int, std::string>::iterator itr;
+
+
+  itr = MM.end();
+
+  for (int i=0; i<3;i++)
+{
+  --itr;
+//std::cout << itr->first<<itr->second<<"\n";
+  MSlabel=MSlabel+"/"+itr->second;
+}
+}
+
+return MSlabel;
+}
+
 void *process_packet_queue(void*) {
 
 
@@ -199,7 +290,7 @@ while (true) {
 
                 }
                 if (tcp_hdr != NULL) {
-                    if (tcp_hdr->th_flags == TH_ACK) {
+                    if (tcp_hdr->th_flags == TH_ACK ||tcp_hdr->th_flags == 0x18) {
                         cap_time = (struct Ack_time *) calloc(sizeof(struct Ack_time), 1);
                         cap_time->sec = rpkt->pkthdr.ts.tv_sec;
                         cap_time->usec = rpkt->pkthdr.ts.tv_usec;
@@ -555,8 +646,6 @@ index++;
     for (int i = 0; i < flowarray.size(); i++) {
 
         if (flowarray[i]->Packets.size() == 100 ) {
-              if ( flowarray[i]->protof)
-                {  GetURLs(flowarray[i]->Packets); }
              for (int j = 0; j < 100; j++) {     
                  //if( strlen(flowarray[i]->Packets[j]) >= 36)
                        strncpy(array, flowarray[i]->Packets[j], 36);
@@ -593,7 +682,6 @@ index++;
         str += " ";
     }
    }
-   cout<< str<< endl;
     clock_t start3 = clock();
     PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
     pReturn=PyObject_CallObject(pFunc, ArgList);
@@ -635,7 +723,6 @@ for (int i = 0; i < flowarray.size(); i++) {
 
 }
 
-vector < struct service *>services;
 /******************validate label**********************/
 printf("first for loop....\n");
 
@@ -921,8 +1008,22 @@ for(int i = 0; i < flowarray.size (); i++){
         const char *type = "-C";
             strncpy (new_proto, flowarray[i]->proto,32);
             strncat (new_proto, type,32);
+     if(strcmp(flowarray[i]->proto,"HTTP")==0)
+{
+ int pos;
+ char ID[32];
+ strncpy (ID, flowarray[i]->daddr,32);
+ strncat (ID, flowarray[i]->dport,32);
+ pos=FindService(ID);
+if(pos>=0)
+{
+ GetURLs(services[pos],flowarray[i]->Packets);
+}
+}
+
         strncpy(flowarray[i]->proto,new_proto,32);
         cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;
+
     }
     else if(flowarray[i]->specialType==3){
             strncpy(flowarray[i]->proto, "Unknown", 32);
@@ -932,7 +1033,16 @@ for(int i = 0; i < flowarray.size (); i++){
     printf("\n");
     }
 }
+ for (int j=0; j< services.size();j++)
+{
+   if(strcmp(services[j]->label,"HTTP")==0 && services[j]->URLS.size()>0)
+{
+std::string label=GetMSLabel(services[j]->URLS);
+ if (!label.empty())
+   services[j]->MSlabel.assign(label);
+}
 
+}
 /*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
@@ -948,7 +1058,29 @@ for(int i = 0; i < flowarray.size (); i++){
         printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
-            if (flowarray[i]->Ack_times.size() > 1) {
+               if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
+           char SID[32];
+           if (flowarray[i]->isServer==0)
+              {
+                strncpy (SID, flowarray[i]->daddr,32);
+                strncat (SID, flowarray[i]->dport,32);
+              }
+            else if (flowarray[i]->isServer==1)
+              {
+                strncpy (SID, flowarray[i]->saddr,32);
+                strncat (SID, flowarray[i]->sport,32);
+              }
+            int index=FindService(SID);
+           if (index>=0)
+             {
+              std::string newproto= (std::string)flowarray[i]->proto;
+              newproto.insert(4,services[index]->MSlabel);   
+              strncpy(flowarray[i]->proto,newproto.c_str(),32);
+  
+            }
+        }
+
+            if (flowarray[i]->Ack_times.size() > 1 && flowarray[i]->isServer==1) {
                  diff = 0.0;
                  for (int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                      if (j != flowarray[i]->Ack_times.size() - 1)
@@ -966,11 +1098,40 @@ for(int i = 0; i < flowarray.size (); i++){
          }
      }
      FP.close();
-     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
+    if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
+
+        string log_str = "logs/logging.txt";
+        FP.open(log_str, std::ios_base::out);
+        FP.close();
+        FP.open(log_str, ios::app); // using standard ports
+        //printf("Writing to log\n");
+
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
-                if(flowarray[i]->Ack_times.size()>1){
+              if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
+           char SID[32];
+           if (flowarray[i]->isServer==0)
+              {
+                strncpy (SID, flowarray[i]->daddr,32);
+                strncat (SID, flowarray[i]->dport,32);
+              }
+            else if (flowarray[i]->isServer==1)
+              {
+                strncpy (SID, flowarray[i]->saddr,32);
+                strncat (SID, flowarray[i]->sport,32);
+              }
+            int index=FindService(SID);
+           if (index>=0)
+             {
+              std::string newproto= (std::string)flowarray[i]->proto;
+              newproto.insert(4,services[index]->MSlabel);   
+              strncpy(flowarray[i]->proto,newproto.c_str(),32);
+  
+            }
+        }
+
+               if(flowarray[i]->Ack_times.size()>1 && flowarray[i]->isServer==1){
                     diff=0.0;
                     for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                         if (j!=flowarray[i]->Ack_times.size()-1)
@@ -980,13 +1141,22 @@ for(int i = 0; i < flowarray.size (); i++){
                     }
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
                     add_to_flow_array(flowarray[i], RST);
+
+                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
+                    << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
+                    
+                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
+                    << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
                 counter++;
            }
         }
+
+        FP.close();
+
         send_message(flowarray);
         if(counter > 0) {
             printf("Flows sent to controller\n");

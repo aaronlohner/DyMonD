@@ -1,5 +1,3 @@
-#include <boost/algorithm/string.hpp>
-#include <map>
 #include <pthread.h>
 #include <mutex>
 #include <queue>
@@ -7,27 +5,15 @@
 #include <ctime>
 #include <time.h>
 #include <vector>
-#include "/home/melsaa1/anaconda3/envs/name/include/python3.7m/Python.h"
-#include <sniffer.hpp> // needed for flow struct defn
+#include <agent.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;
-struct service
-{
-  char ID[32];
-  char label[32];
-  float score;
-  std::vector<std::string> URLS;
-  std::string MSlabel;
-  
-};
-float threshold = 0.98;
 
 //add post-validation code 
 std::mutex mtx;
 vector<struct flow*> flowarray;
 queue<raw_pkt*> Que;
-vector < struct service *>services;
 int enq=0;
 int deq=0;
 std::ofstream file;
@@ -36,21 +22,6 @@ char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
 double duration=30.0;
-int FindService( char ID [32])
-{
- int pos=-1;
- for (int j=0; j< services.size();j++)
-{ 
-if(strcmp(services[j]->ID,ID)==0)
-{
- 
- pos=j;
- break;
-}
-}
-return  pos;
-}
-
 vector<vector<string>> strTo2DStr(const string& str, const int& r, const int& c)
 {
     vector<vector<string>> mat;
@@ -74,108 +45,37 @@ vector<vector<string>> strTo2DStr(const string& str, const int& r, const int& c)
     return mat;
 }
 
-void GetURLs(service* S, std::vector<char*> Packets)
+void GetURLs( std::vector<char*> Packets)
 
 {
 
+file.open("URLS",  std::ios_base::app);
+    
     int methodCode;
     char *uri;
-    size_t pos = 0;
-    std::string token;
+
 for (int i=0; i<Packets.size(); i++)
 {
 
          methodCode = parseMethod(Packets[i], strlen(Packets[i]));
 
         if (methodsName[methodCode] != "NONE"){
-
+       
 
    uri = parseUri(Packets[i], strlen(Packets[i]));
         if (uri !=NULL)
         {
-        char * token = strtok(uri, "?");
+         char * token = strtok(uri, "?");
         if (token!=NULL)
-        {S->URLS.push_back((std::string)token); 
+        {file << token << "\n";
+        //printf("%s \n",token); 
 }
 } 
 }
 }
+file.close();
+
 }
-
-std::string GetMSLabel(std::vector<std::string> URIS){
-std::map<std::string, int> wordcount;
-std::string word, data;
-size_t pos = 0, pos1=0;
-bool Threshold=false;
-std::string MSlabel;
-//float count=0.0;
-InitStopWords();
-for (int i=0; i<URIS.size(); i++)
-{
-//count++;
-boost::to_lower(URIS[i]);
-
-std::string token, token1;
-while ((pos = URIS[i].find( "/")) != std::string::npos) {
-    token = URIS[i].substr(0, pos);
- if (token.find(".") != std::string::npos)  
-{
-std::vector<std::string> tokens;
-while ((pos1 = token.find(".")) != std::string::npos) {
- token1 = token.substr(0, pos1);
-    tokens.push_back(token1);
-    token.erase(0, pos1 + 1);
-}//while ((pos = data.find("."))
-if (tokens.size()>0)
-{
-   if (SearchList(StopWords,tokens[tokens.size()-1]))
-    {if (!tokens[tokens.size()-2].empty())word= tokens[tokens.size()-2];}
-  else 
-    word= tokens[tokens.size()-1];
- }  
-}//if (token.find(".")
-word=token;
-if (!word.empty() && Alpha(word) && !(SearchList(StopWords,word)))
-  {
-    
-if (wordcount.count(word)>0)
-          wordcount[word] += 1;
-else
-  wordcount.insert ( std::pair<std::string,int>(word,1) );
-  }
-    URIS[i].erase(0, pos + 1);
-}//while ((pos = data.find(delimiter))
-}
-for ( auto item : wordcount )
-{
-std::cout<< (float)item.second/URIS.size()<<"\n";
-  if (((float)item.second/URIS.size()) >= 0.5)
-      {std::cout << item.first<<" "<<item.second<<"\n";MSlabel=MSlabel+"/"+item.first; Threshold=true;}
-}
-if(!Threshold)
-
-{
-
-    multimap<int, std::string> MM;
-    for (auto& it : wordcount) {
-        MM.insert({ it.second, it.first });
-    }
-map<int, std::string>::iterator itr;
-
-
-  itr = MM.end();
-
-  for (int i=0; i<3;i++)
-{
-  --itr;
-//std::cout << itr->first<<itr->second<<"\n";
-  MSlabel=MSlabel+"/"+itr->second;
-}
-}
-
-return MSlabel;
-}
-
 void *process_packet_queue(void*) {
 
 
@@ -290,7 +190,7 @@ while (true) {
 
                 }
                 if (tcp_hdr != NULL) {
-                    if (tcp_hdr->th_flags == TH_ACK ||tcp_hdr->th_flags == 0x18) {
+                    if (tcp_hdr->th_flags == TH_ACK) {
                         cap_time = (struct Ack_time *) calloc(sizeof(struct Ack_time), 1);
                         cap_time->sec = rpkt->pkthdr.ts.tv_sec;
                         cap_time->usec = rpkt->pkthdr.ts.tv_usec;
@@ -475,41 +375,6 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
 
-wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
-    for (int i=0; i<argc; i++) {
-    wchar_t* arg = Py_DecodeLocale(argv[i], NULL);
-    _argv[i] = arg;
-    }
-    clock_t start1 = clock();
-    Py_Initialize();
-    PyObject * pModule = NULL;
-    PyObject * pFunc = NULL;
-    PyObject *pDict = NULL;
-    PyObject *pReturn = NULL;
-   Py_SetProgramName(_argv[0]); 
-  PySys_SetArgv(argc, _argv); // must call this to get sys.argv and relative imports
-    pModule = PyImport_ImportModule("Model");
-        if(pModule==NULL){
-                printf("no module is found\n");
-                PyErr_Print();}
-                else{printf("module is found\n");}
-        pDict = PyModule_GetDict(pModule); 
-    pFunc = PyDict_GetItemString(pDict, "prediction");
-    if(!pFunc ||!(PyCallable_Check(pFunc))){
-        if (PyErr_Occurred())
-                            PyErr_Print();
-                        fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
-        Py_XDECREF(pFunc);
-                Py_DECREF(pModule);
-        return 0;
-    }
-    PyObject *PyList  = PyList_New(0);
-    PyObject *ArgList = PyTuple_New(1);
-
-    clock_t end1 = clock();
-    double elapsed1 = double(end1 - start1)/CLOCKS_PER_SEC;
-    printf("Time measured for initialization and finding the target python program and function: %.3f seconds.\n", elapsed1);
-
 InitMethodName();    
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 switch(opt){
@@ -627,8 +492,7 @@ index++;
            
         }
     }
-    myfile.close();*/
-    clock_t start2 = clock();
+*/
     char *array = new char[36];
     int rownum = 0;
     for (int i = 0; i < flowarray.size(); i++) {
@@ -644,12 +508,14 @@ index++;
     int itr_col = 0;
 
     for (int i = 0; i < flowarray.size(); i++) {
-
+       
         if (flowarray[i]->Packets.size() == 100 ) {
+              if ( flowarray[i]->protof)
+                {  GetURLs(flowarray[i]->Packets); }
              for (int j = 0; j < 100; j++) {     
-                 //if( strlen(flowarray[i]->Packets[j]) >= 36)
+                 if( strlen(flowarray[i]->Packets[j]) >= 36)
                        strncpy(array, flowarray[i]->Packets[j], 36);
-                /*else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
+                else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
                     int d = 36 - strlen(flowarray[i]->Packets[j]);
                     int index = strlen(flowarray[i]->Packets[j]);
                     strncpy(array, flowarray[i]->Packets[j], index);
@@ -657,393 +523,51 @@ index++;
                         array[index] = '0';
                         index++;
                     }
-}*/
+}
                 for (int l = 0; l < 36; l++) {   
                         int b = (unsigned char)array[l]; 
                         p[itr_row][itr_col+l]= b;
                     }
                     itr_col = itr_col + 36;
-
+                    
                 }
                 itr_row++;
                 itr_col=0;
             }
-
+           
     }
-
-    clock_t end2 = clock();
-    double elapsed2 = double(end2 - start2)/CLOCKS_PER_SEC;
-    printf("Time measured for set up 2d array: %.3f seconds.\n", elapsed2);
+    
+   
     printf("2d array creation finished. rownum is %d, column num is 3600\n",itr_row);
+
        std::string str;
+       string str2 = "", str_last = "";
    for (int x =0;x<rownum;x++) {
        for(int y = 0;y<3600;y++){
-        str += std::to_string(p[x][y]);
-        str += " ";
+
+        if(str.size() > 1380) {
+            send_message_test(str2);
+            str.clear();
+            str.append(str_last);
+        }
+        str2.clear();
+        str2 = str;
+        str_last.clear();
+
+        str_last += std::to_string(p[x][y]);
+        str_last += " ";
+
+        str.append(str_last);
+        
+        // str += std::to_string(p[x][y]);
+        // str += " ";
     }
    }
-    clock_t start3 = clock();
-    PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
-    pReturn=PyObject_CallObject(pFunc, ArgList);
-    clock_t end3 = clock();
-    double elapsed3 = double(end3 - start3)/CLOCKS_PER_SEC;
-    printf("Time measured from sending to receiving: %.3f seconds.\n", elapsed3);
+
+    send_message_test(str);
+    if(str.size() > 0) send_message();
 
 
-    char* result;
-    PyArg_Parse(pReturn,"s",&result);
-    printf("result from python is");
-    printf("%s\n",result);
-
-    //int rows=rownum
-    int cols=2;
-    vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
-
-    const char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
-int counter_mat = 0;
-
-for (int i = 0; i < flowarray.size(); i++) {
-       
-        if (flowarray[i]->Packets.size() == 100 ) {
-            int index = stoi(mat[counter_mat][0]);
-            const char* lab=label[index];
-            //flowarray[i]->proto=label[index];
-           // mat[counter][0]=lab;
-           // printf("%s\n",mat[counter][0]);
-            //flowarray[i]->proto=const_cast<char *>(mat[counter][0].c_str());
-           // printf("%s ",flowarray[i]->proto);
-           // printf("%s\n",mat[counter][0]);
-            double score_double = std::stod(mat[counter_mat][1]);
-            //flowarray[i]->score=score_double;
-            //printf("%f\n",flowarray[i]->score);
-            cout<<i<<" "<<flowarray[i]->sport<<" "<<flowarray[i]->saddr<<" "<<flowarray[i]->dport <<" "<< flowarray[i]->daddr<<" "<<lab <<" "<< score_double <<endl;
-
-            counter_mat++;
-        }
-
-}
-
-/******************validate label**********************/
-printf("first for loop....\n");
-
-int counter_f = 0;
-for(int i = 0; i < flowarray.size(); i++)
-  {
-     
-      if(flowarray[i]->Packets.size() == 100 )
-      {
-        int ind = std::stoi(mat[counter_f][0]);
-        string lab =label[ind];
-        string lab_del = lab.substr(0, lab.size()-2);
-        char * mat_lab = const_cast<char*>(lab_del.c_str());
-        float mat_score = std::stod(mat[counter_f][1]);
-        if(mat_score>=threshold){
-            char *ip;
-            char *port;
-            int specialType=0;
-            if(lab.back()=='S')
-            {
-              ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-              flowarray[i]->isServer=1;
-        }
-            else if(lab.back()=='C')
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-              flowarray[i]->isServer=0;
-            }
-            else if(lab.back()=='N'||lab.back()=='W')
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-              flowarray[i]->isServer=0;
-              specialType=1;
-            }
-            char ID [32];
-            strncpy (ID, ip,32);
-            strncat (ID, port,32);
-        
-            int found = 0;
-            int pos = 0;
-            //check if server IP/port number is in services;
-            for (int j = 0; j < services.size (); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  found = 1;
-                  pos = j;
-                  break;
-                }
-            }
-          if (found == 0 && mat_score >= threshold)
-            {
-              printf("create service\n");
-              struct service *ser =(struct service *) calloc (sizeof (struct service), 1);
-              strncpy(ser->ID,ID,32);
-              if(specialType==0){
-              strncpy(ser->label,mat_lab,32);}
-              else{
-                  strncpy(ser->label,const_cast<char*>(lab.c_str()),32);}
-              ser->score = mat_score;
-              services.push_back (ser);
-            }
-          else if(found==1){
-          if (mat_score > services[pos]->score) { 
-            if(specialType==0){strncpy(services[pos]->label,mat_lab,32);}
-            else{strncpy(services[pos]->label,const_cast<char*>(lab.c_str()),32);}
-          services[pos]->score = mat_score;
-            }
-        }
-        }
-        else{flowarray[i]->isServer=2;}
-      
-    counter_f++;
-//    free(ID);
-        }
-    
-    
-}
-//test services
-for(int j = 0;j<services.size();j++){
-    cout<< j <<":ID "<<services[j]->ID <<" lab:"<<services[j]->label<<endl;
-}
-
-/*for all flows
-1 packets.size!=100 --> label unknown
-2 packets.size =100 -->
-                    1) found services.ID=flows.ID, update label if not equal
-                    2) not found service.ID = flows.ID, label as unknown.
-*/
-
-/**************/
-
-
-int count = 0;
-printf("iterate through flows...\n");
-for (int i = 0; i < flowarray.size(); i++)
-    {
-      if (flowarray[i]->Packets.size() != 100 )  {          
-          strncpy(flowarray[i]->proto,"Unknown",32);   
-      }
-
-      else if (flowarray[i]->Packets.size() == 100 )
-        {
-        
-        int ind = std::stoi(mat[count][0]);
-        //   cout<< ind << endl;
-        string flab =label[ind];
-        string flab_del = flab.substr(0, flab.size()-2);
-        char * mat_lab = const_cast<char*>(flab_del.c_str());
-            char *ip;
-            char *port;
-            char *ip_1;
-            char *port_1;
-
-          if(flowarray[i]->isServer ==1)  
-          {   
-              ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-          //printf("server ip: %s server port: %s",ip,port);
-            }
-          else if(flowarray[i]->isServer == 0)
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-            }
-            else if(flowarray[i]->isServer == 2){
-                ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-              ip_1 = flowarray[i]->daddr;
-              port_1 = flowarray[i]->dport;
-            }
-          if(flowarray[i]->isServer ==1||flowarray[i]->isServer ==0){
-          char ID[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID, ip,32);
-          strncat (ID, port,32);
-      //printf("%d",i);
-          printf("%s\n",ID);
-          int pos=-1;
-          int found=0;
-          for (int j = 0; j < services.size(); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  pos = j;
-                  found = 1;
-                  break;
-                }
-            }
-        //replace with counter;
-          if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
-                    strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-            }
-            if(found==0){
-            flowarray[i]->specialType=3;
-            }
-        }
-        else if(flowarray[i]->isServer ==2){
-          char ID[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID, ip,32);
-          strncat (ID, port,32);
-          char ID_1[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID_1, ip_1,32);
-          strncat (ID_1, port_1,32);
-
-          int pos=-1;
-          int found=0;
-          for (int j = 0; j < services.size(); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  pos = j;
-                  found = 1;
-                  break;
-                }
-            }
-          int pos_1=-1;
-          int found_1=0;
-          for (int j = 0; j < services.size(); j++)
-            {
-              if (strcmp(services[j]->ID,ID_1)==0)
-                {
-                  pos_1 = j;
-                  found_1 = 1;
-                  break;
-                }
-            }
-            if(found==1&&found_1==0){
-                flowarray[i]->isServer = 1;
-                if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
-                    strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-                    }
-                
-            }
-            else if(found==0&&found_1==1){
-                flowarray[i]->isServer = 0;
-                if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
-                    strncpy(flowarray[i]->proto,services[pos_1]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-                    }
-
-            }
-            else if(found==1&&found_1==1){
-                if(services[pos]->score > services[pos_1]->score){
-                    flowarray[i]->isServer = 1;
-                    if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
-                    strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-                    }
-                }
-                else if(services[pos]->score <= services[pos_1]->score){
-                     flowarray[i]->isServer = 0;
-                    if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
-                    strncpy(flowarray[i]->proto,services[pos_1]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-                    }
-                }
-
-            }
-            else{
-                flowarray[i]->specialType=3;
-            }
-
-
-
-        }
-
-
-
-       count ++;
-        }
-
-
-        
-    }
-//test result
-
-
-int test_counter=0;
-for(int i = 0; i < flowarray.size (); i++){
-    if(flowarray[i]->Packets.size()==100){
-            printf("flow array %d \n",test_counter);
-            cout << "proto before concatenation: "<< flowarray[i]->proto<< endl;
-    if(flowarray[i]->specialType==2){
-        cout << "proto after concatenation: "<< flowarray[i]->proto<< endl;
-    }
-    else if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
-            char new_proto[32];
-            const char *type = "-S";
-            strncpy (new_proto, flowarray[i]->proto,32);
-            strncat (new_proto, type,32);
-        strncpy(flowarray[i]->proto,new_proto,32);
-    cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;}
-    else if (flowarray[i]->isServer==0&&flowarray[i]->specialType!=3){
-        char new_proto[32];
-        const char *type = "-C";
-            strncpy (new_proto, flowarray[i]->proto,32);
-            strncat (new_proto, type,32);
-     if(strcmp(flowarray[i]->proto,"HTTP")==0)
-{
- int pos;
- char ID[32];
- strncpy (ID, flowarray[i]->daddr,32);
- strncat (ID, flowarray[i]->dport,32);
- pos=FindService(ID);
-if(pos>=0)
-{
- GetURLs(services[pos],flowarray[i]->Packets);
-}
-}
-
-        strncpy(flowarray[i]->proto,new_proto,32);
-        cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;
-
-    }
-    else if(flowarray[i]->specialType==3){
-            strncpy(flowarray[i]->proto, "Unknown", 32);
-        cout << "proto after concatenation: " << flowarray[i]->proto<< endl;
-        }
-    test_counter++;
-    printf("\n");
-    }
-}
- for (int j=0; j< services.size();j++)
-{
-   if(strcmp(services[j]->label,"HTTP")==0 && services[j]->URLS.size()>0)
-{
-std::string label=GetMSLabel(services[j]->URLS);
- if (!label.empty())
-   services[j]->MSlabel.assign(label);
-}
-
-}
-/*********************validate label***********************/   
     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
@@ -1058,29 +582,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
-               if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
-           char SID[32];
-           if (flowarray[i]->isServer==0)
-              {
-                strncpy (SID, flowarray[i]->daddr,32);
-                strncat (SID, flowarray[i]->dport,32);
-              }
-            else if (flowarray[i]->isServer==1)
-              {
-                strncpy (SID, flowarray[i]->saddr,32);
-                strncat (SID, flowarray[i]->sport,32);
-              }
-            int index=FindService(SID);
-           if (index>=0)
-             {
-              std::string newproto= (std::string)flowarray[i]->proto;
-              newproto.insert(4,services[index]->MSlabel);   
-              strncpy(flowarray[i]->proto,newproto.c_str(),32);
-  
-            }
-        }
-
-            if (flowarray[i]->Ack_times.size() > 1 && flowarray[i]->isServer==1) {
+            if (flowarray[i]->Ack_times.size() > 1) {
                  diff = 0.0;
                  for (int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                      if (j != flowarray[i]->Ack_times.size() - 1)
@@ -1098,40 +600,11 @@ std::string label=GetMSLabel(services[j]->URLS);
          }
      }
      FP.close();
-    if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
+     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
-
-        string log_str = "logs/logging.txt";
-        FP.open(log_str, std::ios_base::out);
-        FP.close();
-        FP.open(log_str, ios::app); // using standard ports
-        //printf("Writing to log\n");
-
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
-              if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
-           char SID[32];
-           if (flowarray[i]->isServer==0)
-              {
-                strncpy (SID, flowarray[i]->daddr,32);
-                strncat (SID, flowarray[i]->dport,32);
-              }
-            else if (flowarray[i]->isServer==1)
-              {
-                strncpy (SID, flowarray[i]->saddr,32);
-                strncat (SID, flowarray[i]->sport,32);
-              }
-            int index=FindService(SID);
-           if (index>=0)
-             {
-              std::string newproto= (std::string)flowarray[i]->proto;
-              newproto.insert(4,services[index]->MSlabel);   
-              strncpy(flowarray[i]->proto,newproto.c_str(),32);
-  
-            }
-        }
-
-               if(flowarray[i]->Ack_times.size()>1 && flowarray[i]->isServer==1){
+                if(flowarray[i]->Ack_times.size()>1){
                     diff=0.0;
                     for(int j = 0; j < flowarray[i]->Ack_times.size(); j++) {
                         if (j!=flowarray[i]->Ack_times.size()-1)
@@ -1141,22 +614,13 @@ std::string label=GetMSLabel(services[j]->URLS);
                     }
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
                     add_to_flow_array(flowarray[i], RST);
-
-                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
-                    << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
-                    
-                    FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
-                    << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
                 counter++;
            }
         }
-
-        FP.close();
-
         send_message(flowarray);
         if(counter > 0) {
             printf("Flows sent to controller\n");
@@ -1178,19 +642,7 @@ std::string label=GetMSLabel(services[j]->URLS);
          sniff_more = false;
      }
     }
-        clock_t start4 = clock();
-        Py_DECREF(ArgList);
-        Py_DECREF(PyList);
-        Py_DECREF(pReturn);
-        Py_DECREF(pFunc);
-        Py_DECREF(pModule);
-        Py_XDECREF(pDict);
-        Py_Finalize();
-        clock_t end4 = clock();
-        
-        double elapsed4 = double(end4 - start4)/CLOCKS_PER_SEC;
-        printf("Time measured for finalization: %.3f seconds.\n", elapsed4);
-    
+
   
   
 /* for(int i = 0; i < Nodes.size(); i++)
