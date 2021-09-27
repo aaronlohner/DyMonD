@@ -302,6 +302,7 @@ flowarray[foundIndex]->Packets.push_back(array);
     printf("raw is null \n");
     free(saddr);
     free(daddr);
+return 0;
 }
 
 void *
@@ -354,7 +355,7 @@ capture_main(void *) {
 
     if (cap != NULL)
         pcap_close(cap);
-
+return 0;
 }
 
 /***********************************
