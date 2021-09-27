@@ -203,7 +203,7 @@ def generate_graph(flow_array:FlowArray):
         id2 = None
 
 def write_json_output(fname:str):
-    print("Writing json output")
+    print("Producing call graph data")
     json_dict = {}
     json_dict["class"] = [{"id":str(key), "type":nodes[key].type} for key in nodes]
     json_dict["classAttribute"] = [{"id":str(key), "label":nodes[key].name, "comment":{"undefined":nodes[key].address + ", Port: " + nodes[key].port}, "attributes":[nodes[key].color]} for key in nodes]
@@ -333,14 +333,14 @@ if __name__ == '__main__':
             while response is not None:
                 f.flows.extend(response.flows)
                 response = recv_message()#sniffed_info_pb2.FlowArray)
-            print("Received response from sniffer")
+            print("Received flows from agent")
             tg_start = time.perf_counter()
             generate_graph(f)
         else: # reading from log
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
             recv_message()#None)
-            print("Reading from file")
+            print("Reading flows from file")
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
     else: # sniffing network interface
@@ -352,7 +352,7 @@ if __name__ == '__main__':
         if log == "*": # if using tcp
             l = FlowArray()            
             while len(q) > 0:
-                print("ips in q: {}".format(q))
+                print("Enqueued IP addresses of application components: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
 
@@ -370,7 +370,7 @@ if __name__ == '__main__':
                 while response is not None:
                     f.flows.extend(response.flows)
                     response = recv_message()#sniffed_info_pb2.FlowArray)
-                print("Num received flows: {}".format(len(f.flows)))
+                #print("Num received flows: {}".format(len(f.flows)))
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
                 else:
@@ -388,7 +388,7 @@ if __name__ == '__main__':
                 total_time=total_time+end_time
                 q.extend(ips)
                 del f.flows[:]
-                print("Num accumulated flows: {}".format(len(l.flows)))
+                #print("Num accumulated flows: {}".format(len(l.flows)))
             stop_client()
             tg_start = time.perf_counter()
             generate_graph(l)
@@ -396,12 +396,12 @@ if __name__ == '__main__':
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
-                print("ips in q: {}".format(q))
+                print("Enqueued IP addresses of application components: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("Num received flows: {}".format(len(f.readlines())))
+                    #print("Num received flows: {}".format(len(f.readlines())))
                     f.seek(0)
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
@@ -422,7 +422,7 @@ if __name__ == '__main__':
                 end_time=time.perf_counter()-t1_start
                 total_time=total_time+end_time
                 q.extend(ips)
-                print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
+                #print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
             stop_client()
             os.remove(temp_log)
@@ -432,6 +432,6 @@ if __name__ == '__main__':
     write_json_output(args.output)
     endg_time=time.perf_counter()-tg_start
     total_time=total_time+endg_time
-    print("Controller time: {} seconds".format(round(total_time, 5)))
+    #print("Controller time: {} seconds".format(round(total_time, 5)))
 
-    print("Elapsed time: {} seconds".format(round(time.perf_counter() - t, 5)))
+    print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
