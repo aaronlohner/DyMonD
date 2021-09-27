@@ -6,7 +6,7 @@
 #include <string.h>
 //#include <sniffed_info.pb.h>
 #include <string>
-#include <sniffer.hpp> // needed for flow struct defn
+#include <agent.hpp> // needed for flow struct defn
 // #include <Utils.hpp>
 using namespace std;
 

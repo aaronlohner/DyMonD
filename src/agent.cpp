@@ -8,7 +8,7 @@
 #include <time.h>
 #include <vector>
 #include "/home/melsaa1/anaconda3/envs/name/include/python3.7m/Python.h"
-#include <sniffer.hpp> // needed for flow struct defn
+#include <agent.hpp> // needed for flow struct defn
 #include <server.hpp> // needed for server method calls
 using namespace std;
 using namespace boost::filesystem;

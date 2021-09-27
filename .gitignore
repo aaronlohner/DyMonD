@@ -15,8 +15,8 @@ DyMonD.wiki/
 *.pyc
 *-old*
 
-src/sniffer-*
+src/agent-*
 
-sniffer
-sniffer2
+agent
+agent2
 URLS

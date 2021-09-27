@@ -16,7 +16,7 @@
 #include <queue>
 #include <ctime>
 
-#include <sniffer.hpp> // added, removed some struct defns below instead
+#include <agent.hpp> // added, removed some struct defns below instead
 
 using namespace std;
 
