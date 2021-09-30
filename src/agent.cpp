@@ -22,12 +22,9 @@ struct service
   
 };
 float threshold = 0.98;
-
-//add post-validation code 
 std::mutex mtx;
 vector<struct flow*> flowarray;
 queue<raw_pkt*> Que;
-vector < struct service *>services;
 int enq=0;
 int deq=0;
 std::ofstream file;
@@ -36,7 +33,7 @@ char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
 double duration=30.0;
-int FindService( char ID [32])
+int FindService( vector < struct service *> &services, char ID [32])
 {
  int pos=-1;
  for (int j=0; j< services.size();j++)
@@ -108,7 +105,6 @@ std::string word, data;
 size_t pos = 0, pos1=0;
 bool Threshold=false;
 std::string MSlabel;
-//float count=0.0;
 InitStopWords();
 for (int i=0; i<URIS.size(); i++)
 {
@@ -148,9 +144,8 @@ else
 }
 for ( auto item : wordcount )
 {
-std::cout<< (float)item.second/URIS.size()<<"\n";
   if (((float)item.second/URIS.size()) >= 0.5)
-      {std::cout << item.first<<" "<<item.second<<"\n";MSlabel=MSlabel+"/"+item.first; Threshold=true;}
+      {MSlabel=MSlabel+"/"+item.first; Threshold=true;}
 }
 if(!Threshold)
 
@@ -168,7 +163,6 @@ map<int, std::string>::iterator itr;
   for (int i=0; i<3;i++)
 {
   --itr;
-//std::cout << itr->first<<itr->second<<"\n";
   MSlabel=MSlabel+"/"+itr->second;
 }
 }
@@ -207,7 +201,6 @@ while (true) {
         rpkt = (raw_pkt *) Que.front();
         Que.pop();
         deq++;
-//        printf("pop\n");
         mtx.unlock();
  if (NULL != rpkt) {
             char *cp = rpkt->raw;
@@ -226,7 +219,6 @@ while (true) {
 
             if (eth_hdr->ether_type != 0x0800) // not an IP packet
             {
-                printf("eth \n");
                 free_ethhdr(eth_hdr);
             }
             else {
@@ -283,7 +275,7 @@ while (true) {
                     sprintf(f->dport, "%u", dport);
                     f->NumBytes = tcp_dl;
                     f->protof = false;
-                    strncpy(f->proto, "Unknown", 32);//f->proto = strdup("Unknown");
+                    strncpy(f->proto, "Unknown", 32);
                     flowarray.push_back(f);
                     Pfound = false;
                     foundIndex = flowarray.size() - 1;
@@ -333,52 +325,7 @@ flowarray[foundIndex]->Packets.push_back(array);
 }
 }
 }
-                
-// here is the service identification module. This is the one should be replaced by calling the python script with flows.csv as an input
 
-                if ((!Pfound)) {
-                    if (dport == 80 || dport == 8080 || dport == 8000 || dport == 8079) {
-                        //flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "http"));
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-C");
-                    }
-                    else if (sport == 80 || sport == 8080 || sport == 8000 || sport == 8079) {
-//                        flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "http"));
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","HTTP-S");
-
-                    }
-                    else if (dport == 3306) {
-  //                      flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "mysql"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","MySQL-C");
-
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                    }
-                    else if (sport == 3306) {
-    //                    flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "mysql"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","MySQL-S");
-
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                    }
-                    else if (dport == 11211) {
-      //                  flowarray[foundIndex]->dport = strdup(strcat(flowarray[foundIndex]->dport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcache-C");
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                    }
-                    else if (sport == 11211) {
-        //                flowarray[foundIndex]->sport = strdup(strcat(flowarray[foundIndex]->sport, "memcached"));
-                        snprintf(flowarray[foundIndex]->proto, sizeof(flowarray[foundIndex]->proto), "%s","Memcache-S");
-                        flowarray[foundIndex]->protof = true;
-                        Pfound = true;
-                    }
-
-
-                }
 
 
                 if (tcp_hdr != NULL)
@@ -389,24 +336,23 @@ flowarray[foundIndex]->Packets.push_back(array);
                 free_iphdr(ip_hdr);
 
 
-            } // else eth_type
+            } 
 
             raw_packet_free(rpkt);
 
         } else
            continue;
 
-    } //while
+    } 
 }
     
-    printf("raw is null \n");
     free(saddr);
     free(daddr);
 return 0;
 }
 
-void *
-capture_main(void *) {
+void * 
+capture_main(void*) {
 
     char errbuf[PCAP_ERRBUF_SIZE];
     memset(errbuf, 0, PCAP_ERRBUF_SIZE);
@@ -418,9 +364,9 @@ capture_main(void *) {
     double elapsed_time;
     double sniff_duration = duration;//30.0;
     if (!LiveMode)
-    cap = pcap_open_offline(tracefile, errbuf);
+    {    printf("Processing the network trace file...\n");cap = pcap_open_offline(tracefile, errbuf);}
     else
-    cap = pcap_open_live(interface, 65535, 1, 1000, errbuf);  
+   { printf("Starting to sniff...\n"); cap = pcap_open_live(interface, 65535, 1, 1000, errbuf);}  
         
          if (cap == NULL) {
         printf("errbuf: ");
@@ -490,15 +436,14 @@ wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
   PySys_SetArgv(argc, _argv); // must call this to get sys.argv and relative imports
     pModule = PyImport_ImportModule("Model");
         if(pModule==NULL){
-                printf("no module is found\n");
+                printf("Model is not found\n");
                 PyErr_Print();}
-                else{printf("module is found\n");}
-        pDict = PyModule_GetDict(pModule); 
+                pDict = PyModule_GetDict(pModule); 
     pFunc = PyDict_GetItemString(pDict, "prediction");
     if(!pFunc ||!(PyCallable_Check(pFunc))){
         if (PyErr_Occurred())
                             PyErr_Print();
-                        fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
+                        fprintf(stderr, "Cannot find prediction function \"%s\"\n", argv[2]);
         Py_XDECREF(pFunc);
                 Py_DECREF(pModule);
         return 0;
@@ -508,7 +453,7 @@ wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
 
     clock_t end1 = clock();
     double elapsed1 = double(end1 - start1)/CLOCKS_PER_SEC;
-    printf("Time measured for initialization and finding the target python program and function: %.3f seconds.\n", elapsed1);
+
 
 InitMethodName();    
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
@@ -552,7 +497,6 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
  if (interface != NULL)
     LiveMode=true;
     
-    printf("Starting to sniff...\n");
     while(sniff_more){
         /* Start packet receiving thread */
         pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
@@ -562,72 +506,6 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
         // Wait for all threads to finish
         pthread_join(job_pkt_q, &thread_result);
     pthread_join(capture, &thread_result);
-
-    printf("enq: %d Deq: %d\n", enq,deq);
-//std::string line;
-//   int index=0;
-/*while (std::getline(infile, line))
-{
-    std::istringstream iss(line);
-    //std::string token1;
-    char *token1;
-    double token2;
-    bool found=false;
-    if (!(iss >> token1 >> token2)) { break; } // error
-//      if (token2<1.0)
-//{
-         snprintf(ID, sizeof(ID), "%s%s", flowarray[index]->saddr,flowarray[index]->sport);  
-        for (int i = 0; i < Nodes.size(); i++) {
-                    if (Nodes[i]->NodeID == NULL) continue;
-                    if (strstr(ID, Nodes[i]->NodeID) != NULL) {
-                           if (token2 > Nodes[i]->score ) {
-                          Nodes[i]->service= strdup(token1);
-                          Nodes[i]->score= token2;
-                          flowarray[index]->proto=strdup(token1);
-                     
-                    }
-else 
-   flowarray[index]->proto=strdup(Nodes[i]->service);
-found=true;
-break;
-                }              
-}
- if(!found)
-flowarray[index]->proto=strdup(token1);
-index++;
-}*/
- /*   myfile.open("flows/flows.csv", std::ios_base::out);
-    printf("flowarray size is %lu\n",flowarray.size());
-     char *array = new char[36];
-    for (int i = 0; i < flowarray.size(); i++) {
-       
-        if (flowarray[i]->Packets.size() == 100 ) {
-              if ( flowarray[i]->protof)
-                {  GetURLs(flowarray[i]->Packets); }
-             for (int j = 0; j < 100; j++) {     
-                 if( strlen(flowarray[i]->Packets[j]) >= 36)
-                       strncpy(array, flowarray[i]->Packets[j], 36);
-                else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
-                    int d = 36 - strlen(flowarray[i]->Packets[j]);
-                    int index = strlen(flowarray[i]->Packets[j]);
-                    strncpy(array, flowarray[i]->Packets[j], index);
-                    for (int j = 0; j < d; j++) {
-                        array[index] = '0';
-                        index++;
-                    }
-}
-                for (int l = 0; l <36; l++) {    
-                    b = ( unsigned char )array[l];
-                    if((j*l)!=3465)
-                    myfile << b << ",";
-                    else     // last byte is followed by new line instead of ","
-                    myfile << b << "\n"; 
-                }
-            }
-           
-        }
-    }
-    myfile.close();*/
     clock_t start2 = clock();
     char *array = new char[36];
     int rownum = 0;
@@ -636,7 +514,6 @@ index++;
                rownum++;
            }
     }
-    //printf("2darray rownum is %d",rownum);
     int *arr_2d=new int[rownum*3600];
     int(*p)[3600]=(int(*)[3600])arr_2d; 
 
@@ -647,17 +524,7 @@ index++;
 
         if (flowarray[i]->Packets.size() == 100 ) {
              for (int j = 0; j < 100; j++) {     
-                 //if( strlen(flowarray[i]->Packets[j]) >= 36)
                        strncpy(array, flowarray[i]->Packets[j], 36);
-                /*else if ( strlen(flowarray[i]->Packets[j]) > 0 &&  strlen(flowarray[i]->Packets[j]) < 36) {
-                    int d = 36 - strlen(flowarray[i]->Packets[j]);
-                    int index = strlen(flowarray[i]->Packets[j]);
-                    strncpy(array, flowarray[i]->Packets[j], index);
-                    for (int j = 0; j < d; j++) {
-                        array[index] = '0';
-                        index++;
-                    }
-}*/
                 for (int l = 0; l < 36; l++) {   
                         int b = (unsigned char)array[l]; 
                         p[itr_row][itr_col+l]= b;
@@ -672,33 +539,24 @@ index++;
     }
 
     clock_t end2 = clock();
-    double elapsed2 = double(end2 - start2)/CLOCKS_PER_SEC;
-    printf("Time measured for set up 2d array: %.3f seconds.\n", elapsed2);
-    printf("2d array creation finished. rownum is %d, column num is 3600\n",itr_row);
-       std::string str;
+    double elapsed2 = double(end2 - start2)/CLOCKS_PER_SEC; // Time needed to formulate the inpur to the deep learning model
+    std::string str;
    for (int x =0;x<rownum;x++) {
        for(int y = 0;y<3600;y++){
         str += std::to_string(p[x][y]);
         str += " ";
     }
    }
+    printf("Sending flows data to the model, service identification starts.\n");
     clock_t start3 = clock();
     PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
     pReturn=PyObject_CallObject(pFunc, ArgList);
     clock_t end3 = clock();
-    double elapsed3 = double(end3 - start3)/CLOCKS_PER_SEC;
-    printf("Time measured from sending to receiving: %.3f seconds.\n", elapsed3);
-
-
+    double elapsed3 = double(end3 - start3)/CLOCKS_PER_SEC;// Service Identification time
     char* result;
     PyArg_Parse(pReturn,"s",&result);
-    printf("result from python is");
-    printf("%s\n",result);
-
-    //int rows=rownum
     int cols=2;
     vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
-
     const char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
 int counter_mat = 0;
 
@@ -707,24 +565,15 @@ for (int i = 0; i < flowarray.size(); i++) {
         if (flowarray[i]->Packets.size() == 100 ) {
             int index = stoi(mat[counter_mat][0]);
             const char* lab=label[index];
-            //flowarray[i]->proto=label[index];
-           // mat[counter][0]=lab;
-           // printf("%s\n",mat[counter][0]);
-            //flowarray[i]->proto=const_cast<char *>(mat[counter][0].c_str());
-           // printf("%s ",flowarray[i]->proto);
-           // printf("%s\n",mat[counter][0]);
             double score_double = std::stod(mat[counter_mat][1]);
-            //flowarray[i]->score=score_double;
-            //printf("%f\n",flowarray[i]->score);
-            cout<<i<<" "<<flowarray[i]->sport<<" "<<flowarray[i]->saddr<<" "<<flowarray[i]->dport <<" "<< flowarray[i]->daddr<<" "<<lab <<" "<< score_double <<endl;
-
+            flowarray[i]->score=score_double;
             counter_mat++;
         }
 
 }
 
 /******************validate label**********************/
-printf("first for loop....\n");
+vector < struct service *>services;
 
 int counter_f = 0;
 for(int i = 0; i < flowarray.size(); i++)
@@ -778,7 +627,6 @@ for(int i = 0; i < flowarray.size(); i++)
             }
           if (found == 0 && mat_score >= threshold)
             {
-              printf("create service\n");
               struct service *ser =(struct service *) calloc (sizeof (struct service), 1);
               strncpy(ser->ID,ID,32);
               if(specialType==0){
@@ -799,16 +647,10 @@ for(int i = 0; i < flowarray.size(); i++)
         else{flowarray[i]->isServer=2;}
       
     counter_f++;
-//    free(ID);
         }
     
     
 }
-//test services
-for(int j = 0;j<services.size();j++){
-    cout<< j <<":ID "<<services[j]->ID <<" lab:"<<services[j]->label<<endl;
-}
-
 /*for all flows
 1 packets.size!=100 --> label unknown
 2 packets.size =100 -->
@@ -820,7 +662,6 @@ for(int j = 0;j<services.size();j++){
 
 
 int count = 0;
-printf("iterate through flows...\n");
 for (int i = 0; i < flowarray.size(); i++)
     {
       if (flowarray[i]->Packets.size() != 100 )  {          
@@ -831,7 +672,6 @@ for (int i = 0; i < flowarray.size(); i++)
         {
         
         int ind = std::stoi(mat[count][0]);
-        //   cout<< ind << endl;
         string flab =label[ind];
         string flab_del = flab.substr(0, flab.size()-2);
         char * mat_lab = const_cast<char*>(flab_del.c_str());
@@ -839,67 +679,18 @@ for (int i = 0; i < flowarray.size(); i++)
             char *port;
             char *ip_1;
             char *port_1;
-
-          if(flowarray[i]->isServer ==1)  
-          {   
-              ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-          //printf("server ip: %s server port: %s",ip,port);
-            }
-          else if(flowarray[i]->isServer == 0)
-            {
-              ip = flowarray[i]->daddr;
-              port = flowarray[i]->dport;
-            }
-            else if(flowarray[i]->isServer == 2){
-                ip = flowarray[i]->saddr;
-              port = flowarray[i]->sport;
-              ip_1 = flowarray[i]->daddr;
-              port_1 = flowarray[i]->dport;
-            }
-          if(flowarray[i]->isServer ==1||flowarray[i]->isServer ==0){
-          char ID[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID, ip,32);
-          strncat (ID, port,32);
-      //printf("%d",i);
-          printf("%s\n",ID);
-          int pos=-1;
-          int found=0;
-          for (int j = 0; j < services.size(); j++)
-            {
-              if (strcmp(services[j]->ID,ID)==0)
-                {
-                  pos = j;
-                  found = 1;
-                  break;
-                }
-            }
-        //replace with counter;
-          if(found==1&&(strcmp(flowarray[i]->proto,services[pos]->label)!=0)){
-                    strncpy(flowarray[i]->proto,services[pos]->label,32);
-                    if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
-                        flowarray[i]->specialType=2;
-                    }
-                    else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
-            }
-            if(found==0){
-            flowarray[i]->specialType=3;
-            }
-        }
-        else if(flowarray[i]->isServer ==2){
-          char ID[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID, ip,32);
-          strncat (ID, port,32);
-          char ID_1[32];
-       //   ID = (char *) malloc(strlen(ip) + strlen(port) + 1);
-          strncpy (ID_1, ip_1,32);
-          strncat (ID_1, port_1,32);
-
-          int pos=-1;
-          int found=0;
+            ip = flowarray[i]->saddr;
+            port = flowarray[i]->sport;
+            ip_1 = flowarray[i]->daddr;
+            port_1 = flowarray[i]->dport;
+            char ID[32];
+            strncpy (ID, ip,32);
+            strncat (ID, port,32);
+            char ID_1[32];
+            strncpy (ID_1, ip_1,32);
+            strncat (ID_1, port_1,32);
+            int pos=-1;
+            int found=0;
           for (int j = 0; j < services.size(); j++)
             {
               if (strcmp(services[j]->ID,ID)==0)
@@ -924,11 +715,11 @@ for (int i = 0; i < flowarray.size(); i++)
                 flowarray[i]->isServer = 1;
                 if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
                     strncpy(flowarray[i]->proto,services[pos]->label,32);
+                    flowarray[i]->score=services[pos]->score;
                     if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
                     }
                     else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
                     }
                 
             }
@@ -936,11 +727,12 @@ for (int i = 0; i < flowarray.size(); i++)
                 flowarray[i]->isServer = 0;
                 if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
                     strncpy(flowarray[i]->proto,services[pos_1]->label,32);
+                     flowarray[i]->score=services[pos_1]->score;
                     if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
                     }
                     else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
+
                     }
 
             }
@@ -949,22 +741,22 @@ for (int i = 0; i < flowarray.size(); i++)
                     flowarray[i]->isServer = 1;
                     if(strcmp(flowarray[i]->proto,services[pos]->label)!=0){
                     strncpy(flowarray[i]->proto,services[pos]->label,32);
+                    flowarray[i]->score=services[pos]->score;
                     if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
                     }
                     else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
                     }
                 }
                 else if(services[pos]->score <= services[pos_1]->score){
                      flowarray[i]->isServer = 0;
                     if(strcmp(flowarray[i]->proto,services[pos_1]->label)!=0){
                     strncpy(flowarray[i]->proto,services[pos_1]->label,32);
+                    flowarray[i]->score=services[pos_1]->score;
                     if(strcmp(flowarray[i]->proto,"CassMN")==0||strcmp(flowarray[i]->proto,"Spark-W")==0){
                         flowarray[i]->specialType=2;
                     }
                     else{flowarray[i]->specialType=1;}
-                    //cout<<"i is: "<<i<<" proto is "<< flowarray[i]->proto<< endl;
                     }
                 }
 
@@ -973,36 +765,83 @@ for (int i = 0; i < flowarray.size(); i++)
                 flowarray[i]->specialType=3;
             }
 
-
-
-        }
-
-
-
        count ++;
         }
 
 
         
     }
-//test result
+// validate the Bidirection flows 
 
-
+char RFlowID[55];
 int test_counter=0;
 for(int i = 0; i < flowarray.size (); i++){
     if(flowarray[i]->Packets.size()==100){
-            printf("flow array %d \n",test_counter);
-            cout << "proto before concatenation: "<< flowarray[i]->proto<< endl;
-    if(flowarray[i]->specialType==2){
-        cout << "proto after concatenation: "<< flowarray[i]->proto<< endl;
-    }
-    else if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
+
+   if(!flowarray[i]->protof)
+{
+snprintf(RFlowID, sizeof(RFlowID), "%s-%s--%s-%s",flowarray[i]->daddr, flowarray[i]->saddr,flowarray[i]->dport,flowarray[i]->sport);
+int position =-1;
+for(int j = i+1; j < flowarray.size(); j++){
+if (strstr(flowarray[j]->flowID,RFlowID)!=NULL)
+{
+position=j;
+break;
+
+}
+}
+if (position>0)
+{
+ if (strcmp(flowarray[i]->proto,flowarray[position]->proto)!=0)
+{
+  if (flowarray[i]->score > flowarray[position]->score)
+     {
+        strncpy(flowarray[position]->proto,flowarray[i]->proto,32);
+       if (flowarray[i]->isServer==0)
+           flowarray[position]->isServer=1;
+       else if (flowarray[i]->isServer==1)
+           flowarray[position]->isServer=0;
+     }
+  else if (flowarray[i]->score < flowarray[position]->score)
+     {
+        strncpy(flowarray[i]->proto,flowarray[position]->proto,32);
+       if (flowarray[position]->isServer==0)
+           flowarray[i]->isServer=1;
+       else if (flowarray[position]->isServer==1)
+           flowarray[i]->isServer=0;
+     }
+
+}
+else
+{
+  if (flowarray[i]->score > flowarray[position]->score)
+     {
+       if (flowarray[i]->isServer==0)
+           flowarray[position]->isServer=1;
+       else if (flowarray[i]->isServer==1)
+           flowarray[position]->isServer=0;
+     }
+  else if (flowarray[i]->score < flowarray[position]->score)
+     {
+       if (flowarray[position]->isServer==0)
+           flowarray[i]->isServer=1;
+       else if (flowarray[position]->isServer==1)
+           flowarray[i]->isServer=0;
+     }
+
+}
+flowarray[position]->protof=true;
+}
+flowarray[i]->protof=true; 
+}
+//validate the Bidirection flows 
+   if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
             char new_proto[32];
             const char *type = "-S";
             strncpy (new_proto, flowarray[i]->proto,32);
             strncat (new_proto, type,32);
         strncpy(flowarray[i]->proto,new_proto,32);
-    cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;}
+    }
     else if (flowarray[i]->isServer==0&&flowarray[i]->specialType!=3){
         char new_proto[32];
         const char *type = "-C";
@@ -1014,7 +853,7 @@ for(int i = 0; i < flowarray.size (); i++){
  char ID[32];
  strncpy (ID, flowarray[i]->daddr,32);
  strncat (ID, flowarray[i]->dport,32);
- pos=FindService(ID);
+ pos=FindService(services,ID);
 if(pos>=0)
 {
  GetURLs(services[pos],flowarray[i]->Packets);
@@ -1022,15 +861,12 @@ if(pos>=0)
 }
 
         strncpy(flowarray[i]->proto,new_proto,32);
-        cout<<"proto after concatenation: " << flowarray[i]->proto<< endl;
-
+        
     }
     else if(flowarray[i]->specialType==3){
             strncpy(flowarray[i]->proto, "Unknown", 32);
-        cout << "proto after concatenation: " << flowarray[i]->proto<< endl;
-        }
+                }
     test_counter++;
-    printf("\n");
     }
 }
  for (int j=0; j< services.size();j++)
@@ -1043,7 +879,8 @@ std::string label=GetMSLabel(services[j]->URLS);
 }
 
 }
-/*********************validate label***********************/   
+/*********************validate label***********************/ 
+         // performance metrics clacualation and dumping into file  
     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
@@ -1053,8 +890,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         } else {
             log_str.append(log);
         }
-         // performance metrics clacualation and dumping into file
-        FP.open(log_str, std::ios_base::out); // using standard ports
+        FP.open(log_str, std::ios_base::out); 
         printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
          if (flowarray[i]->Packets.size() == 100) {
@@ -1070,7 +906,7 @@ std::string label=GetMSLabel(services[j]->URLS);
                 strncpy (SID, flowarray[i]->saddr,32);
                 strncat (SID, flowarray[i]->sport,32);
               }
-            int index=FindService(SID);
+            int index=FindService(services,SID);
            if (index>=0)
              {
               std::string newproto= (std::string)flowarray[i]->proto;
@@ -1101,11 +937,11 @@ std::string label=GetMSLabel(services[j]->URLS);
     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
 
+        // This is logging the flows sent over tcp for debugging purposes
         string log_str = "logs/logging.txt";
         FP.open(log_str, std::ios_base::out);
         FP.close();
-        FP.open(log_str, ios::app); // using standard ports
-        //printf("Writing to log\n");
+        FP.open(log_str, ios::app);
 
         for(int i = 0; i < flowarray.size(); i++) {
            if (flowarray[i]->Packets.size() == 100 ) {
@@ -1121,7 +957,7 @@ std::string label=GetMSLabel(services[j]->URLS);
                 strncpy (SID, flowarray[i]->saddr,32);
                 strncat (SID, flowarray[i]->sport,32);
               }
-            int index=FindService(SID);
+            int index=FindService(services,SID);
            if (index>=0)
              {
               std::string newproto= (std::string)flowarray[i]->proto;
@@ -1147,7 +983,7 @@ std::string label=GetMSLabel(services[j]->URLS);
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
-                    
+
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
@@ -1186,20 +1022,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         Py_DECREF(pModule);
         Py_XDECREF(pDict);
         Py_Finalize();
-        clock_t end4 = clock();
-        
-        double elapsed4 = double(end4 - start4)/CLOCKS_PER_SEC;
-        printf("Time measured for finalization: %.3f seconds.\n", elapsed4);
-    
-  
-  
-/* for(int i = 0; i < Nodes.size(); i++)
-     {
-         // printf("%s %s %f\n",Nodes[i]->NodeID, Nodes[i]->service, Nodes[i]->score); 
-         free(Nodes[i]);
-     }*/
-
-
-
+        clock_t end4 = clock();        
+        double elapsed4 = double(end4 - start4)/CLOCKS_PER_SEC;// environment finalization time
     return 0;
 }
