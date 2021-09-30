@@ -7,10 +7,14 @@ sys.path.insert(2,'/home/melsaa1/anaconda3/envs/name/lib/python3.7/lib-dynload')
 sys.path.insert(3,'/home/melsaa1/anaconda3/envs/name/lib/python3.7/site-packages')
 #print(sys.path)
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import warnings
+warnings.filterwarnings('ignore')
 #print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
 #print("PATH:", os.environ.get('PATH'))
 import pandas
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import time
 #from keras.models import Sequential, load_model
 #from keras.utils import np_utils, to_categorical
