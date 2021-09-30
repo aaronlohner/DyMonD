@@ -330,6 +330,7 @@ if __name__ == '__main__':
                 ft.writelines(to_write)
 
         if log == "*":
+            print("Waiting for flows from agent...")
             response = recv_message()#sniffed_info_pb2.FlowArray)
             while response is not None:
                 f.flows.extend(response.flows)
@@ -338,6 +339,7 @@ if __name__ == '__main__':
             tg_start = time.perf_counter()
             generate_graph(f)
         else: # reading from log
+            print("Waiting for flows to be recorded by agent...")
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
             recv_message()#None)
@@ -367,6 +369,7 @@ if __name__ == '__main__':
                         ft.writelines(to_write)
                         ft.write("\n\n\nNext component\n")
 
+                print("Waiting for flows from agent...")
                 response = recv_message()#sniffed_info_pb2.FlowArray)
                 while response is not None:
                     f.flows.extend(response.flows)
@@ -400,9 +403,10 @@ if __name__ == '__main__':
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
+                print("Waiting for flows to be recorded by agent...")
                 recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    print("Received flows from agent")
+                    print("Reading flows from file")
                     f.seek(0)
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)
