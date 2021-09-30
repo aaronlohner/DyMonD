@@ -65,7 +65,7 @@ def recv_message_test() -> str:
     return data
 
 def setup_client(mode:str, log:str, host):
-    print("Setting up connection with agent")
+    print("Setting up connection with agent...")
     if host is None:
         s.connect((HOST, PORT))
     else:

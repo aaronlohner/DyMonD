@@ -315,6 +315,7 @@ if __name__ == '__main__':
         log = "logs/" + log
     else: # using tcp
         setup_client(opt, log, args.host)
+    print("Connected")
     
     f = FlowArray()
     if opt == "f": # reading from pcap file
