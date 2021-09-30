@@ -275,7 +275,8 @@ if __name__ == '__main__':
     group2 = parser.add_mutually_exclusive_group()
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
-    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
+    # TODO: move dictionary input to agent side
+    parser.add_argument("-d", "--dictionary", default=2, type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
@@ -352,9 +353,9 @@ if __name__ == '__main__':
         if log == "*": # if using tcp
             l = FlowArray()            
             while len(q) > 0:
-                print("Enqueued IP addresses of application components: {}".format(q))
+                print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
+                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)], ip)#sniff(ip)
 
                 if args.test:
                     to_write = ""
@@ -370,7 +371,7 @@ if __name__ == '__main__':
                 while response is not None:
                     f.flows.extend(response.flows)
                     response = recv_message()#sniffed_info_pb2.FlowArray)
-                #print("Num received flows: {}".format(len(f.flows)))
+                print("Received flows from agent")
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
                 else:
@@ -396,12 +397,12 @@ if __name__ == '__main__':
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
-                print("Enqueued IP addresses of application components: {}".format(q))
+                print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
                 sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
-                    #print("Num received flows: {}".format(len(f.readlines())))
+                    print("Received flows from agent")
                     f.seek(0)
                     if os.stat(log).st_size == 0:
                             lines_to_write.extend(f)

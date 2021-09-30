@@ -14,7 +14,7 @@ def send_message(mesg:str) -> None:
     # First send the message length
     s.send(length.to_bytes(4, byteorder="big"))
     s.send(mesg)
-    print("Sent message")
+    #print("Sent message to agent")
 
 def recv_message() -> FlowArray: # if using protobuf to send data, this fcn should have a param called mesg_type
     """Receive a message, prefixed with its size, from a TCP socket."""
@@ -65,22 +65,28 @@ def recv_message_test() -> str:
     return data
 
 def setup_client(mode:str, log:str, host):
+    print("Setting up connection with agent")
     if host is None:
         s.connect((HOST, PORT))
     else:
-        print("Attempting to connect to sniffer on host address " + host)
+        print("Attempting to connect to agent on host address " + host)
         s.connect((host, PORT))
     send_message(mode)
     sleep(0.2)
     send_message(log)
 
-def sniff(arg:str):
+def sniff(arg:str, ip=None):
     sleep(0.2)
+    if ip is None:
+        print("Requesting agent to sniff capture file {}".format(arg))
+    else:
+        print("Requesting agent to sniff on IP address {}".format(ip))
     send_message(arg)
     
 
 def stop_client():
+    print("Closing connection with agent")
     send_message("stop") # ad hoc stopping signal
     s.close()
-    print("Disconnected from server")
+    #print("Disconnected from agent")
 

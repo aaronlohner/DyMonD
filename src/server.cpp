@@ -49,13 +49,13 @@ void setup_server() {
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Waiting for client to accept...\n");
+	printf("Waiting for controller to connect...\n");
 	if ((client_fd = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 	{
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
-	printf("Connected.\n");
+	printf("Connected\n");
 }
 
 /*
@@ -63,14 +63,14 @@ void setup_server() {
  */
 void stop_server(){
 	close(client_fd);
-	printf("Server disconnected from client\n");
+	printf("Disconnected from controller\n");
 }
 
 /*
  * Read incoming message into input buffer
  */
 void receive_message(char inputBuffer[]) {
-	printf("Waiting for a message from client...\n");
+	printf("Waiting for a message from controller...\n");
 	int mesg_len_buf, mesg_length;
 	// Expect to receive message length first in a 4-byte block immediate followed by the message
 	// Only continue once message is received
@@ -78,7 +78,7 @@ void receive_message(char inputBuffer[]) {
 	mesg_length = ntohl(mesg_len_buf);
 	recv(client_fd, buffer, mesg_length, 0);
 	strncpy(inputBuffer, buffer, mesg_length);
-	printf("Received: %s\n", inputBuffer);
+	//printf("Received: %s\n", inputBuffer);
 	// Reset global variable for future incoming messages
 	memset(buffer, 0, sizeof(buffer));
 	valread = 0;
@@ -228,5 +228,5 @@ void send_message_test(string str){
 
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
-	printf("Empty message sent to controller\n");
+	//printf("Empty message sent to controller\n");
 }

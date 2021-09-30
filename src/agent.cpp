@@ -420,6 +420,7 @@ int main(int argc, char *argv[]){
     pthread_t job_pkt_q;
     pthread_t capture;
     char ID[28];
+    string log_str = "logs/logging.txt"; // for debugging
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -481,6 +482,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     receive_message(mode_buf); // receive indication if using interface or reading from file
     receive_message(log); // receive indication if sending via tcp or writing to logfile
     receive_message(arg);  // receive network interface name or name of pcap file
+    printf("Received IP address of initial application component to sniff\n");
     opt = mode_buf[0];
     capture_dir.append(arg);
     switch(opt){
@@ -491,6 +493,10 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
                 case 'f':
                         tracefile = (char*)capture_dir.c_str(); break;
             }
+
+    // This is for logging the flows sent over tcp for debugging purposes
+    FP.open(log_str, std::ios_base::out);
+    FP.close();
 } else {
     log[0] = '\0';
 }
@@ -937,10 +943,7 @@ std::string label=GetMSLabel(services[j]->URLS);
     if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
 
-        // This is logging the flows sent over tcp for debugging purposes
-        string log_str = "logs/logging.txt";
-        FP.open(log_str, std::ios_base::out);
-        FP.close();
+        // For debugging flows
         FP.open(log_str, ios::app);
 
         for(int i = 0; i < flowarray.size(); i++) {
@@ -978,12 +981,14 @@ std::string label=GetMSLabel(services[j]->URLS);
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
                     add_to_flow_array(flowarray[i], RST);
 
+                    // For debugging flows
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
                 }
                 else {
                     add_to_flow_array(flowarray[i], 0.0);
 
+                    // For debugging flows
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport  <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "\n";
                 }
@@ -1009,9 +1014,14 @@ std::string label=GetMSLabel(services[j]->URLS);
      if(mode_buf[0] == 'i'){
         flowarray.clear();
         receive_message(arg);
-        if(!strcmp(arg, "stop")) sniff_more = false;
+        if(!strcmp(arg, "stop")) {
+            sniff_more = false;
+        } else {
+            printf("Received next IP address\n");
+        }
      } else {
          sniff_more = false;
+         printf("Sniffing completed\n");
      }
     }
         clock_t start4 = clock();
