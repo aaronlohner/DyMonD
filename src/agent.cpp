@@ -479,9 +479,9 @@ bool sniff_more = true;
 string capture_dir = "captures/";
 if(argc == 1 || strstr(argv[1], "-t") != NULL){
     setup_server(); // prepare server for incoming client tcp connection
-    receive_message(mode_buf); // receive indication if using interface or reading from file
-    receive_message(log); // receive indication if sending via tcp or writing to logfile
-    receive_message(arg);  // receive network interface name or name of pcap file
+    receive_message(mode_buf, true); // receive indication if using interface or reading from file
+    receive_message(log, true); // receive indication if sending via tcp or writing to logfile
+    receive_message(arg, false);  // receive network interface name or name of pcap file
     printf("Received IP address of initial application component to sniff\n");
     opt = mode_buf[0];
     capture_dir.append(arg);
@@ -1013,7 +1013,7 @@ std::string label=GetMSLabel(services[j]->URLS);
      }
      if(mode_buf[0] == 'i'){
         flowarray.clear();
-        receive_message(arg);
+        receive_message(arg, false);
         if(!strcmp(arg, "stop")) {
             sniff_more = false;
         } else {
@@ -1021,9 +1021,10 @@ std::string label=GetMSLabel(services[j]->URLS);
         }
      } else {
          sniff_more = false;
-         printf("Sniffing completed\n");
      }
     }
+
+        printf("Sniffing completed\n");
         clock_t start4 = clock();
         Py_DECREF(ArgList);
         Py_DECREF(PyList);

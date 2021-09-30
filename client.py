@@ -18,6 +18,7 @@ def send_message(mesg:str) -> None:
 
 def recv_message() -> FlowArray: # if using protobuf to send data, this fcn should have a param called mesg_type
     """Receive a message, prefixed with its size, from a TCP socket."""
+    print("Waiting for flows from agent...")
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)

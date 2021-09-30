@@ -34,4 +34,4 @@ void send_message_test(string str);
 
 void send_message();
 
-void receive_message(char *inputBuffer);
+void receive_message(char *inputBuffer, bool suppress_output);

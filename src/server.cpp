@@ -69,8 +69,8 @@ void stop_server(){
 /*
  * Read incoming message into input buffer
  */
-void receive_message(char inputBuffer[]) {
-	printf("Waiting for a message from controller...\n");
+void receive_message(char inputBuffer[], bool suppress_output) {
+	if(!suppress_output) printf("Waiting for message from controller...\n");
 	int mesg_len_buf, mesg_length;
 	// Expect to receive message length first in a 4-byte block immediate followed by the message
 	// Only continue once message is received
