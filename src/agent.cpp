@@ -553,7 +553,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
         str += " ";
     }
    }
-    printf("Sending flows data to the model, service identification starts.\n");
+    printf("Sending flows data to the model, starting service identification\n");
     clock_t start3 = clock();
     PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
     pReturn=PyObject_CallObject(pFunc, ArgList);
