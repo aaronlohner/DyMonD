@@ -887,7 +887,7 @@ std::string label=GetMSLabel(services[j]->URLS);
 }
 /*********************validate label***********************/ 
          // performance metrics clacualation   
-     printf("Collecting performance figures.\n");
+     printf("Collecting performance figures\n");
      int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
