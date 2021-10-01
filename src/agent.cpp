@@ -553,7 +553,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
         str += " ";
     }
    }
-    printf("Sending flows data to the model, starting service identification\n");
+    printf("Sending flows data to the model, starting service identification.\n");
     clock_t start3 = clock();
     PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));
     pReturn=PyObject_CallObject(pFunc, ArgList);
@@ -886,8 +886,9 @@ std::string label=GetMSLabel(services[j]->URLS);
 
 }
 /*********************validate label***********************/ 
-         // performance metrics clacualation and dumping into file  
-    int counter = 0;
+         // performance metrics clacualation   
+     printf("Collecting performance figures.\n");
+     int counter = 0;
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
