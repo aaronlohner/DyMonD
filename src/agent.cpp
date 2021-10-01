@@ -482,7 +482,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     receive_message(mode_buf, true); // receive indication if using interface or reading from file
     receive_message(log, true); // receive indication if sending via tcp or writing to logfile
     receive_message(arg, false);  // receive network interface name or name of pcap file
-    printf("Received IP address of initial application component to sniff\n");
+    printf("Monitoring request received\n");
     opt = mode_buf[0];
     capture_dir.append(arg);
     switch(opt){
@@ -1017,7 +1017,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         if(!strcmp(arg, "stop")) {
             sniff_more = false;
         } else {
-            printf("Received next IP address\n");
+            printf("Monitoring request received\n");
         }
      } else {
          sniff_more = false;
