@@ -1029,11 +1029,11 @@ std::string label=GetMSLabel(services[j]->URLS);
         FP.close();
 
         send_message(flowarray);
-        if(counter > 0) {
+        //if(counter > 0) {
             printf("Flows sent to controller\n");
             send_message();
             counter = 0;
-        }
+        //}
     }
      for(int i = 0; i < flowarray.size(); i++)
      {
