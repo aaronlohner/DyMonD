@@ -510,12 +510,13 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
         receive_message(mode_buf, true); // receive indication if using interface or reading from file
         receive_message(log, true); // receive indication if sending via tcp or writing to logfile
         receive_message(arg, false);  // receive network interface name or name of pcap file
-        printf("mode: %c, log: %s, arg: %s", mode_buf[0], log, arg);
+        printf("mode: %c, log: %s, arg: %s\n", mode_buf[0], log, arg);
         if(standalone){
             sniff_more = false;
         } else {
             if(mode_buf[0] == 'i'){
                 LiveMode=true;
+                interface = arg;
                 flowarray.clear();
                 if(!strcmp(mode_buf, "stop")) { // if(!strcmp(arg, "stop")) {
                     sniff_more = false;
