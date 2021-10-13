@@ -75,7 +75,7 @@ def setup_client(host): #setup_client(mode:str, log:str, host):
     # sleep(0.2)
     # send_message(log)
 
-def sniff(mode:str, log:str, arg:str, ip=None): #sniff(arg:str, ip=None):
+def sniff(mode:str, log:str, arg:str, ip=None, time:int=None): #sniff(arg:str, ip=None):
     sleep(0.2)
     if ip is None: # arg holds capture file name
         print("Requesting agent to sniff capture file {}".format(arg))
@@ -86,6 +86,9 @@ def sniff(mode:str, log:str, arg:str, ip=None): #sniff(arg:str, ip=None):
     send_message(log)
     sleep(0.2)
     send_message(arg)
+    if ip is None:
+        sleep(0.2)
+        send_message(time)
     
 
 def stop_client():

@@ -462,7 +462,7 @@ bool standalone = true;
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 switch(opt){
             case 't':
-                if(atof(optarg) <= 5 || atof(optarg) > 1000) {
+                if(atof(optarg) <= 5 || atof(optarg) >= 1000) {
                     printf("Time out of range");
                     exit(EXIT_FAILURE);
                 } else duration = atof(optarg);
@@ -476,7 +476,7 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 }
         }
 
-char mode_buf[64], log[64], arg[64];
+char mode_buf[64], log[64], arg[64], time[64];
 bool sniff_more = true;
 string capture_dir; // = "captures/"'
 if(argc == 1 || strstr(argv[1], "-t") != NULL){
@@ -507,10 +507,12 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     LiveMode=true;
     
     while(sniff_more){
-        receive_message(mode_buf, true); // receive indication if using interface or reading from file
+        receive_message(mode_buf, false); // receive indication if using interface or reading from file
         receive_message(log, true); // receive indication if sending via tcp or writing to logfile
-        receive_message(arg, false);  // receive network interface name or name of pcap file
-        printf("mode: %c, log: %s, arg: %s\n", mode_buf[0], log, arg);
+        receive_message(arg, true);  // receive network interface name or name of pcap file
+        receive_message(time, true);
+        duration = atof(time);
+        //printf("mode: %c, log: %s, arg: %s\n", mode_buf[0], log, arg);
         if(standalone){
             sniff_more = false;
         } else {

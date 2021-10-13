@@ -276,11 +276,12 @@ if __name__ == '__main__':
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
     # TODO: move dictionary input to agent side
-    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
+    parser.add_argument("-d", "--dictionary", type=int, help="use specified dictionary mapping from interfaces to IPs")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
-    parser.add_argument("-t", "--test", action="store_true", help="receive string for input to learning model")
+    parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
+    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), default=8, help="sniffing time for each component")
     args = parser.parse_args()
     interfaces = {}
     if args.dictionary is not None and args.IP is None:
@@ -359,7 +360,7 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip)#sniff(ip)
+                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
 
                 if args.test:
                     to_write = ""
@@ -404,7 +405,7 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
+                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
                 print("Waiting for flows to be recorded by agent...")
                 recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
