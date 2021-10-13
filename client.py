@@ -88,7 +88,7 @@ def sniff(mode:str, log:str, arg:str, ip=None, time:int=None): #sniff(arg:str, i
     send_message(arg)
     if ip is not None:
         sleep(0.2)
-        send_message(time)
+        send_message(str(time))
     
 
 def stop_client():
