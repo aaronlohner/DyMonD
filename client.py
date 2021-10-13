@@ -86,7 +86,7 @@ def sniff(mode:str, log:str, arg:str, ip=None, time:int=None): #sniff(arg:str, i
     send_message(log)
     sleep(0.2)
     send_message(arg)
-    if ip is None:
+    if ip is not None:
         sleep(0.2)
         send_message(time)
     
