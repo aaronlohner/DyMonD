@@ -424,8 +424,8 @@ int main(int argc, char *argv[]){
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
-    wchar_t* arg = Py_DecodeLocale(argv[i], NULL);
-    _argv[i] = arg;
+    wchar_t* argp = Py_DecodeLocale(argv[i], NULL); // already a variable called arg elsewhere
+    _argv[i] = argp;
     }
     clock_t start1 = clock();
     Py_Initialize();
@@ -456,11 +456,13 @@ wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     double elapsed1 = double(end1 - start1)/CLOCKS_PER_SEC;
 
 
-InitMethodName();    
+InitMethodName();
+// Standalone args and sniffing time
+bool standalone = true;
 while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 switch(opt){
             case 't':
-                if(atof(optarg) <= 0 || atof(optarg) > 1000) {
+                if(atof(optarg) <= 5 || atof(optarg) > 1000) {
                     printf("Time out of range");
                     exit(EXIT_FAILURE);
                 } else duration = atof(optarg);
@@ -476,34 +478,60 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
 
 char mode_buf[64], log[64], arg[64];
 bool sniff_more = true;
-string capture_dir = "captures/";
+string capture_dir; // = "captures/"'
 if(argc == 1 || strstr(argv[1], "-t") != NULL){
+    standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
-    receive_message(mode_buf, true); // receive indication if using interface or reading from file
-    receive_message(log, true); // receive indication if sending via tcp or writing to logfile
-    receive_message(arg, false);  // receive network interface name or name of pcap file
-    printf("Monitoring request received\n");
-    opt = mode_buf[0];
-    capture_dir.append(arg);
-    switch(opt){
-                case 'i':
-                    interface = arg; break;
-                case 'p':
-                            ipaddress = arg; break;
-                case 'f':
-                        tracefile = (char*)capture_dir.c_str(); break;
-            }
+    // receive_message(mode_buf, true); // receive indication if using interface or reading from file
+    // receive_message(log, true); // receive indication if sending via tcp or writing to logfile
+    // receive_message(arg, false);  // receive network interface name or name of pcap file
+    // printf("Monitoring request received\n");
+    // opt = mode_buf[0];
+    // capture_dir.append(arg);
+    // switch(opt){
+    //             case 'i':
+    //                 interface = arg; break;
+    //             case 'p':
+    //                         ipaddress = arg; break;
+    //             case 'f':
+    //                     tracefile = (char*)capture_dir.c_str(); break;
+    //         }
 
     // This is for logging the flows sent over tcp for debugging purposes
     FP.open(log_str, std::ios_base::out);
     FP.close();
-} else {
+} else { // Standalone mode
     log[0] = '\0';
 }
  if (interface != NULL)
     LiveMode=true;
     
     while(sniff_more){
+        receive_message(mode_buf, true); // receive indication if using interface or reading from file
+        receive_message(log, true); // receive indication if sending via tcp or writing to logfile
+        receive_message(arg, false);  // receive network interface name or name of pcap file
+        printf("mode: %c, log: %s, arg: %s", mode_buf[0], log, arg);
+        if(standalone){
+            sniff_more = false;
+        } else {
+            if(mode_buf[0] == 'i'){
+                LiveMode=true;
+                flowarray.clear();
+                if(!strcmp(mode_buf, "stop")) { // if(!strcmp(arg, "stop")) {
+                    sniff_more = false;
+                } else {
+                    printf("Monitoring request received\n");
+                }
+            } else {
+                LiveMode=false;
+                capture_dir.clear();
+                capture_dir.append("captures/").append(arg);
+                tracefile = (char*)capture_dir.c_str();
+                sniff_more = false;
+            }
+        }
+        
+
         /* Start packet receiving thread */
         pthread_create(&job_pkt_q, NULL,&process_packet_queue, NULL);
         /* Start main capture in live or offline mode */
@@ -1012,17 +1040,17 @@ std::string label=GetMSLabel(services[j]->URLS);
              free(flowarray[i]->Ack_times[j]);
          free(flowarray[i]);
      }
-     if(mode_buf[0] == 'i'){
-        flowarray.clear();
-        receive_message(arg, false);
-        if(!strcmp(arg, "stop")) {
-            sniff_more = false;
-        } else {
-            printf("Monitoring request received\n");
-        }
-     } else {
-         sniff_more = false;
-     }
+    //  if(mode_buf[0] == 'i'){
+    //     flowarray.clear();
+    //     receive_message(arg, false);
+    //     if(!strcmp(mode_buf, "stop")) { // if(!strcmp(arg, "stop")) {
+    //         sniff_more = false;
+    //     } else {
+    //         printf("Monitoring request received\n");
+    //     }
+    //  } else {
+    //      sniff_more = false;
+    //  }
     }
 
         printf("Sniffing completed\n");

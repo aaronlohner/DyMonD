@@ -64,23 +64,27 @@ def recv_message_test() -> str:
     data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
     return data
 
-def setup_client(mode:str, log:str, host):
+def setup_client(host): #setup_client(mode:str, log:str, host):
     print("Setting up connection with agent...")
     if host is None:
         s.connect((HOST, PORT))
     else:
         print("Attempting to connect to agent on host address " + host)
         s.connect((host, PORT))
+    # send_message(mode)
+    # sleep(0.2)
+    # send_message(log)
+
+def sniff(mode:str, log:str, arg:str, ip=None): #sniff(arg:str, ip=None):
+    sleep(0.2)
+    if ip is None: # arg holds capture file name
+        print("Requesting agent to sniff capture file {}".format(arg))
+    else: # arg holds network interface of ip
+        print("Requesting agent to sniff on IP address {}".format(ip))
     send_message(mode)
     sleep(0.2)
     send_message(log)
-
-def sniff(arg:str, ip=None):
     sleep(0.2)
-    if ip is None:
-        print("Requesting agent to sniff capture file {}".format(arg))
-    else:
-        print("Requesting agent to sniff on IP address {}".format(ip))
     send_message(arg)
     
 

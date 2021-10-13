@@ -276,7 +276,7 @@ if __name__ == '__main__':
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
     # TODO: move dictionary input to agent side
-    parser.add_argument("-d", "--dictionary", default=2, type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
+    parser.add_argument("-d", "--dictionary", type=int, choices=[1, 2, 3], help="use specified dictionary mapping from interfaces to IPs")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
@@ -294,32 +294,33 @@ if __name__ == '__main__':
         # reverse-lookup interface from newly found ips to pass in to sniff()
         interfaces = load_interfaces_dictionary(args.dictionary)
 
-    opt, arg = None, None
+    mode, arg = None, None
     if args.IP is not None:
-        opt = "i"
+        mode = "i"
         arg = args.IP
     elif args.file is not None:
-        opt = "f"
+        mode = "f"
         arg = args.file
     log = args.log
     
     t = time.perf_counter()
 
-    if opt == "i" and log != "*": # if sniffing interface and using log
+    if mode == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        setup_client(opt, "temp-log.txt", args.host)
-        temp_log = "logs/temp-log.txt"
-        log = "logs/" + log
-    elif log != "*": # if sniffing file and using log
-        setup_client(opt, log, args.host)
-        log = "logs/" + log
-    else: # using tcp
-        setup_client(opt, log, args.host)
+        # setup_client(mode, "temp-log.txt", args.host)
+        temp_log = os.path.join("logs", "temp-log.txt") #temp_log = "logs/temp-log.txt"
+        log = os.path.join("logs", log)
+    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
+        #  setup_client(mode, log, args.host)
+        log = os.path.join("logs", log)
+    # else: # using tcp (interface or log)
+    #     setup_client(mode, log, args.host)
+    setup_client(args.host)
     print("Connected")
     
     f = FlowArray()
-    if opt == "f": # reading from pcap file
-        sniff(arg)
+    if mode == "f": # reading from pcap file
+        sniff(mode, args.log, arg)
 
         if args.test:
             to_write = ""
@@ -358,7 +359,7 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)], ip)#sniff(ip)
+                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip)#sniff(ip)
 
                 if args.test:
                     to_write = ""
@@ -403,7 +404,7 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
+                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)])#sniff(ip)
                 print("Waiting for flows to be recorded by agent...")
                 recv_message()#None)
                 with open(log, "r") as l, open(temp_log, "r") as f:
