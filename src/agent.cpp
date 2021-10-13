@@ -508,23 +508,21 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     
     while(sniff_more){
         receive_message(mode_buf, false); // receive indication if using interface or reading from file
+        if(!strcmp(mode_buf, "stop")) {
+            break;
+        }
         receive_message(log, true); // receive indication if sending via tcp or writing to logfile
         receive_message(arg, true);  // receive network interface name or name of pcap file
         receive_message(time, true);
         duration = atof(time);
-        //printf("mode: %c, log: %s, arg: %s\n", mode_buf[0], log, arg);
         if(standalone){
             sniff_more = false;
         } else {
             if(mode_buf[0] == 'i'){
+                printf("Monitoring request received\n");
                 LiveMode=true;
                 interface = arg;
                 flowarray.clear();
-                if(!strcmp(mode_buf, "stop")) { // if(!strcmp(arg, "stop")) {
-                    sniff_more = false;
-                } else {
-                    printf("Monitoring request received\n");
-                }
             } else {
                 LiveMode=false;
                 capture_dir.clear();
