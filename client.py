@@ -1,3 +1,4 @@
+from flask import Flask, render_template, request
 import sys
 import socket
 from time import sleep
@@ -6,6 +7,21 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 9080         # The port used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+app = Flask(__name__)
+app.config["DEBUG"] = True
+
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/inputs", methods=['POST'])
+def recv_client_inputs():
+    ip = request.form['ip']
+    time = request.form['time']
+    mode = request.form['mode']
+    print(f'received {mode}, {ip}, {time}')
+    return render_template('index.html', ip=ip)
 
 def send_message(mesg:str) -> None:
     """Send a message though the TCP socket."""

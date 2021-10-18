@@ -14,5 +14,9 @@ def index():
 def recv_client_inputs():
     ip = request.form['ip']
     time = request.form['time']
-    print(f'received {ip}, {time}')
-    return render_template('controller.html', ip=ip, time=time)
+    mode = request.form['mode']
+    print(f'received {ip}, {time}, {mode}')
+    return render_template('index.html', ip=ip)
+
+    #PUT THIS BACK INTO INDEX.HTML
+    #http://bmj-cluster.cs.mcgill.ca:15490

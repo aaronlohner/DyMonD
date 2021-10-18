@@ -8,11 +8,23 @@
     </head>
     <body>
         <h1>DyMonD Controller Interface</h1>
-        <p>Enter starting IP address and desired sniffing time per component:</p>
-        <form action="http://bmj-cluster.cs.mcgill.ca:15490/inputs" method="post">
-            <input type="text" name="ip" placeholder="IP">
-            <input type="text" name="time" placeholder="Time (seconds)">
+        <p>Enter the framework mode, the starting IP address and desired sniffing time per component:</p>
+        <form action="/inputs" method="post">
+            <div>
+                <label for="file">File mode     </label>
+                <input type="radio" id="file" name="mode" value="file">
+                <label for="interface">Interface mode</label>
+                <input type="radio" id="interface" name="mode" value="interface">
+            </div>
+            <label for="ip">Starting IP address:</label>
+            <input type="text" id="ip" name="ip" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"><br>
+            <label for="ip">Time (seconds):</label>
+            <input type="number" id="time" name="time" min="5" max="1000" size="30"><br>
+            
             <button>Send to controller</button>
         </form>
+        {% if ip != null %}
+        <p>Sent values to controller.</p>
+        {% endif %}
     </body>
 </html>

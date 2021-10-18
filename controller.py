@@ -269,6 +269,9 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_
                         visited.append(new_ip)
     return (ips, visited)
 
+def run(mode:str, ip:str, time:int):
+    # MOVE MOST OF CODE FROM MAIN INTO HERE
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     group1 = parser.add_mutually_exclusive_group(required=True)
