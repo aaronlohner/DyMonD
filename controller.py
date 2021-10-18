@@ -266,7 +266,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_
                         visited.append(new_ip)
     return (ips, visited)
 
-def run_startup(mode:str, log:str, host:str, arg:str, time:int, app:int, out:str):
+def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, app:int, out:str):
     # MOVE MOST OF CODE FROM MAIN INTO HERE
     interfaces = {}
     if mode == 'i':
@@ -286,9 +286,9 @@ def run_startup(mode:str, log:str, host:str, arg:str, time:int, app:int, out:str
 
     setup_client(host)
     print("Connected")
-    run_main(mode, interfaces, log_orig, log, temp_log, arg, time, out)
+    run_main(mode, interfaces, log_orig, log, temp_log, arg, sniff_time, out)
 
-def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, time:int, out:str):
+def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
     t = time.perf_counter()
     f = FlowArray()
     if mode == "f": # reading from pcap file
@@ -331,7 +331,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, time)#sniff(ip)
+                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, sniff_time)#sniff(ip)
 
                 # if args.test:
                 #     to_write = ""
@@ -376,7 +376,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
+                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, sniff_time)#sniff(ip)
                 print("Waiting for flows to be recorded by agent...")
                 recv_message()
                 with open(log, "r") as l, open(temp_log, "r") as f:
