@@ -5,10 +5,7 @@ import random
 import json
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, recv_message_test, sniff
-#from proto_gen import sniffed_info_pb2
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
-
-# THIS SCRIPT WAS ORIGINALLY LOCATED WITHIN THE FOLDER webvowl1.1.7SE
 
 nodes = {}
 edges = {}
@@ -269,78 +266,48 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_
                         visited.append(new_ip)
     return (ips, visited)
 
-def run(mode:str, ip:str, time:int):
+def run_startup(mode:str, log:str, host:str, arg:str, time:int, app:int, out:str):
     # MOVE MOST OF CODE FROM MAIN INTO HERE
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    group1 = parser.add_mutually_exclusive_group(required=True)
-    group2 = parser.add_mutually_exclusive_group()
-    group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
-    group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
-    # TODO: move dictionary input to agent side
-    parser.add_argument("-d", "--dictionary", type=int, help="use specified dictionary mapping from interfaces to IPs")
-    group2.add_argument("-H", "--host", help="address for sniffer host")
-    group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
-    parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
-    parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
-    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), default=8, help="sniffing time for each component")
-    args = parser.parse_args()
     interfaces = {}
-    if args.dictionary is not None and args.IP is None:
-        parser.error("--dictionary requires --IP.")
-    # Temporary measure until flow detector module is implement to match IPs to interfaces
-    elif args.IP is not None and args.dictionary is None:
-        parser.error("--IP requires --dictionary.")
-    if args.dictionary is not None:
+    if mode == 'i':
         # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
         # use 'interfaces' dictionary to add ip of input interface to q and visited,
         # reverse-lookup interface from newly found ips to pass in to sniff()
-        interfaces = load_interfaces_dictionary(args.dictionary)
-
-    mode, arg = None, None
-    if args.IP is not None:
-        mode = "i"
-        arg = args.IP
-    elif args.file is not None:
-        mode = "f"
-        arg = args.file
-    log = args.log
+        interfaces = load_interfaces_dictionary(app)    
     
-    t = time.perf_counter()
-
+    log_orig = log
     if mode == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        # setup_client(mode, "temp-log.txt", args.host)
-        temp_log = os.path.join("logs", "temp-log.txt") #temp_log = "logs/temp-log.txt"
+        temp_log = os.path.join("logs", "temp-log.txt")
         log = os.path.join("logs", log)
     elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
-        #  setup_client(mode, log, args.host)
         log = os.path.join("logs", log)
-    # else: # using tcp (interface or log)
-    #     setup_client(mode, log, args.host)
-    setup_client(args.host)
+
+    setup_client(host)
     print("Connected")
-    
+    run_main(mode, interfaces, log_orig, log, temp_log, arg, time, out)
+
+def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, time:int, out:str):
+    t = time.perf_counter()
     f = FlowArray()
     if mode == "f": # reading from pcap file
-        sniff(mode, args.log, arg)
+        sniff(mode, log_orig, arg)
 
-        if args.test:
-            to_write = ""
-            response = recv_message_test()
-            while response is not None:
-                to_write += response
-                response = recv_message_test()
-            with open("logs/model_string.txt", "w") as ft:
-                ft.writelines(to_write)
+        # if args.test:
+        #     to_write = ""
+        #     response = recv_message_test()
+        #     while response is not None:
+        #         to_write += response
+        #         response = recv_message_test()
+        #     with open("logs/model_string.txt", "w") as ft:
+        #         ft.writelines(to_write)
 
         if log == "*":
             print("Waiting for flows from agent...")
-            response = recv_message()#sniffed_info_pb2.FlowArray)
+            response = recv_message()
             while response is not None:
                 f.flows.extend(response.flows)
-                response = recv_message()#sniffed_info_pb2.FlowArray)
+                response = recv_message()
             print("Received flows from agent")
             tg_start = time.perf_counter()
             generate_graph(f)
@@ -356,24 +323,24 @@ if __name__ == '__main__':
         q, visited, ips = [arg], [arg], []
         exists = False
 
-        open("logs/model_string.txt", "w").close()
+        #open("logs/model_string.txt", "w").close()
 
         if log == "*": # if using tcp
             l = FlowArray()            
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
+                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, time)#sniff(ip)
 
-                if args.test:
-                    to_write = ""
-                    response = recv_message_test()
-                    while response is not None:
-                        to_write += response
-                        response = recv_message_test()
-                    with open("logs/model_string.txt", "a") as ft:
-                        ft.writelines(to_write)
-                        ft.write("\n\n\nNext component\n")
+                # if args.test:
+                #     to_write = ""
+                #     response = recv_message_test()
+                #     while response is not None:
+                #         to_write += response
+                #         response = recv_message_test()
+                #     with open("logs/model_string.txt", "a") as ft:
+                #         ft.writelines(to_write)
+                #         ft.write("\n\n\nNext component\n")
 
                 print("Waiting for flows from agent...")
                 response = recv_message()#sniffed_info_pb2.FlowArray)
@@ -408,9 +375,9 @@ if __name__ == '__main__':
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, args.log, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
+                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, args.time)#sniff(ip)
                 print("Waiting for flows to be recorded by agent...")
-                recv_message()#None)
+                recv_message()
                 with open(log, "r") as l, open(temp_log, "r") as f:
                     print("Reading flows from file")
                     f.seek(0)
@@ -440,9 +407,62 @@ if __name__ == '__main__':
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
 
-    write_json_output(args.output)
+    write_json_output(out)
     endg_time=time.perf_counter()-tg_start
     total_time=total_time+endg_time
     #print("Controller time: {} seconds".format(round(total_time, 5)))
 
     print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
+
+def run_startup_parser():
+    parser = argparse.ArgumentParser()
+    group1 = parser.add_mutually_exclusive_group(required=True)
+    group2 = parser.add_mutually_exclusive_group()
+    group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
+    group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
+    # TODO: move dictionary input to agent side
+    parser.add_argument("-d", "--dictionary", type=int, help="use specified dictionary mapping from interfaces to IPs")
+    group2.add_argument("-H", "--host", help="address for sniffer host")
+    group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
+    parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
+    parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
+    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), default=8, help="sniffing time for each component")
+    args = parser.parse_args()
+    interfaces = {}
+    if args.dictionary is not None and args.IP is None:
+        parser.error("--dictionary requires --IP.")
+    # Temporary measure until flow detector module is implement to match IPs to interfaces
+    elif args.IP is not None and args.dictionary is None:
+        parser.error("--IP requires --dictionary.")
+    if args.dictionary is not None:
+        # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
+        # use 'interfaces' dictionary to add ip of input interface to q and visited,
+        # reverse-lookup interface from newly found ips to pass in to sniff()
+        interfaces = load_interfaces_dictionary(args.dictionary)
+
+    mode, arg = None, None
+    if args.IP is not None:
+        mode = "i"
+        arg = args.IP
+    elif args.file is not None:
+        mode = "f"
+        arg = args.file
+    log = args.log
+    
+    if mode == "i" and log != "*": # if sniffing interface and using log
+        # Sniffer will write to a temp log
+        # setup_client(mode, "temp-log.txt", args.host)
+        temp_log = os.path.join("logs", "temp-log.txt") #temp_log = "logs/temp-log.txt"
+        log = os.path.join("logs", log)
+    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
+        #  setup_client(mode, log, args.host)
+        log = os.path.join("logs", log)
+    # else: # using tcp (interface or log)
+    #     setup_client(mode, log, args.host)
+    setup_client(args.host)
+    print("Connected")
+    
+    run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
+
+# if __name__ == '__main__':
+#     run_startup_parser()

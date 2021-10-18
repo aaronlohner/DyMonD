@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request
-#import os.path as osp
+from controller import run_startup
 
-# dirname = osp.dirname(__file__)
-# html_path = osp.join(dirname, '..', 'web')
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
@@ -14,6 +12,7 @@ def index():
 def recv_client_inputs():
     mode = request.form['mode']
     log = request.form['log']
+    host = request.form['host']
     arg = None
     if mode == 'i':
         arg = request.form['ip']
@@ -22,9 +21,7 @@ def recv_client_inputs():
     time = request.form['time']
     app = request.form['app']
     out = request.form['out']
-
-    print(f'received {mode}, {log}, {arg}, {time}, {app}, {out}')
-    return render_template('index.html', arg=arg)
-
-    #PUT THIS BACK INTO INDEX.HTML
-    #http://bmj-cluster.cs.mcgill.ca:15490
+    
+    #render_template('index.html', arg=arg)
+    print(f'received {mode}, {log}, {host}, {arg}, {time}, {app}, {out}')
+    run_startup(mode, log, host, arg, time, app, out)
