@@ -276,6 +276,7 @@ def run_startup(mode:str, log:str, host:str, arg:str, time:int, app:int, out:str
         interfaces = load_interfaces_dictionary(app)    
     
     log_orig = log
+    temp_log = None
     if mode == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
         temp_log = os.path.join("logs", "temp-log.txt")
