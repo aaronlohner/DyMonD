@@ -9,7 +9,6 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 nodes = {}
 edges = {}
-total_time=0.0
 class node: #attributes of a node
     def __init__(self, ptype, pname, paddress, pPort, pcolor):
         self.type = ptype
@@ -289,6 +288,7 @@ def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, app:int, o
     run_main(mode, interfaces, log_orig, log, temp_log, arg, sniff_time, out)
 
 def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
+    total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
     if mode == "f": # reading from pcap file
