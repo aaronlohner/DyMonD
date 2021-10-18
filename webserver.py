@@ -25,3 +25,5 @@ def recv_client_inputs():
     #render_template('index.html', arg=arg)
     print(f'received {mode}, {log}, {host}, {arg}, {time}, {app}, {out}')
     run_startup(mode, log, host, arg, time, app, out)
+
+    return render_template('index.html', done='done')
