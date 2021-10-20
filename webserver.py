@@ -19,11 +19,10 @@ def recv_client_inputs():
     else:
         arg = request.form['file']
     time = request.form['time']
-    app = request.form['app']
     out = request.form['out']
     
     #render_template('index.html', arg=arg)
-    print(f'received {mode}, {log}, {host}, {arg}, {time}, {app}, {out}')
-    run_startup(mode, log, host, arg, time, app, out)
+    print(f'received {mode}, {log}, {host}, {arg}, {time}, {out}')
+    run_startup(mode, log, host, arg, time, out)
 
     return render_template('index.html', done='done')
