@@ -1,0 +1,34 @@
+YCSB
+veth21cc865 172.17.0.2
+veth144f13a 172.17.0.3
+veth028ea3d 172.17.0.4
+veth97390d7 172.17.0.5
+
+TeaStore
+br-962b0d768dd9 172.26.0.1
+veth6a7bb16 172.20.0.2 db //
+veth7943e16 172.20.0.7 image //
+veth69831a9 172.20.0.4 persistence //
+veth17a3316 172.20.0.8 webui //
+veth236c607 172.20.0.5 auth //
+veth829737a 172.20.0.3 registry //
+vethb711eef 172.20.0.9 generator //
+veth497cc6c 172.20.0.6 recommender //
+
+SockShop
+br-5b135f09be01 172.18.0.1 gateway
+veth5cf24f8 172.18.0.6 docker-compose_queue-master_1
+vetha736f3e 172.18.0.14 docker-compose_carts_1
+veth2a58a57 172.18.0.13 docker-compose_payment_1
+veth31fe6f5 172.18.0.2 docker-compose_orders-db_1
+vethfee9474 172.18.0.7 docker-compose_rabbitmq_1
+veth7a9fd93 172.18.0.12 docker-compose_catalogue_1
+veth2900592 172.18.0.3 docker-compose_catalogue-db_1
+veth0d2b104 172.18.0. docker-compose_edge-router_1 startingpoint
+veth381fbb0 172.18.0.15 docker-compose_front-end_1 startingpoint
+veth4175053 172.18.0.4 docker-compose_carts-db_1
+veth21f3636 172.18.0.11 docker-compose_orders_1
+veth170c6bf 172.18.0.5 docker-compose_user-db_1
+vethc3dd246 172.18.0.10 docker-compose_shipping_1
+veth8888dee 172.18.0.9 docker-compose_user_1
+veth07eb787 172.20.0.2 generator
