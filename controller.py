@@ -466,5 +466,5 @@ def run_startup_parser():
     
     run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
 
-# if __name__ == '__main__':
-#     run_startup_parser()
+if __name__ == '__main__':
+    run_startup_parser()

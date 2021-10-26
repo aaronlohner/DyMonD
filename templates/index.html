@@ -9,7 +9,7 @@
     <body>
         <h1>DyMonD Controller Interface</h1>
         <p>Enter the framework mode, the starting IP address and desired sniffing time per component:</p>
-        <form action="http://bmj-cluster.cs.mcgill.ca:15490/inputs" method="post"> <!--/inputs-->
+        <form action="http://bmj-cluster.cs.mcgill.ca:15490/inputs" method="post"> <!--inputs-->
             <div>
                 <b>Setup:</b>
                 <label for="file">Read from file</label>
@@ -24,6 +24,7 @@
                 <label for="tcp">TCP</label>
                 <input type="radio" id="tcp" name="log" value="*" checked>
             </div>
+            <!--
             <div>
                 <b>Agent host:</b>
                 <label for="node-02">node-02</label>
@@ -31,6 +32,7 @@
                 <label for="compute-04">compute-04</label>
                 <input type="radio" id="compute-04" name="host" value=10.0.1.54>
             </div>
+            -->
             <label for="ip">Starting IP address:</label>
             <input type="text" id="ip" name="ip" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"><br>
             <label for="ip">Time (seconds):</label>

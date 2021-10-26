@@ -12,7 +12,7 @@ def index():
 def recv_client_inputs():
     mode = request.form['mode']
     log = request.form['log']
-    host = request.form['host']
+    #host = request.form['host']
     arg = None
     if mode == 'i':
         arg = request.form['ip']
@@ -22,7 +22,7 @@ def recv_client_inputs():
     out = request.form['out']
     
     #render_template('index.html', arg=arg)
-    print(f'received {mode}, {log}, {host}, {arg}, {time}, {out}')
-    run_startup(mode, log, host, arg, time, out)
+    print(f'received {mode}, {log}, {arg}, {time}, {out}')
+    run_startup(mode, log, '10.0.1.22', arg, time, out) # specifies IP of node-02 for hosting agent
 
     return render_template('index.html', done='done')
