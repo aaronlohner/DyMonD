@@ -370,7 +370,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
                 q.extend(ips)
                 del f.flows[:]
                 #print("Num accumulated flows: {}".format(len(l.flows)))
-            stop_client()
+            #stop_client()
             tg_start = time.perf_counter()
             generate_graph(l)
         else: # if using log
@@ -406,7 +406,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
                 q.extend(ips)
                 #print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
-            stop_client()
+            #stop_client()
             os.remove(temp_log)
             tg_start = time.perf_counter()
             generate_graph_from_file(log)

@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request
+import os.path as osp
+import json
 import requests
+from flask import Flask, render_template, request
 from controller import run_startup
 
 app = Flask(__name__)
@@ -25,8 +27,9 @@ def recv_client_inputs():
                'out':request.form['out']}
     r = requests.get('http://bmj-cluster.cs.mcgill.ca:13680/run', params=payload)
     
-    print(r.json())
-    #render_template('index.html', arg=arg)
+    json_str = json.dumps(r.json(), indent = 4)
+    with open(osp.join("json", request.form['out']), "w") as output:
+        output.write(json_str)
 
     return render_template('index.html', done='done')
 
