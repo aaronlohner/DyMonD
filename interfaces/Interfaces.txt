@@ -6,14 +6,15 @@ veth97390d7 172.17.0.5
 
 TeaStore
 br-962b0d768dd9 172.26.0.1
-veth15209a7 172.20.0.8 db
-vethbb7c0b1 172.20.0.7 image
-veth739859f 172.17.0.5 persistence
-vethe7cfd01 172.17.0.3 webui
-vethd2b7b36 172.17.0.4 auth
-veth3ec2496 172.17.0.2 registry
+veth5fad4c0 172.20.0.3 registry //
+veth66fbcd8 172.20.0.4 webui startpoint
+vethf737066 172.20.0.5 auth
+vethf25e6f2 172.20.0.6 persistence
+veth6ab97d1 172.20.0.7 recommender
+vethc1b6475 172.20.0.8 image
+vetha288031 172.20.0.9 db
 veth342681d 172.20.0.2 generator
-vethafbfcac 172.17.0.6 recommender
+
 
 SockShop
 br-5b135f09be01 172.18.0.1 gateway
