@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from flask.helpers import make_response
 import requests
 from controller import run_startup
 

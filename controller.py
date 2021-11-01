@@ -212,9 +212,9 @@ def write_json_output(fname:str):
                 propAtt["label"] += "RST: " + edges[key].RST
             else:
                 propAtt["label"] += "C: " + str(edges[key].C)
-    json_obj = json.dumps(json_dict, indent = 4)
+    json_str = json.dumps(json_dict, indent = 4)
     with open("json/" + fname, "w") as output:
-        output.write(json_obj)
+        output.write(json_str)
 
     return json_dict
 
@@ -288,7 +288,7 @@ def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):
 
     setup_client(host)
     print("Connected")
-    run_main(mode, interfaces, log_orig, log, temp_log, arg, sniff_time, out)
+    return run_main(mode, interfaces, log_orig, log, temp_log, arg, sniff_time, out)
 
 def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
     total_time=0.0
@@ -468,7 +468,7 @@ def run_startup_parser():
     setup_client(args.host)
     print("Connected")
     
-    return run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
+    run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
 
 if __name__ == '__main__':
     run_startup_parser()
