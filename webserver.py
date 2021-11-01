@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request
+from flask.helpers import make_response
+import requests
 from controller import run_startup
 
 app = Flask(__name__)
@@ -11,18 +13,27 @@ def index():
 @app.route("/inputs", methods=['POST'])
 def recv_client_inputs():
     mode = request.form['mode']
-    log = request.form['log']
-    #host = request.form['host']
     arg = None
     if mode == 'i':
         arg = request.form['ip']
     else:
         arg = request.form['file']
-    time = request.form['time']
-    out = request.form['out']
+    payload = {'mode':mode,
+               'log':request.form['log'],
+               'host':'10.0.1.22', # specifies IP of node-02 for hosting agent
+               'arg':arg,
+               'time':request.form['time'],
+               'out':request.form['out']}
+    r = requests.get('http://bmj-cluster.cs.mcgill.ca:13680/run', params=payload)
     
+    print(r.json())
     #render_template('index.html', arg=arg)
-    print(f'received {mode}, {log}, {arg}, {time}, {out}')
-    run_startup(mode, log, '10.0.1.22', arg, time, out) # specifies IP of node-02 for hosting agent
 
     return render_template('index.html', done='done')
+
+@app.route("/run", methods=['GET'])
+def run():
+    print('recieved: {}'.format(request.args))
+    json_obj = run_startup(**request.args)
+    #run_startup(mode, log, '10.0.1.22', arg, time, out)
+    return json_obj

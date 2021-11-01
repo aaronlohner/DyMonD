@@ -216,6 +216,8 @@ def write_json_output(fname:str):
     with open("json/" + fname, "w") as output:
         output.write(json_obj)
 
+    return json_obj
+
 def load_interfaces_dictionary() -> Dict[str, str]:
     interfaces = {}
     with open("interfaces/Interfaces.txt", "r") as f:
@@ -409,12 +411,13 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
 
-    write_json_output(out)
+    #write_json_output(out)
     endg_time=time.perf_counter()-tg_start
     total_time=total_time+endg_time
     #print("Controller time: {} seconds".format(round(total_time, 5)))
 
     print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
+    return write_json_output(out)
 
 def run_startup_parser():
     parser = argparse.ArgumentParser()
@@ -465,7 +468,7 @@ def run_startup_parser():
     setup_client(args.host)
     print("Connected")
     
-    run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
+    return run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
 
 if __name__ == '__main__':
     run_startup_parser()
