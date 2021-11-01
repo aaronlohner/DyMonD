@@ -23,6 +23,6 @@ def recv_client_inputs():
     
     #render_template('index.html', arg=arg)
     print(f'received {mode}, {log}, {arg}, {time}, {out}')
-    run_startup(mode, log, '10.0.1.36', arg, time, out) # specifies IP of node-02 for hosting agent
+    run_startup(mode, log, '10.0.1.22', arg, time, out) # specifies IP of node-02 for hosting agent
 
     return render_template('index.html', done='done')
