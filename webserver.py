@@ -33,8 +33,7 @@ def recv_client_inputs():
 
 @app.route("/run", methods=['GET'])
 def run():
-    print('recieved: {}'.format(request.args))
-    mode, log, host, arg, time, out = request.args.keys()
+    mode, log, host, arg, time, out = request.args.values()
     time = int(time)
     json_obj = run_startup(mode, log, host, arg, time, out)
     return json_obj

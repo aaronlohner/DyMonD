@@ -216,7 +216,7 @@ def write_json_output(fname:str):
     with open("json/" + fname, "w") as output:
         output.write(json_obj)
 
-    return json_obj
+    return json_dict
 
 def load_interfaces_dictionary() -> Dict[str, str]:
     interfaces = {}
