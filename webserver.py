@@ -11,6 +11,7 @@ app.config["DEBUG"] = True
 def index():
     return redirect(url_for('inputs'))
 
+# UI webserver
 @app.route("/inputs", methods=['GET', 'POST'])
 def inputs():
     if request.method == 'GET':
@@ -36,6 +37,7 @@ def inputs():
 
         return render_template('index.html', done='done')
 
+# Controller webserver
 @app.route("/run", methods=['GET'])
 def run():
     mode, log, host, arg, time, out = request.args.values()

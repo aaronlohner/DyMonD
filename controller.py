@@ -3,12 +3,14 @@ import argparse
 import time
 import random
 import json
+import os.path as osp
 from typing import Dict, Tuple, List
 from client import setup_client, stop_client, recv_message, recv_message_test, sniff
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 nodes = {}
 edges = {}
+
 class node: #attributes of a node
     def __init__(self, ptype, pname, paddress, pPort, pcolor):
         self.type = ptype
@@ -40,6 +42,10 @@ class edge: #attributes of an edge
         else:
             return False
         
+def reset_global_vars():
+    global nodes; global edges
+    nodes.clear(); edges.clear()
+
 def randomColor(): #generate random light colors
     return "#"+''.join([(str)(hex(random.randint(80,255))).split("x")[1], (str)(hex(random.randint(80,255))).split("x")[1], (str)(hex(random.randint(80,255))).split("x")[1]])
 
@@ -212,11 +218,13 @@ def write_json_output(fname:str):
                 propAtt["label"] += "RST: " + edges[key].RST
             else:
                 propAtt["label"] += "C: " + str(edges[key].C)
-    json_str = json.dumps(json_dict, indent = 4)
-    with open("json/" + fname, "w") as output:
-        output.write(json_str)
-    # with open("json/" + fname, "w") as f:
-    #     json.dump(json_dict, f)
+
+    reset_global_vars()
+    #json_str = json.dumps(json_dict, indent = 4)
+    # with open("json/" + fname, "w") as output:
+    #     output.write(json_str)
+    with open(osp.join("json", fname), "w") as f:
+        json.dump(json_dict, f, indent=4)
 
     return json_dict
 
