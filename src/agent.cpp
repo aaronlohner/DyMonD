@@ -28,7 +28,7 @@ queue<raw_pkt*> Que;
 int enq=0;
 int deq=0;
 std::ofstream file;
-char* interface = NULL;
+char[32] interface = NULL;
 char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
@@ -534,7 +534,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
             if(mode_buf[0] == 'i'){
                 printf("Monitoring request received\n");
                 LiveMode=true;
-                strncpy(interface, ip_map[arg].c_str(), ip_map[arg].size()+1);
+                strncpy(interface, ip_map[arg].c_str(), 32);
                 flowarray.clear();
             } else {
                 LiveMode=false;
