@@ -28,7 +28,7 @@ queue<raw_pkt*> Que;
 int enq=0;
 int deq=0;
 std::ofstream file;
-char[32] interface = NULL;
+char[] interface[32];
 char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
@@ -421,6 +421,7 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
+    interface[0] = '\0';
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -468,7 +469,7 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 } else duration = atof(optarg);
                 break;
                         case 'i':
-                                interface = optarg; break;
+                                strcpy(interface, optarg); break;
                         case 'p':
                                 ipaddress = optarg; break;
                         case 'f':
@@ -516,7 +517,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
 } else { // Standalone mode
     log[0] = '\0';
 }
- if (interface != NULL)
+ if (interface[0] != '\0')
     LiveMode=true;
     
     while(sniff_more){
