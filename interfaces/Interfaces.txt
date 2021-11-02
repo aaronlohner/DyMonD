@@ -32,4 +32,3 @@ veth07aaac1 172.18.0.7 docker-compose_orders_1 //
 veth5ca58c7 172.18.0.6 docker-compose_user-db_1 //
 veth6fd49f1 172.18.0.10 docker-compose_shipping_1 //
 veth8888dee 172.18.0.9 docker-compose_user_1
-veth342681d 172.20.0.2 generator
