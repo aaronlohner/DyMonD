@@ -76,18 +76,18 @@ def setup_client(host): #setup_client(mode:str, log:str, host):
             s.connect((host, PORT))
         connected = True
 
-def sniff(mode:str, log:str, arg:str, ip=None, time:int=None): #sniff(arg:str, ip=None):
+def sniff(mode:str, log:str, arg:str, time:int=None): #sniff(arg:str, ip=None):
     sleep(0.2)
-    if ip is None: # arg holds capture file name
+    if mode == 'f': # arg holds capture file name
         print("Requesting agent to sniff capture file {}".format(arg))
     else: # arg holds network interface of ip
-        print("Requesting agent to sniff on IP address {}".format(ip))
+        print("Requesting agent to sniff on IP address {}".format(arg))
     send_message(mode)
     sleep(0.2)
     send_message(log)
     sleep(0.2)
     send_message(arg)
-    if ip is not None:
+    if mode == 'i':
         sleep(0.2)
         send_message(str(time))
     

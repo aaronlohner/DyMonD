@@ -220,23 +220,20 @@ def write_json_output(fname:str):
                 propAtt["label"] += "C: " + str(edges[key].C)
 
     reset_global_vars()
-    #json_str = json.dumps(json_dict, indent = 4)
-    # with open("json/" + fname, "w") as output:
-    #     output.write(json_str)
     with open(osp.join("json", fname), "w") as f:
         json.dump(json_dict, f, indent=4)
 
     return json_dict
 
-def load_interfaces_dictionary() -> Dict[str, str]:
-    interfaces = {}
-    with open("interfaces/Interfaces.txt", "r") as f:
-        for line in f:
-            # this technique for splitting works even for lines with more than two whitespace-separated parts
-            split_line = line.split()
-            if len(split_line) > 1:
-                interfaces[split_line[0]] = split_line[1]
-    return interfaces
+# def load_interfaces_dictionary() -> Dict[str, str]:
+#     interfaces = {}
+#     with open("interfaces/Interfaces.txt", "r") as f:
+#         for line in f:
+#             # this technique for splitting works even for lines with more than two whitespace-separated parts
+#             split_line = line.split()
+#             if len(split_line) > 1:
+#                 interfaces[split_line[0]] = split_line[1]
+#     return interfaces
 
 def render_readable(num:int) -> str:
     if num < 10000:
@@ -259,13 +256,13 @@ def equal_flows(new_flow:Flow, flow:Flow) -> bool:
             return True
     return False
 
-def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_ips:List[str]) -> Tuple[List[str], List[str]]:
+def next_hop_extractor(new_flows_container, ip:str, visited:List[str], blacklisted_ips:List[str]=[]) -> Tuple[List[str], List[str]]:
     ips = []
     if type(new_flows_container) is not str:
         for flow in new_flows_container.flows:
             if flow.s_addr == ip:
                 new_ip = flow.d_addr
-                if new_ip not in visited and new_ip in possible_ips:
+                if new_ip not in visited and new_ip not in blacklisted_ips:
                     ips.append(new_ip)
                     visited.append(new_ip)
     else:
@@ -273,19 +270,18 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], possible_
             for line in f:
                 if line.split(':')[0] == ip: # if flow has current ip as saddr
                     new_ip = line.split(' ')[1].split(':')[0]
-                    if new_ip not in visited and new_ip in possible_ips:
+                    if new_ip not in visited and new_ip not in blacklisted_ips:
                         ips.append(new_ip)
                         visited.append(new_ip)
     return (ips, visited)
 
 def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):
-    # MOVE MOST OF CODE FROM MAIN INTO HERE
-    interfaces = {}
-    if mode == 'i':
-        # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
-        # use 'interfaces' dictionary to add ip of input interface to q and visited,
-        # reverse-lookup interface from newly found ips to pass in to sniff()
-        interfaces = load_interfaces_dictionary()    
+    # interfaces = {}
+    # if mode == 'i':
+    #     # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
+    #     # use 'interfaces' dictionary to add ip of input interface to q and visited,
+    #     # reverse-lookup interface from newly found ips to pass in to sniff()
+    #     interfaces = load_interfaces_dictionary()    
     
     log_orig = log
     temp_log = None
@@ -298,9 +294,9 @@ def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):
 
     setup_client(host)
     print("Connected")
-    return run_main(mode, interfaces, log_orig, log, temp_log, arg, sniff_time, out)
+    return run_main(mode, log_orig, log, temp_log, arg, sniff_time, out)
 
-def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
+def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
@@ -344,7 +340,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, sniff_time)#sniff(ip)
+                sniff(mode, log_orig, ip, sniff_time)
 
                 # if args.test:
                 #     to_write = ""
@@ -374,7 +370,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
                         if not exists:
                             l.flows.append(new_flow)
                 t1_start = time.perf_counter()
-                ips, visited = next_hop_extractor(f, ip, visited, list(interfaces.values()))
+                ips, visited = next_hop_extractor(f, ip, visited) # can also specify ips to omit (on blacklist)
                 end_time=time.perf_counter()-t1_start
                 total_time=total_time+end_time
                 q.extend(ips)
@@ -389,7 +385,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
-                sniff(mode, log_orig, list(interfaces.keys())[list(interfaces.values()).index(ip)], ip, sniff_time)#sniff(ip)
+                sniff(mode, log_orig, ip, sniff_time)
                 print("Waiting for flows to be recorded by agent...")
                 recv_message()
                 with open(log, "r") as l, open(temp_log, "r") as f:
@@ -410,7 +406,7 @@ def run_main(mode:str, interfaces, log_orig:str, log:str, temp_log:str, arg:str,
                 with open(log, "a") as l:
                     l.writelines(lines_to_write)
                 t1_start = time.perf_counter()
-                ips, visited = next_hop_extractor(temp_log, ip, visited, list(interfaces.values()))
+                ips, visited = next_hop_extractor(temp_log, ip, visited) # can also specify ips to omit (on blacklist)
                 end_time=time.perf_counter()-t1_start
                 total_time=total_time+end_time
                 q.extend(ips)
@@ -454,7 +450,7 @@ def run_startup_parser():
     #     # use 'interfaces' dictionary to add ip of input interface to q and visited,
     #     # reverse-lookup interface from newly found ips to pass in to sniff()
     #     interfaces = load_interfaces_dictionary(args.dictionary)
-    interfaces = load_interfaces_dictionary()
+    #interfaces = load_interfaces_dictionary()
 
     mode, arg = None, None
     if args.IP is not None:
@@ -478,7 +474,7 @@ def run_startup_parser():
     setup_client(args.host)
     print("Connected")
     
-    run_main(mode, interfaces, args.log, log, temp_log, arg, args.time, args.output)
+    run_main(mode, args.log, log, temp_log, arg, args.time, args.output)
 
 if __name__ == '__main__':
     run_startup_parser()

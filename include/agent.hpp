@@ -18,6 +18,7 @@
 #include <pcap/pcap.h>
 #include <limits>
 #include <stdint.h>
+#include <map>
 
 using namespace std;
 using namespace boost::filesystem;

@@ -479,6 +479,7 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
 char mode_buf[64], log[64], arg[64], time[64];
 bool sniff_more = true;
 string capture_dir; // = "captures/"'
+map<string, string> ip_map;
 if(argc == 1 || strstr(argv[1], "-t") != NULL){
     standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
@@ -496,6 +497,20 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     //             case 'f':
     //                     tracefile = (char*)capture_dir.c_str(); break;
     //         }
+
+    if(mode_buf[0] == 'i'){
+        ifstream inFile("interfaces/Interfaces.csv", ios::in);
+        string lineStr;
+        while (getline(inFile, lineStr))
+        {
+            // Interface is VALUE, IP is KEY
+            int index = lineStr.find(" ");
+            string interface_val = lineStr.substr(0, index);
+            string ip_address_key = lineStr.substr(index+1, lineStr.size()-1);
+            ip_map[ip_address_key] = interface_val;
+        }
+    }
+
 
     // This is for logging the flows sent over tcp for debugging purposes
     FP.open(log_str, std::ios_base::out);
@@ -521,7 +536,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
             if(mode_buf[0] == 'i'){
                 printf("Monitoring request received\n");
                 LiveMode=true;
-                interface = arg;
+                interface = ip_map[arg];
                 flowarray.clear();
             } else {
                 LiveMode=false;
@@ -915,7 +930,7 @@ std::string label=GetMSLabel(services[j]->URLS);
 
 }
 /*********************validate label***********************/ 
-         // performance metrics clacualation   
+         // performance metrics calculation   
      printf("Collecting performance figures\n");
      int counter = 0;
      double diff, RST;
