@@ -498,17 +498,15 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     //                     tracefile = (char*)capture_dir.c_str(); break;
     //         }
 
-    if(mode_buf[0] == 'i'){
-        ifstream inFile("interfaces/Interfaces.csv", ios::in);
-        string lineStr;
-        while (getline(inFile, lineStr))
-        {
-            // Interface is VALUE, IP is KEY
-            int index = lineStr.find(" ");
-            string interface_val = lineStr.substr(0, index);
-            string ip_address_key = lineStr.substr(index+1, lineStr.size()-1);
-            ip_map[ip_address_key] = interface_val;
-        }
+    ifstream inFile("interfaces/Interfaces.csv", ios::in);
+    string lineStr;
+    while (getline(inFile, lineStr))
+    {
+        // Interface is VALUE, IP is KEY
+        int index = lineStr.find(" ");
+        string interface_val = lineStr.substr(0, index);
+        string ip_address_key = lineStr.substr(index+1, lineStr.size()-1);
+        ip_map[ip_address_key] = interface_val;
     }
 
 
@@ -536,9 +534,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
             if(mode_buf[0] == 'i'){
                 printf("Monitoring request received\n");
                 LiveMode=true;
-                char *cstr = new char[ip_map[arg].length()+1];
                 strcpy(interface, ip_map[arg].c_str());
-                delete [] cstr;
                 flowarray.clear();
             } else {
                 LiveMode=false;
