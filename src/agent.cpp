@@ -28,7 +28,7 @@ queue<raw_pkt*> Que;
 int enq=0;
 int deq=0;
 std::ofstream file;
-char[] interface[32];
+char interface[32];
 char* ipaddress = NULL;
 char* tracefile = NULL; 
 bool LiveMode=false;
@@ -366,7 +366,7 @@ capture_main(void*) {
     if (!LiveMode)
     {    printf("Processing the network trace file...\n");cap = pcap_open_offline(tracefile, errbuf);}
     else
-   { printf("Starting to sniff...\n"); cap = pcap_open_live(interface, 65535, 1, 1000, errbuf);}  
+   { printf("Starting to sniff...\n"); cap = pcap_open_live(interface.c_str(), 65535, 1, 1000, errbuf);}  
         
          if (cap == NULL) {
         printf("errbuf: ");
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
-    interface[0] = '\0';
+    //interface[0] = '\0';
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -517,8 +517,8 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
 } else { // Standalone mode
     log[0] = '\0';
 }
- if (interface[0] != '\0')
-    LiveMode=true;
+//  if (interface[0] != '\0')
+//     LiveMode=true;
     
     while(sniff_more){
         receive_message(mode_buf, false); // receive indication if using interface or reading from file
@@ -536,6 +536,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
                 printf("Monitoring request received\n");
                 LiveMode=true;
                 strncpy(interface, ip_map[arg].c_str(), 32);
+                printf("%s\n", interface);
                 flowarray.clear();
             } else {
                 LiveMode=false;
