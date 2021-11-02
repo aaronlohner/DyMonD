@@ -6,6 +6,7 @@ from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 9080         # The port used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+connected = False
 
 def send_message(mesg:str) -> None:
     """Send a message though the TCP socket."""
@@ -65,15 +66,15 @@ def recv_message_test() -> str:
     return data
 
 def setup_client(host): #setup_client(mode:str, log:str, host):
-    print("Setting up connection with agent...")
-    if host is None:
-        s.connect((HOST, PORT))
-    else:
-        print("Attempting to connect to agent on host address " + host)
-        s.connect((host, PORT))
-    # send_message(mode)
-    # sleep(0.2)
-    # send_message(log)
+    global connected
+    if not connected:
+        print("Setting up connection with agent...")
+        if host is None:
+            s.connect((HOST, PORT))
+        else:
+            print("Attempting to connect to agent on host address " + host)
+            s.connect((host, PORT))
+        connected = True
 
 def sniff(mode:str, log:str, arg:str, ip=None, time:int=None): #sniff(arg:str, ip=None):
     sleep(0.2)

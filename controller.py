@@ -215,6 +215,8 @@ def write_json_output(fname:str):
     json_str = json.dumps(json_dict, indent = 4)
     with open("json/" + fname, "w") as output:
         output.write(json_str)
+    # with open("json/" + fname, "w") as f:
+    #     json.dump(json_dict, f)
 
     return json_dict
 
