@@ -366,7 +366,10 @@ capture_main(void*) {
     if (!LiveMode)
     {    printf("Processing the network trace file...\n");cap = pcap_open_offline(tracefile, errbuf);}
     else
-   { printf("Starting to sniff...\n"); cap = pcap_open_live(interface, 65535, 1, 1000, errbuf);}  
+   { 
+       char *interface_pcap = interface;
+       printf("Starting to sniff...\n"); cap = pcap_open_live(interface_pcap, 65535, 1, 1000, errbuf);
+       }  
         
          if (cap == NULL) {
         printf("errbuf: ");
