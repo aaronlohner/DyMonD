@@ -1,18 +1,18 @@
 import os.path as osp
 import json
 import requests
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from controller import run_startup
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-# @app.route("/")
-# def index():
-#     return render_template('index.html')
+@app.route("/")
+def index():
+    return redirect(url_for('inputs'))
 
 @app.route("/inputs", methods=['GET', 'POST'])
-def recv_client_inputs():
+def inputs():
     if request.method == 'GET':
         return render_template('index.html')
     elif request.method == 'POST':
