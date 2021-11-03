@@ -13,7 +13,7 @@ vethf25e6f2 172.20.0.6 persistence
 veth6ab97d1 172.20.0.7 recommender
 vethc1b6475 172.20.0.8 image
 vetha288031 172.20.0.9 db
-veth360180f 172.20.0.2 generator
+veth57f4f06 172.20.0.2 generator
 
 
 SockShop
