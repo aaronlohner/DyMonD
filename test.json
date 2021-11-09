@@ -1,0 +1,364 @@
+{
+    "class": [
+        {
+            "id": "0",
+            "type": "owl:equivalentClass"
+        },
+        {
+            "id": "1",
+            "type": "owl:Class"
+        },
+        {
+            "id": "2",
+            "type": "owl:equivalentClass"
+        },
+        {
+            "id": "3",
+            "type": "owl:Class"
+        },
+        {
+            "id": "4",
+            "type": "owl:Class"
+        },
+        {
+            "id": "5",
+            "type": "owl:equivalentClass"
+        },
+        {
+            "id": "6",
+            "type": "owl:Class"
+        },
+        {
+            "id": "7",
+            "type": "owl:equivalentClass"
+        },
+        {
+            "id": "8",
+            "type": "owl:equivalentClass"
+        },
+        {
+            "id": "9",
+            "type": "owl:Class"
+        },
+        {
+            "id": "10",
+            "type": "owl:equivalentClass"
+        }
+    ],
+    "classAttribute": [
+        {
+            "attributes": [
+                "#d4a177"
+            ],
+            "comment": {
+                "undefined": "172.20.0.9, Port: 3306"
+            },
+            "id": "0",
+            "label": "MYSQL"
+        },
+        {
+            "attributes": [
+                "#d4aaf9"
+            ],
+            "comment": {
+                "undefined": "172.20.0.6, Port: 48748"
+            },
+            "id": "1",
+            "label": "Client"
+        },
+        {
+            "attributes": [
+                "#d1ccab"
+            ],
+            "comment": {
+                "undefined": "172.20.0.4, Port: 8080"
+            },
+            "id": "2",
+            "label": "HTTP/webuistence/products"
+        },
+        {
+            "attributes": [
+                "#7ca8bd"
+            ],
+            "comment": {
+                "undefined": "172.20.0.2, Port: 42974"
+            },
+            "id": "3",
+            "label": "Client"
+        },
+        {
+            "attributes": [
+                "#d1ccab"
+            ],
+            "comment": {
+                "undefined": "172.20.0.4, Port: 55434"
+            },
+            "id": "4",
+            "label": "Client"
+        },
+        {
+            "attributes": [
+                "#dbde98"
+            ],
+            "comment": {
+                "undefined": "172.20.0.5, Port: 8080"
+            },
+            "id": "5",
+            "label": "HTTP/auth/useractionsucts"
+        },
+        {
+            "attributes": [
+                "#b1e4a9"
+            ],
+            "comment": {
+                "undefined": "172.20.0.7, Port: 8080"
+            },
+            "id": "6",
+            "label": "Client"
+        },
+        {
+            "attributes": [
+                "#668563"
+            ],
+            "comment": {
+                "undefined": "172.20.0.8, Port: 8080"
+            },
+            "id": "7",
+            "label": "HTTP/imageuseractionsucts"
+        },
+        {
+            "attributes": [
+                "#d4aaf9"
+            ],
+            "comment": {
+                "undefined": "172.20.0.6, Port: 8080"
+            },
+            "id": "8",
+            "label": "HTTP/persistence/products"
+        },
+        {
+            "attributes": [
+                "#dbde98"
+            ],
+            "comment": {
+                "undefined": "172.20.0.5, Port: 58508"
+            },
+            "id": "9",
+            "label": "Client"
+        },
+        {
+            "attributes": [
+                "#b1e4a9"
+            ],
+            "comment": {
+                "undefined": "172.20.0.7, Port: 8080"
+            },
+            "id": "10",
+            "label": "HTTP/recommendertionsucts"
+        }
+    ],
+    "property": [
+        {
+            "id": "0",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "1",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "2",
+            "type": "owl:DatatypeProperty"
+        },
+        {
+            "id": "3",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "4",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "5",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "6",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "7",
+            "type": "owl:DatatypeProperty"
+        },
+        {
+            "id": "8",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "9",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "10",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "11",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "12",
+            "type": "owl:DatatypeProperty"
+        },
+        {
+            "id": "13",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "14",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "15",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "16",
+            "type": "owl:DatatypeProperty"
+        },
+        {
+            "id": "17",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "18",
+            "type": "owl:ObjectProperty"
+        },
+        {
+            "id": "19",
+            "type": "owl:ObjectProperty"
+        }
+    ],
+    "propertyAttribute": [
+        {
+            "domain": "0",
+            "id": "0",
+            "label": "TH: 36.9K, RST: 0.03",
+            "range": "1"
+        },
+        {
+            "domain": "2",
+            "id": "1",
+            "label": "TH: 2.6M, RST: 0.011",
+            "range": "3"
+        },
+        {
+            "domain": "4",
+            "id": "2",
+            "label": "same address",
+            "range": "2"
+        },
+        {
+            "domain": "4",
+            "id": "3",
+            "label": "TH: 67.7K, C: 27",
+            "range": "5"
+        },
+        {
+            "domain": "2",
+            "id": "4",
+            "label": "TH: 3200, RST: 0.051",
+            "range": "6"
+        },
+        {
+            "domain": "4",
+            "id": "5",
+            "label": "TH: 23.4K, C: 16",
+            "range": "7"
+        },
+        {
+            "domain": "7",
+            "id": "6",
+            "label": "TH: 1.6M, RST: 0.008",
+            "range": "4"
+        },
+        {
+            "domain": "1",
+            "id": "7",
+            "label": "same address",
+            "range": "8"
+        },
+        {
+            "domain": "4",
+            "id": "8",
+            "label": "TH: 47.3K, C: 46",
+            "range": "8"
+        },
+        {
+            "domain": "8",
+            "id": "9",
+            "label": "TH: 78.4K, RST: 0.022",
+            "range": "4"
+        },
+        {
+            "domain": "3",
+            "id": "10",
+            "label": "TH: 28.0K, C: 12",
+            "range": "2"
+        },
+        {
+            "domain": "5",
+            "id": "11",
+            "label": "TH: 29.2K, RST: 0.019",
+            "range": "4"
+        },
+        {
+            "domain": "9",
+            "id": "12",
+            "label": "same address",
+            "range": "5"
+        },
+        {
+            "domain": "9",
+            "id": "13",
+            "label": "TH: 2298, C: 2",
+            "range": "8"
+        },
+        {
+            "domain": "8",
+            "id": "14",
+            "label": "TH: 1786, RST: 0.135",
+            "range": "9"
+        },
+        {
+            "domain": "6",
+            "id": "15",
+            "label": "TH: 551, C: 1",
+            "range": "2"
+        },
+        {
+            "domain": "6",
+            "id": "16",
+            "label": "same address",
+            "range": "10"
+        },
+        {
+            "domain": "4",
+            "id": "17",
+            "label": "TH: 6441, C: 4",
+            "range": "10"
+        },
+        {
+            "domain": "10",
+            "id": "18",
+            "label": "TH: 2208, RST: 0.027",
+            "range": "4"
+        },
+        {
+            "domain": "1",
+            "id": "19",
+            "label": "TH: 3537, C: 2",
+            "range": "0"
+        }
+    ]
+}
