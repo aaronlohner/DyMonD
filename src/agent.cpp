@@ -539,7 +539,6 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
                 printf("Monitoring request received\n");
                 LiveMode=true;
                 strncpy(interface, ip_map[arg].c_str(), 32);
-                printf("%s\n", interface);
                 flowarray.clear();
             } else {
                 LiveMode=false;

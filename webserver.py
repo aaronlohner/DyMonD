@@ -1,4 +1,5 @@
 import os.path as osp
+import webbrowser
 import json
 import requests
 from flask import Flask, render_template, request, redirect, url_for
@@ -6,6 +7,7 @@ from controller import run_startup
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
+chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
 
 @app.route("/")
 def index():
@@ -24,18 +26,18 @@ def inputs():
         else:
             arg = request.form['file']
         payload = {'mode':mode,
-                'log':request.form['log'],
+                'log': '*', #request.form['log'],
                 'host':'10.0.1.22', # specifies IP of node-02 for hosting agent
                 'arg':arg,
                 'time':request.form['time'],
                 'out':request.form['out']}
         r = requests.get('http://bmj-cluster.cs.mcgill.ca:13680/run', params=payload)
-        
+        import time; time.sleep(2)
         json_str = json.dumps(r.json(), indent = 4)
         with open(osp.join("json", request.form['out']), "w") as output:
             output.write(json_str)
-
-        return render_template('index.html', done='done')
+        webbrowser.get(chrome_path).open("file://"+ osp.realpath(osp.join("webvowl1.1.7SE", "index.html")), new=2)
+        return render_template('index.html', completed="Sniffing completed.")
 
 # Controller webserver
 @app.route("/run", methods=['GET'])

@@ -220,20 +220,10 @@ def write_json_output(fname:str):
                 propAtt["label"] += "C: " + str(edges[key].C)
 
     reset_global_vars()
-    with open(osp.join("json", fname), "w") as f:
-        json.dump(json_dict, f, indent=4)
+    # with open(osp.join("json", fname), "w") as f:
+    #     json.dump(json_dict, f, indent=4)
 
     return json_dict
-
-# def load_interfaces_dictionary() -> Dict[str, str]:
-#     interfaces = {}
-#     with open("interfaces/Interfaces.txt", "r") as f:
-#         for line in f:
-#             # this technique for splitting works even for lines with more than two whitespace-separated parts
-#             split_line = line.split()
-#             if len(split_line) > 1:
-#                 interfaces[split_line[0]] = split_line[1]
-#     return interfaces
 
 def render_readable(num:int) -> str:
     if num < 10000:
@@ -275,13 +265,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], blacklist
                         visited.append(new_ip)
     return (ips, visited)
 
-def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):
-    # interfaces = {}
-    # if mode == 'i':
-    #     # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
-    #     # use 'interfaces' dictionary to add ip of input interface to q and visited,
-    #     # reverse-lookup interface from newly found ips to pass in to sniff()
-    #     interfaces = load_interfaces_dictionary()    
+def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str): 
     
     log_orig = log
     temp_log = None

@@ -55,7 +55,7 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     return msg
 
 def recv_message_test() -> str:
-    sleep(0.01) # -- MAY NEED TO MODIFY IF EXPERIENCING DECODE ERRORS
+    #sleep(0.01) # -- MAY NEED TO MODIFY IF EXPERIENCING DECODE ERRORS
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
     size = s.recv(4)
