@@ -424,6 +424,7 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
+    char *input_ip;
     bool cmd_mode = false;
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
@@ -472,7 +473,7 @@ while((opt = getopt(argc, argv, "t:i:f:p:c")) != -1){
                 } else duration = atof(optarg);
                 break;
             case 'i':
-                    strcpy(interface, optarg); break; // later converted from ip to interface
+                    input_ip = optarg; break;
             case 'p':
                     ipaddress = optarg; break;
             case 'f':
@@ -528,8 +529,9 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
             sniff_more = false;
             if (interface[0] != '\0') {
                 LiveMode=true;
-                strncpy(interface, ip_map[interface].c_str(), 32);
-                printf("interface: %s", interface);
+                printf("input_ip: %s\n", input_ip);
+                strncpy(interface, ip_map[input_ip].c_str(), 32);
+                printf("interface: %s\n", interface);
             }
         } else {
             receive_message(mode_buf, false); // receive indication if using interface or reading from file
