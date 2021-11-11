@@ -527,7 +527,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     while(sniff_more){
         if(standalone){
             sniff_more = false;
-            if (interface[0] != '\0') {
+            if (input_ip != NULL) {
                 LiveMode=true;
                 printf("input_ip: %s\n", input_ip);
                 strncpy(interface, ip_map[input_ip].c_str(), 32);
