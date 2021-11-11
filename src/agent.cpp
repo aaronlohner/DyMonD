@@ -424,7 +424,6 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
-    //interface[0] = '\0';
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -524,17 +523,17 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
 //     LiveMode=true;
     
     while(sniff_more){
-        receive_message(mode_buf, false); // receive indication if using interface or reading from file
-        if(!strcmp(mode_buf, "stop")) {
-            break;
-        }
-        receive_message(log, true); // receive indication if sending via tcp or writing to logfile
-        receive_message(arg, true);  // receive network interface name or name of pcap file
-        receive_message(time, true);
-        duration = atof(time);
         if(standalone){
             sniff_more = false;
         } else {
+            receive_message(mode_buf, false); // receive indication if using interface or reading from file
+            if(!strcmp(mode_buf, "stop")) {
+                break;
+            }
+            receive_message(log, true); // receive indication if sending via tcp or writing to logfile
+            receive_message(arg, true);  // receive network interface name or name of pcap file
+            receive_message(time, true);
+            duration = atof(time);
             if(mode_buf[0] == 'i'){
                 printf("Monitoring request received\n");
                 LiveMode=true;
@@ -1044,13 +1043,12 @@ std::string label=GetMSLabel(services[j]->URLS);
         }
 
         FP.close();
-
-        send_message(flowarray);
-        //if(counter > 0) {
+        if (!standalone) {
+            send_message(flowarray);
             printf("Flows sent to controller\n");
             send_message();
-            counter = 0;
-        //}
+        }
+        counter = 0;
     }
      for(int i = 0; i < flowarray.size(); i++)
      {

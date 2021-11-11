@@ -415,28 +415,14 @@ def run_startup_parser():
     group2 = parser.add_mutually_exclusive_group()
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
-    # TODO: move dictionary input to agent side
-    #parser.add_argument("-d", "--dictionary", type=int, help="use specified dictionary mapping from interfaces to IPs")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
     parser.add_argument("-t", "--time", type=int, choices=range(5,1000), default=8, help="sniffing time for each component")
     args = parser.parse_args()
-    # interfaces = {}
-    # if args.dictionary is not None and args.IP is None:
-    #     parser.error("--dictionary requires --IP.")
-    # # Temporary measure until flow detector module is implement to match IPs to interfaces
-    # elif args.IP is not None and args.dictionary is None:
-    #     parser.error("--IP requires --dictionary.")
-    # if args.dictionary is not None:
-    #     # Temporary implementation until flow detector is implemented: dictionary mapping interfaces to ips,
-    #     # use 'interfaces' dictionary to add ip of input interface to q and visited,
-    #     # reverse-lookup interface from newly found ips to pass in to sniff()
-    #     interfaces = load_interfaces_dictionary(args.dictionary)
-    #interfaces = load_interfaces_dictionary()
 
-    mode, arg = None, None
+    mode, arg, temp_log = None, None, None
     if args.IP is not None:
         mode = "i"
         arg = args.IP
