@@ -529,7 +529,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
             sniff_more = false;
             if (input_ip != NULL) {
                 LiveMode=true;
-                const char* ip_const = input_ip
+                const char* ip_const = input_ip;
                 printf("input_ip: %s\n", ip_const);
                 string ip_str = ip_const;
                 printf("ip_str: %s\n", ip_const);
