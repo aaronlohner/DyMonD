@@ -424,6 +424,7 @@ int main(int argc, char *argv[]){
     pthread_t capture;
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
+    bool cmd_mode = false;
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -476,6 +477,8 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                                 ipaddress = optarg; break;
                         case 'f':
                                 tracefile = optarg; break;
+                        case 'c':
+                                cmd_mode = true; break;
                 }
         }
 
@@ -483,7 +486,7 @@ char mode_buf[64], log[64], arg[64], time[64];
 bool sniff_more = true;
 string capture_dir; // = "captures/"'
 map<string, string> ip_map;
-if(argc == 1 || strstr(argv[1], "-t") != NULL){
+if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
     // receive_message(mode_buf, true); // receive indication if using interface or reading from file
@@ -519,12 +522,11 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
 } else { // Standalone mode
     log[0] = '\0';
 }
-//  if (interface[0] != '\0')
-//     LiveMode=true;
     
     while(sniff_more){
         if(standalone){
             sniff_more = false;
+            if (interface[0] != '\0') LiveMode=true;
         } else {
             receive_message(mode_buf, false); // receive indication if using interface or reading from file
             if(!strcmp(mode_buf, "stop")) {
@@ -988,7 +990,7 @@ std::string label=GetMSLabel(services[j]->URLS);
          }
      }
      FP.close();
-    if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
+    if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
 
         // For debugging flows

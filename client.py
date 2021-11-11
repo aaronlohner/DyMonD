@@ -96,5 +96,5 @@ def stop_client():
     print("Closing connection with agent")
     send_message("stop") # ad hoc stopping signal
     s.close()
-    #print("Disconnected from agent")
+    print("Disconnected from agent")
 

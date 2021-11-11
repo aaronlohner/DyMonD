@@ -220,8 +220,8 @@ def write_json_output(fname:str):
                 propAtt["label"] += "C: " + str(edges[key].C)
 
     reset_global_vars()
-    # with open(osp.join("json", fname), "w") as f:
-    #     json.dump(json_dict, f, indent=4)
+    with open(osp.join("json", fname), "w") as f:
+        json.dump(json_dict, f, indent=4)
 
     return json_dict
 
@@ -280,7 +280,7 @@ def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):
     print("Connected")
     return run_main(mode, log_orig, log, temp_log, arg, sniff_time, out)
 
-def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str):
+def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str, cmd_mode=False):
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
@@ -360,7 +360,8 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 q.extend(ips)
                 del f.flows[:]
                 #print("Num accumulated flows: {}".format(len(l.flows)))
-            #stop_client()
+            if cmd_mode:
+                stop_client()
             tg_start = time.perf_counter()
             generate_graph(l)
         else: # if using log
@@ -396,7 +397,8 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 q.extend(ips)
                 #print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
-            #stop_client()
+            if cmd_mode:
+                stop_client()
             os.remove(temp_log)
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
@@ -433,18 +435,14 @@ def run_startup_parser():
     
     if mode == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        # setup_client(mode, "temp-log.txt", args.host)
         temp_log = os.path.join("logs", "temp-log.txt") #temp_log = "logs/temp-log.txt"
         log = os.path.join("logs", log)
     elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
-        #  setup_client(mode, log, args.host)
         log = os.path.join("logs", log)
-    # else: # using tcp (interface or log)
-    #     setup_client(mode, log, args.host)
     setup_client(args.host)
     print("Connected")
     
-    run_main(mode, args.log, log, temp_log, arg, args.time, args.output)
+    run_main(mode, args.log, log, temp_log, arg, args.time, args.output, cmd_mode=True)
 
 if __name__ == '__main__':
     run_startup_parser()
