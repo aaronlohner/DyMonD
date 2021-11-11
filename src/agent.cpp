@@ -463,7 +463,7 @@ wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
 InitMethodName();
 // Standalone args and sniffing time
 bool standalone = true;
-while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
+while((opt = getopt(argc, argv, "t:i:f:p:c")) != -1){
                 switch(opt){
             case 't':
                 if(atof(optarg) <= 5 || atof(optarg) >= 1000) {
@@ -471,14 +471,14 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                     exit(EXIT_FAILURE);
                 } else duration = atof(optarg);
                 break;
-                        case 'i':
-                                strcpy(interface, optarg); break;
-                        case 'p':
-                                ipaddress = optarg; break;
-                        case 'f':
-                                tracefile = optarg; break;
-                        case 'c':
-                                cmd_mode = true; break;
+            case 'i':
+                    strcpy(interface, optarg); break; // later converted from ip to interface
+            case 'p':
+                    ipaddress = optarg; break;
+            case 'f':
+                    tracefile = optarg; break;
+            case 'c':
+                    cmd_mode = true; break;
                 }
         }
 
@@ -529,6 +529,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
             if (interface[0] != '\0') {
                 LiveMode=true;
                 strncpy(interface, ip_map[interface].c_str(), 32);
+                printf("interface: %s", interface);
             }
         } else {
             receive_message(mode_buf, false); // receive indication if using interface or reading from file
