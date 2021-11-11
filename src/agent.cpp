@@ -529,10 +529,11 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
             sniff_more = false;
             if (input_ip != NULL) {
                 LiveMode=true;
-                printf("input_ip: %s\n", input_ip);
-                string ip_str = input_ip;
-                printf("ip_str: %s\n", ip_str);
-                strncpy(interface, ip_map[ip_str].c_str(), 32);
+                const char* ip_const = input_ip
+                printf("input_ip: %s\n", ip_const);
+                string ip_str = ip_const;
+                printf("ip_str: %s\n", ip_const);
+                strncpy(interface, ip_map[ip_const].c_str(), 32);
                 printf("interface: %s\n", interface);
             }
         } else {
