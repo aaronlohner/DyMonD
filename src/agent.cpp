@@ -611,7 +611,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
     vector< vector<string> > mat = strTo2DStr(result,rownum,cols);
     const char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
 int counter_mat = 0;
-
+myfile.open("predictions.txt", std::ios_base::app);
 for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) {
@@ -619,11 +619,13 @@ for (int i = 0; i < flowarray.size(); i++) {
             const char* lab=label[index];
             double score_double = std::stod(mat[counter_mat][1]);
             flowarray[i]->score=score_double;
+            myfile << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
+                    << flowarray[i]->dport <<" " << lab << " "<<  flowarray[i]->score << "\n";
             counter_mat++;
         }
 
 }
-
+myfile.close();
 /******************validate label**********************/
 vector < struct service *>services;
 
