@@ -526,7 +526,10 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     while(sniff_more){
         if(standalone){
             sniff_more = false;
-            if (interface[0] != '\0') LiveMode=true;
+            if (interface[0] != '\0') {
+                LiveMode=true;
+                strncpy(interface, ip_map[interface].c_str(), 32);
+            }
         } else {
             receive_message(mode_buf, false); // receive indication if using interface or reading from file
             if(!strcmp(mode_buf, "stop")) {
