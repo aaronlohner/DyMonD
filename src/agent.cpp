@@ -530,7 +530,8 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
             if (input_ip != NULL) {
                 LiveMode=true;
                 printf("input_ip: %s\n", input_ip);
-                strncpy(interface, ip_map[input_ip].c_str(), 32);
+                string ip_str = '' + input_ip;
+                strncpy(interface, ip_map[ip_str].c_str(), 32);
                 printf("interface: %s\n", interface);
             }
         } else {
