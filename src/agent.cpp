@@ -532,8 +532,8 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
                 const char* ip_const = input_ip;
                 printf("input_ip: %s\n", ip_const);
                 string ip_str = ip_const;
-                printf("ip_str: %s\n", ip_const);
-                strncpy(interface, ip_map[ip_const].c_str(), 32);
+                printf("ip_str: %s\n", ip_str);
+                strncpy(interface, ip_map[ip_str].c_str(), 32);
                 printf("interface: %s\n", interface);
             }
         } else {
