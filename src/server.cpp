@@ -160,11 +160,13 @@ void get_service_type(flow *flow, char *service){
 			service[i] = flow->proto[i];
 			i++;
 		}
+		service[i] = '\0';
 	}
 }
 
 /*
- * Send string of flows
+ * Send string of flows. Input is not used in method but instead used
+ * to differentiate this method from send_message() which takes no input
  */
 void send_message(vector<struct flow*> flowarray){
 	// string data;

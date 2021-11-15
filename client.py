@@ -34,9 +34,11 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     msg = FlowArray()
     for line in data:
         if len(line) > 0:
+
             if len(line.split()) < 7:
                 print("MISSING DATA: {}".format(line))
                 continue
+
             flow = Flow()
             line = line.split()
             flow.s_addr, flow.s_port, flow.d_addr, flow.d_port = line[0:4]
@@ -46,9 +48,11 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
             else:
                 flow.is_server = False
             flow.service_type = line[6]
+            print('st: {}'.format(flow.service_type))
             if len(line) < 8:
                 print("MISSING RST")
                 flow.rst = 0.0
+            
             else:
                 flow.rst = float(line[7])
             msg.flows.append(flow)
