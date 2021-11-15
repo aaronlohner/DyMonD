@@ -151,7 +151,7 @@ bool is_server(flow *flow){
  * Populate the service parameter with the name of the service type in the flow
  */
 void get_service_type(flow *flow, char *service){
-	memset(service, 0, sizeof(service));
+	//memset(service, 0, sizeof(service));
 	if(strstr(flow->proto, "Unknown") != NULL) {
 		strcpy(service, flow->proto);
 	} else {
