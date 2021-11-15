@@ -532,7 +532,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
                 const char* ip_const = input_ip;
                 printf("input_ip: %s\n", ip_const);
                 string ip_str = ip_const;
-                printf("ip_str: %s\n", ip_str);
+                printf("ip_str: %s\n", ip_str.c_str());
                 strncpy(interface, ip_map[ip_str].c_str(), 32);
                 printf("interface: %s\n", interface);
             }
@@ -622,6 +622,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     const char *label[18] = {"Cass-C", "Cass-S", "CassMN", "DB2-C", "DB2-S", "HTTP-S", "HTTP-C", "MYSQL-S", "MYSQL-C", "Memcached-C", "Memcached-S", "MonetDB-C", "MonetDB-S", "PGSQL-C", "PGSQL-S", "Redis-C", "Redis-S", "Spark-W"};
 int counter_mat = 0;
 myfile.open("predictions.txt", std::ios_base::app);
+myfile << interface << "\n";
 for (int i = 0; i < flowarray.size(); i++) {
        
         if (flowarray[i]->Packets.size() == 100 ) {
@@ -856,6 +857,9 @@ break;
 }
 if (position>0)
 {
+ flowarray[position]->protof=true;
+flowarray[i]->protof=true;
+
  if (strcmp(flowarray[i]->proto,flowarray[position]->proto)!=0)
 {
   if (flowarray[i]->score > flowarray[position]->score)
@@ -894,9 +898,7 @@ else
      }
 
 }
-flowarray[position]->protof=true;
 }
-flowarray[i]->protof=true; 
 }
 //validate the Bidirection flows 
    if(flowarray[i]->isServer==1&&flowarray[i]->specialType!=3){
@@ -958,7 +960,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         FP.open(log_str, std::ios_base::out); 
         printf("Writing to log\n");
      for(int i = 0; i < flowarray.size(); i++) {
-         if (flowarray[i]->Packets.size() == 100) {
+         if (flowarray[i]->Packets.size() == 100 && strstr(flowarray[i]->proto,"Unknown") == NULL &&flowarray[i]->protof ) {
                if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
            char SID[32];
            if (flowarray[i]->isServer==0)
@@ -1006,7 +1008,7 @@ std::string label=GetMSLabel(services[j]->URLS);
         FP.open(log_str, ios::app);
 
         for(int i = 0; i < flowarray.size(); i++) {
-           if (flowarray[i]->Packets.size() == 100 ) {
+           if (flowarray[i]->Packets.size() == 100 && strstr(flowarray[i]->proto,"Unknown") == NULL &&flowarray[i]->protof) {
               if(strstr(flowarray[i]->proto,"HTTP") != NULL) {
            char SID[32];
            if (flowarray[i]->isServer==0)
