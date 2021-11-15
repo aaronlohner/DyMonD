@@ -15,9 +15,8 @@ def send_message(mesg:str) -> None:
     # First send the message length
     s.send(length.to_bytes(4, byteorder="big"))
     s.send(mesg)
-    #print("Sent message to agent")
-
-def recv_message() -> FlowArray: # if using protobuf to send data, this fcn should have a param called mesg_type
+\
+def recv_message() -> FlowArray: # if using protobuf, this fcn should have a param called mesg_type
     """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
     # Convention is that first 4 bytes contain size of message to follow
@@ -34,8 +33,8 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
     msg = FlowArray()
     for line in data:
         if len(line) > 0:
-
-            if len(line.split()) < 7:
+            # Triggered if error receiving message
+            if len(line.split()) < 8:
                 print("MISSING DATA: {}".format(line))
                 continue
 
@@ -48,13 +47,7 @@ def recv_message() -> FlowArray: # if using protobuf to send data, this fcn shou
             else:
                 flow.is_server = False
             flow.service_type = line[6]
-            print('st: {}'.format(flow.service_type))
-            if len(line) < 8:
-                print("MISSING RST")
-                flow.rst = 0.0
-            
-            else:
-                flow.rst = float(line[7])
+            flow.rst = float(line[7])
             msg.flows.append(flow)
     return msg
 
@@ -69,7 +62,7 @@ def recv_message_test() -> str:
     data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
     return data
 
-def setup_client(host): #setup_client(mode:str, log:str, host):
+def setup_client(host):
     global connected
     if not connected:
         print("Setting up connection with agent...")
@@ -80,7 +73,7 @@ def setup_client(host): #setup_client(mode:str, log:str, host):
             s.connect((host, PORT))
         connected = True
 
-def sniff(mode:str, log:str, arg:str, time:int=None): #sniff(arg:str, ip=None):
+def sniff(mode:str, log:str, arg:str, time:int=None):
     sleep(0.2)
     if mode == 'f': # arg holds capture file name
         print("Requesting agent to sniff capture file {}".format(arg))
@@ -98,7 +91,7 @@ def sniff(mode:str, log:str, arg:str, time:int=None): #sniff(arg:str, ip=None):
 
 def stop_client():
     print("Closing connection with agent")
-    send_message("stop") # ad hoc stopping signal
+    send_message("stop") # stopping signal
     s.close()
     print("Disconnected from agent")
 

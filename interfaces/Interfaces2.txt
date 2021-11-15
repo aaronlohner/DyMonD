@@ -1,9 +1,0 @@
-br-962b0d768dd9 172.26.0.1
-veth6a7bb16 172.20.0.2 db //
-veth7943e16 172.20.0.7 image //
-veth69831a9 172.20.0.4 persistence //
-veth17a3316 172.20.0.8 webui //
-veth236c607 172.20.0.5 auth //
-veth829737a 172.20.0.3 registry //
-vethb711eef 172.20.0.9 generator //
-veth497cc6c 172.20.0.6 recommender //

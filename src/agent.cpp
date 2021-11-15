@@ -485,25 +485,11 @@ while((opt = getopt(argc, argv, "t:i:f:p:c")) != -1){
 
 char mode_buf[64], log[64], arg[64], time[64];
 bool sniff_more = true;
-string capture_dir; // = "captures/"'
+string capture_dir; // = "captures/"
 map<string, string> ip_map;
 if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
-    // receive_message(mode_buf, true); // receive indication if using interface or reading from file
-    // receive_message(log, true); // receive indication if sending via tcp or writing to logfile
-    // receive_message(arg, false);  // receive network interface name or name of pcap file
-    // printf("Monitoring request received\n");
-    // opt = mode_buf[0];
-    // capture_dir.append(arg);
-    // switch(opt){
-    //             case 'i':
-    //                 interface = arg; break;
-    //             case 'p':
-    //                         ipaddress = arg; break;
-    //             case 'f':
-    //                     tracefile = (char*)capture_dir.c_str(); break;
-    //         }
 
     ifstream inFile("interfaces/Interfaces.csv", ios::in);
     string lineStr;
@@ -1071,17 +1057,6 @@ std::string label=GetMSLabel(services[j]->URLS);
              free(flowarray[i]->Ack_times[j]);
          free(flowarray[i]);
      }
-    //  if(mode_buf[0] == 'i'){
-    //     flowarray.clear();
-    //     receive_message(arg, false);
-    //     if(!strcmp(mode_buf, "stop")) { // if(!strcmp(arg, "stop")) {
-    //         sniff_more = false;
-    //     } else {
-    //         printf("Monitoring request received\n");
-    //     }
-    //  } else {
-    //      sniff_more = false;
-    //  }
     }
 
         printf("Sniffing completed\n");

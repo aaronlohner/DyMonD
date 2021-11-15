@@ -4,10 +4,9 @@ int server_fd, client_fd, valread;
 struct sockaddr_in address;
 int opt = 1;
 int addrlen = sizeof(address);
-char buffer[1024] = {0}, empty_buf[0];
+char buffer[1024] = {0};
 char service[32] = {0};
-//FlowArray flow_array = FlowArray();
-//FlowArray flow_array_smaller = FlowArray();
+char empty_buf[0];
 string flow_string = "";
 string flow_string_smaller = "";
 string flow_last = "";
@@ -78,7 +77,6 @@ void receive_message(char inputBuffer[], bool suppress_output) {
 	mesg_length = ntohl(mesg_len_buf);
 	recv(client_fd, buffer, mesg_length, 0);
 	strncpy(inputBuffer, buffer, mesg_length);
-	//printf("Received: %s\n", inputBuffer);
 	// Reset global variable for future incoming messages
 	memset(buffer, 0, sizeof(buffer));
 	valread = 0;
@@ -88,9 +86,6 @@ void receive_message(char inputBuffer[], bool suppress_output) {
  * Add flow element to flow array with RST
  */
 void add_to_flow_array(flow *flow, double RST) {
-	//add_to_flow_array(flow);
-	//flow_array.mutable_flows(flow_array.flows_size()-1)->set_rst(RST);
-
 	size_t length = flow_string.size();
 	if(length > 1380){
 		send_message(flow_string_smaller);
@@ -111,7 +106,7 @@ void add_to_flow_array(flow *flow, double RST) {
 }
 
 /*
- * Add flow element to flow array
+ * Add flow element to flow array. Uses protobuf
  */
 /*void add_to_flow_array(flow *flow) {
 	string data;
@@ -151,7 +146,6 @@ bool is_server(flow *flow){
  * Populate the service parameter with the name of the service type in the flow
  */
 void get_service_type(flow *flow, char *service){
-	//memset(service, 0, sizeof(service));
 	if(strstr(flow->proto, "Unknown") != NULL) {
 		strcpy(service, flow->proto);
 	} else {
@@ -169,16 +163,6 @@ void get_service_type(flow *flow, char *service){
  * to differentiate this method from send_message() which takes no input
  */
 void send_message(vector<struct flow*> flowarray){
-	// string data;
-	// flow_array.SerializeToString(&data);
-	// size_t length = data.size();
-	// uint32_t nlength = htonl(length);
-	// // First send message length
-	// send(client_fd, &nlength, 4, 0);
-	// send(client_fd, data.c_str(), length, 0);
-	// // Reset global variable for future use
-	// flow_array.clear_flows();
-
 	size_t length = flow_string.size();
 	uint32_t nlength = htonl(length);
 	// First send message length
@@ -190,7 +174,7 @@ void send_message(vector<struct flow*> flowarray){
 }
 
 /*
- * Send array of flows
+ * Send array of flows. Uses protobuf
  */
 /*void send_message(FlowArray flowarray){
 	string data;
@@ -230,5 +214,4 @@ void send_message_test(string str){
 
 void send_message(){
 	send(client_fd, empty_buf, 4, 0);
-	//printf("Empty message sent to controller\n");
 }

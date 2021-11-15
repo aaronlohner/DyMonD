@@ -4,7 +4,7 @@ import time
 import random
 import json
 import os.path as osp
-from typing import Dict, Tuple, List
+from typing import Tuple, List
 from client import setup_client, stop_client, recv_message, recv_message_test, sniff
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
@@ -309,14 +309,13 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
             print("Waiting for flows to be recorded by agent...")
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
-            recv_message()#None)
+            recv_message()
             print("Reading flows from file")
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
     else: # sniffing network interface
         q, visited, ips = [arg], [arg], []
         exists = False
-
         #open("logs/model_string.txt", "w").close()
 
         if log == "*": # if using tcp
@@ -337,10 +336,10 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 #         ft.write("\n\n\nNext component\n")
 
                 print("Waiting for flows from agent...")
-                response = recv_message()#sniffed_info_pb2.FlowArray)
+                response = recv_message()#sniffed_info_pb2.FlowArray) # uses protobuf
                 while response is not None:
                     f.flows.extend(response.flows)
-                    response = recv_message()#sniffed_info_pb2.FlowArray)
+                    response = recv_message()#sniffed_info_pb2.FlowArray) # uses protobuf
                 print("Received flows from agent")
                 if len(l.flows) == 0:
                     l.flows.extend(f.flows)
@@ -359,7 +358,6 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 total_time=total_time+end_time
                 q.extend(ips)
                 del f.flows[:]
-                #print("Num accumulated flows: {}".format(len(l.flows)))
             if cmd_mode:
                 stop_client()
             tg_start = time.perf_counter()
@@ -395,7 +393,6 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 end_time=time.perf_counter()-t1_start
                 total_time=total_time+end_time
                 q.extend(ips)
-                #print("Num accumulated flows: {}".format(len(open(log, "r").readlines())))
                 lines_to_write.clear()
             if cmd_mode:
                 stop_client()
@@ -403,7 +400,6 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
 
-    #write_json_output(out)
     endg_time=time.perf_counter()-tg_start
     total_time=total_time+endg_time
     #print("Controller time: {} seconds".format(round(total_time, 5)))
@@ -435,7 +431,7 @@ def run_startup_parser():
     
     if mode == "i" and log != "*": # if sniffing interface and using log
         # Sniffer will write to a temp log
-        temp_log = os.path.join("logs", "temp-log.txt") #temp_log = "logs/temp-log.txt"
+        temp_log = os.path.join("logs", "temp-log.txt")
         log = os.path.join("logs", log)
     elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
         log = os.path.join("logs", log)
