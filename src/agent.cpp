@@ -490,7 +490,9 @@ map<string, string> ip_map;
 if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
-
+} else { // Standalone mode
+    log[0] = '\0';
+}
     ifstream inFile("interfaces/Interfaces.csv", ios::in);
     string lineStr;
     while (getline(inFile, lineStr))
@@ -506,13 +508,10 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     // This is for logging the flows sent over tcp for debugging purposes
     FP.open(log_str, std::ios_base::out);
     FP.close();
-} else { // Standalone mode
-    log[0] = '\0';
-}
     
     while(sniff_more){
         if(standalone){
-            printf('standalone\n');
+            printf("Running as standalone\n");
             sniff_more = false;
             if (input_ip != NULL) {
                 LiveMode=true;
