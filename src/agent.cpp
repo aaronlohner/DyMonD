@@ -512,6 +512,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
     
     while(sniff_more){
         if(standalone){
+            printf('standalone\n');
             sniff_more = false;
             if (input_ip != NULL) {
                 LiveMode=true;
