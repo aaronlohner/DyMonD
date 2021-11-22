@@ -8,7 +8,7 @@ TeaStore
 br-962b0d768dd9 172.26.0.1
 veth5fad4c0 172.20.0.3 registry //
 veth66fbcd8 172.20.0.4 webui startpoint
-vethf737066 172.20.0.5 auth
+veth104814b 172.20.0.5 auth
 vethf25e6f2 172.20.0.6 persistence
 veth6ab97d1 172.20.0.7 recommender
 vethc1b6475 172.20.0.8 image

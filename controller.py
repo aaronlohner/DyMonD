@@ -149,6 +149,7 @@ def generate_graph(flow_array:FlowArray):
         else:#node 1 is server and node2 is client
             newNode1 = node("owl:equivalentClass", flow.service_type, flow.s_addr, flow.s_port, randomColor())
             newNode2 = node("owl:Class", "Client", flow.d_addr, flow.d_port, randomColor())
+        
         if newNode1 not in nodes.values():#if node 1 is not included in graph
             id1 = len(nodes)
             nodes[len(nodes)] = newNode1#expand node dictionary
