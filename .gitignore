@@ -7,8 +7,7 @@ json/
 logs/
 test/
 
-webvowl*/
-DyMonD.wiki/
+DyMonD*/
 
 *.pcap
 *.zip

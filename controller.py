@@ -8,6 +8,19 @@ from typing import Tuple, List
 from client import setup_client, stop_client, recv_message, recv_message_test, sniff
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
+from flask import Flask, request
+from controller import run_startup
+
+app = Flask(__name__)
+app.config["DEBUG"] = True
+
+@app.route("/run", methods=['GET'])
+def run():
+    mode, log, host, arg, time, out = request.args.values()
+    time = int(time)
+    json_obj = run_startup(mode, log, host, arg, time, out)
+    return json_obj
+
 nodes = {}
 edges = {}
 
@@ -416,9 +429,9 @@ def run_startup_parser():
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
     group2.add_argument("-H", "--host", help="address for sniffer host")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
+    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), metavar="[5-1000]", default=8, help="sniffing time for each component")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
-    parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
-    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), default=8, help="sniffing time for each component")
+    #parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
     args = parser.parse_args()
 
     mode, arg, temp_log = None, None, None
