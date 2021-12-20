@@ -9,7 +9,6 @@ from client import setup_client, stop_client, recv_message, recv_message_test, s
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
 
 from flask import Flask, request
-from controller import run_startup
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
