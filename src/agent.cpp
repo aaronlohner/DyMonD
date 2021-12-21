@@ -527,7 +527,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
                 break;
             }
             receive_message(log, true); // receive indication if sending via tcp or writing to logfile
-            receive_message(arg, true);  // receive network interface name or name of pcap file
+            receive_message(arg, true);  // receive ip address or name of pcap file
             receive_message(time, true);
             duration = atof(time);
             if(mode_buf[0] == 'i'){
