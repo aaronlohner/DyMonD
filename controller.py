@@ -5,20 +5,12 @@ import random
 import json
 import os.path as osp
 from typing import Tuple, List
-from client import setup_client, stop_client, recv_message, recv_message_test, sniff
+from client import setup_client, stop_client, recv_message, sniff
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
-
 from flask import Flask, request
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-
-@app.route("/run", methods=['GET'])
-def run():
-    mode, log, host, arg, time, out = request.args.values()
-    time = int(time)
-    json_obj = run_startup(mode, log, host, arg, time, out)
-    return json_obj
 
 nodes = {}
 edges = {}
@@ -278,37 +270,29 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], blacklist
                         visited.append(new_ip)
     return (ips, visited)
 
-def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str): 
+def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=False):
+    """
+    When monitoring an application, iteratively send IP address to agent and collect flows.
+    When reading a pcap file, send filename and collect flows. Then in both cases, generate call graph.
+
+    Args:
+        mode (str): Specifies the framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
+        log_orig (str): Indicates the mode in which to send flows (* for TCP mode, else a filename for logging mode).
+        log (str): Same as log_orig for TCP mode, corresponds to os.path.join("logs", log_orig) in logging mode.
+        arg (str): IP address of component to be monitored or name of pcap file to be read.
+        sniff_time (int): Number of seconds that component at IP address specified or capture file specified in arg will be monitored.
+        out (str): Name of JSON output file containing call graph information.
+        cmd_mode (bool): True if using framework in command line mode, False otherwise.
+
+    Returns:
+        dict: JSON object containing call graph information.
+    """
     
-    log_orig = log
-    temp_log = None
-    if mode == "i" and log != "*": # if sniffing interface and using log
-        # Sniffer will write to a temp log
-        temp_log = os.path.join("logs", "temp-log.txt")
-        log = os.path.join("logs", log)
-    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
-        log = os.path.join("logs", log)
-
-    setup_client(host)
-    print("Connected")
-    return run_main(mode, log_orig, log, temp_log, arg, sniff_time, out)
-
-def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str, cmd_mode=False):
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
     if mode == "f": # reading from pcap file
-        sniff(mode, log_orig, arg)
-
-        # if args.test:
-        #     to_write = ""
-        #     response = recv_message_test()
-        #     while response is not None:
-        #         to_write += response
-        #         response = recv_message_test()
-        #     with open("logs/model_string.txt", "w") as ft:
-        #         ft.writelines(to_write)
-
+        sniff(mode, log_orig, arg, sniff_time)
         if log == "*":
             print("Waiting for flows from agent...")
             response = recv_message()
@@ -337,17 +321,6 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
                 sniff(mode, log_orig, ip, sniff_time)
-
-                # if args.test:
-                #     to_write = ""
-                #     response = recv_message_test()
-                #     while response is not None:
-                #         to_write += response
-                #         response = recv_message_test()
-                #     with open("logs/model_string.txt", "a") as ft:
-                #         ft.writelines(to_write)
-                #         ft.write("\n\n\nNext component\n")
-
                 print("Waiting for flows from agent...")
                 response = recv_message()#sniffed_info_pb2.FlowArray) # uses protobuf
                 while response is not None:
@@ -420,6 +393,27 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
     print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
     return write_json_output(out)
 
+def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):    
+    log_orig = log
+    temp_log = None
+    if mode == "i" and log != "*": # if sniffing interface and using log
+        # Sniffer will write to a temp log
+        temp_log = os.path.join("logs", "temp-log.txt")
+        log = os.path.join("logs", log)
+    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
+        log = os.path.join("logs", log)
+
+    setup_client(host)
+    print("Connected")
+    return run_main(mode, log_orig, log, temp_log, arg, sniff_time, out)
+
+@app.route("/run", methods=['GET'])
+def run():
+    mode, log, host, arg, time, out = request.args.values()
+    time = int(time)
+    json_obj = run_startup(mode, log, host, arg, time, out)
+    return json_obj
+
 def run_startup_parser():
     parser = argparse.ArgumentParser()
     group1 = parser.add_mutually_exclusive_group(required=True)
@@ -428,9 +422,8 @@ def run_startup_parser():
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
     group2.add_argument("-H", "--host", default='127.0.0.1', help="address for sniffer host. Defaults to localhost")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
-    parser.add_argument("-t", "--time", type=int, choices=range(5,1000), metavar="[5-1000]", default=8, help="sniffing time for each component")
+    parser.add_argument("-t", "--time", type=int, choices=range(7,1000), metavar="7-1000", default=8, help="sniffing time for each component")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
-    #parser.add_argument("--test", action="store_true", help="receive string for input to learning model")
     args = parser.parse_args()
 
     mode, arg, temp_log = None, None, None

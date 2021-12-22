@@ -594,6 +594,9 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
         str += " ";
     }
    }
+
+   // To view string being sent to model for this round of flows, save str to file here
+
     printf("Sending flows data to the model, starting service identification.\n");
     clock_t start3 = clock();
     PyTuple_SetItem(ArgList, 0, Py_BuildValue("s", str.c_str()));

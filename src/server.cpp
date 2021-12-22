@@ -203,7 +203,7 @@ void send_message(string flowarray){
 }
 
 /*
- * Send string of flows
+ * Standard method format to send a regular string
  */
 void send_message_test(string str){
 	size_t length = str.size();

@@ -15,7 +15,7 @@ def send_message(mesg:str) -> None:
     # First send the message length
     s.send(length.to_bytes(4, byteorder="big"))
     s.send(mesg)
-\
+
 def recv_message() -> FlowArray: # if using protobuf, this fcn should have a param called mesg_type
     """Receive a message, prefixed with its size, from a TCP socket."""
     data = b''
@@ -51,17 +51,6 @@ def recv_message() -> FlowArray: # if using protobuf, this fcn should have a par
             msg.flows.append(flow)
     return msg
 
-def recv_message_test() -> str:
-    #sleep(0.01) # -- MAY NEED TO MODIFY IF EXPERIENCING DECODE ERRORS
-    data = b''
-    # Convention is that first 4 bytes contain size of message to follow
-    size = s.recv(4)
-    # Stop waiting for server to send messages when receive an incoming message of '0'
-    if int.from_bytes(size, "big") == 0:
-        return None
-    data = s.recv(int.from_bytes(size, "big")).decode("utf-8")
-    return data
-
 def setup_client(host):
     global connected
     if not connected:
@@ -73,7 +62,19 @@ def setup_client(host):
             s.connect((host, PORT))
         connected = True
 
-def sniff(mode:str, log:str, arg:str, time:int=None):
+def sniff(mode:str, log:str, arg:str, time:int=30):
+    """
+    Sends data to agent to initiate application monitoring on one component or to read from a capture file.
+
+    Args:
+        mode (str): Specifies the framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
+        log (str): Indicates the mode in which to send flows (* for TCP mode, else a filename for logging mode).
+        arg (str): IP address of component to be monitored or name of pcap file to be read.
+        time (int, optional): Number of seconds that component at IP address specified or capture file specified in arg will be monitored.
+
+    Return:
+        NoneType: None
+    """
     sleep(0.2)
     if mode == 'f': # arg holds capture file name
         print("Requesting agent to sniff capture file {}".format(arg))
@@ -84,9 +85,8 @@ def sniff(mode:str, log:str, arg:str, time:int=None):
     send_message(log)
     sleep(0.2)
     send_message(arg)
-    if mode == 'i':
-        sleep(0.2)
-        send_message(str(time))
+    sleep(0.2)
+    send_message(str(time))
     
 
 def stop_client():

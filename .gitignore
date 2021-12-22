@@ -14,8 +14,7 @@ DyMonD*/
 *.pyc
 *-old*
 
-src/agent-*
-src/sniffer-*
+src/agent_*
 
 sniffer
 agent
