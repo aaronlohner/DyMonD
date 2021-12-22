@@ -6,18 +6,15 @@ flows/
 json/
 logs/
 test/
-
 DyMonD*/
+images*/
+diagrams/
+src/agent_*
 
 *.pcap
 *.zip
 *.pyc
 *-old*
 
-src/agent_*
-
-sniffer
-agent
-agent2
 URLS
 predictions.txt

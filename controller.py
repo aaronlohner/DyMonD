@@ -287,7 +287,7 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
     Returns:
         dict: JSON object containing call graph information.
     """
-    
+    # INITIAL START
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
@@ -295,7 +295,9 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
         sniff(mode, log_orig, arg, sniff_time)
         if log == "*":
             print("Waiting for flows from agent...")
+            # STOP - FILE/TCP
             response = recv_message()
+            # START - FILE/TCP
             while response is not None:
                 f.flows.extend(response.flows)
                 response = recv_message()
@@ -306,7 +308,9 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
             print("Waiting for flows to be recorded by agent...")
             # Proceed to read from logfile only when sniffer closes connection and sends a
             # blank message, indicating it is done writing to logfile
+            # STOP - FILE/LOG
             recv_message()
+            # START - FILE/LOG
             print("Reading flows from file")
             tg_start = time.perf_counter()
             generate_graph_from_file(log)
@@ -321,8 +325,10 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
                 print("IP address(es) in queue: {}".format(q))
                 ip = q.pop(0)
                 sniff(mode, log_orig, ip, sniff_time)
+                # STOP - APP/TCP
                 print("Waiting for flows from agent...")
                 response = recv_message()#sniffed_info_pb2.FlowArray) # uses protobuf
+                # START - APP/TCP
                 while response is not None:
                     f.flows.extend(response.flows)
                     response = recv_message()#sniffed_info_pb2.FlowArray) # uses protobuf
@@ -357,7 +363,9 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
                 ip = q.pop(0)
                 sniff(mode, log_orig, ip, sniff_time)
                 print("Waiting for flows to be recorded by agent...")
+                # STOP - APP/LOG
                 recv_message()
+                # START - APP/LOG
                 with open(log, "r") as l, open(temp_log, "r") as f:
                     print("Reading flows from file")
                     f.seek(0)
@@ -392,6 +400,7 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
     #print("Controller time: {} seconds".format(round(total_time, 5)))
 
     print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
+    # FINAL STOP - this excludes the execution time for write_json_output()
     return write_json_output(out)
 
 def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):    
