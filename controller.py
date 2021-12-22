@@ -270,7 +270,7 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], blacklist
                         visited.append(new_ip)
     return (ips, visited)
 
-def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=False):
+def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=False):
     """
     When monitoring an application, iteratively send IP address to agent and collect flows.
     When reading a pcap file, send filename and collect flows. Then in both cases, generate call graph.
@@ -349,6 +349,7 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
             tg_start = time.perf_counter()
             generate_graph(l)
         else: # if using log
+            temp_log = os.path.join("logs", "temp-log.txt")
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
@@ -395,17 +396,11 @@ def run_main(mode:str, log_orig:str, log:str, temp_log:str, arg:str, sniff_time:
 
 def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):    
     log_orig = log
-    temp_log = None
-    if mode == "i" and log != "*": # if sniffing interface and using log
-        # Sniffer will write to a temp log
-        temp_log = os.path.join("logs", "temp-log.txt")
+    if log != "*": # if using log
         log = os.path.join("logs", log)
-    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
-        log = os.path.join("logs", log)
-
     setup_client(host)
     print("Connected")
-    return run_main(mode, log_orig, log, temp_log, arg, sniff_time, out)
+    return run_main(mode, log_orig, log, arg, sniff_time, out)
 
 @app.route("/run", methods=['GET'])
 def run():
@@ -426,7 +421,7 @@ def run_startup_parser():
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")
     args = parser.parse_args()
 
-    mode, arg, temp_log = None, None, None
+    mode, arg = None, None
     if args.IP is not None:
         mode = "i"
         arg = args.IP
@@ -435,16 +430,13 @@ def run_startup_parser():
         arg = args.file
     log = args.log
     
-    if mode == "i" and log != "*": # if sniffing interface and using log
-        # Sniffer will write to a temp log
-        temp_log = os.path.join("logs", "temp-log.txt")
+    if log != "*": # if using log
         log = os.path.join("logs", log)
-    elif log != "*": # if sniffing file and using log (sniffing interface using log would trigger above statement)
-        log = os.path.join("logs", log)
+        
     setup_client(args.host)
     print("Connected")
     
-    run_main(mode, args.log, log, temp_log, arg, args.time, args.output, cmd_mode=True)
+    run_main(mode, args.log, log, arg, args.time, args.output, cmd_mode=True)
 
 if __name__ == '__main__':
     run_startup_parser()
