@@ -366,6 +366,7 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
             temp_log = os.path.join("logs", "temp-log.txt")
             create_missing_directories(temp_log)
             open(log, "w").close()
+            open(temp_log, "w").close()
             lines_to_write = []
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
