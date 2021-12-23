@@ -4,6 +4,7 @@ import time
 import random
 import json
 import os.path as osp
+from pathlib import Path
 from typing import Tuple, List
 from client import setup_client, stop_client, recv_message, sniff
 from proto_gen.sniffed_info_pb2 import FlowArray, Flow
@@ -14,6 +15,11 @@ app.config["DEBUG"] = True
 
 nodes = {}
 edges = {}
+
+def create_missing_directories(output_path):
+    dirs = osp.split(output_path)[0]
+    if not osp.exists(dirs):
+        Path(dirs).mkdir(parents=True, exist_ok=True)
 
 class node: #attributes of a node
     def __init__(self, ptype, pname, paddress, pPort, pcolor):
@@ -225,7 +231,9 @@ def write_json_output(fname:str):
                 propAtt["label"] += "C: " + str(edges[key].C)
 
     reset_global_vars()
-    with open(osp.join("json", fname), "w") as f:
+    out_path = osp.join("json", fname)
+    create_missing_directories(out_path)
+    with open(out_path, "w") as f:
         json.dump(json_dict, f, indent=4)
 
     return json_dict
@@ -356,6 +364,7 @@ def run_main(mode:str, log_orig:str, log:str, arg:str, sniff_time:int, out:str, 
             generate_graph(l)
         else: # if using log
             temp_log = os.path.join("logs", "temp-log.txt")
+            create_missing_directories(temp_log)
             open(log, "w").close()
             lines_to_write = []
             while len(q) > 0:
