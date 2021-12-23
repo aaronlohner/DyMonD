@@ -477,6 +477,7 @@ while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                     ipaddress = optarg; break;
             case 'f':
                     tracefile = optarg; break;
+                }
         }
 
 char mode_buf[64], log[64], arg[64], time[64];
