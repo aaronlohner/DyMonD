@@ -513,10 +513,7 @@ if(argc == 1 || strstr(argv[1], "-t") != NULL){
             if (input_ip != NULL) {
                 LiveMode=true;
                 strcpy(arg, input_ip);
-                printf("input_ip: %s\n", input_ip);
-                printf("arg: %s\n", arg);
                 strncpy(interface, ip_map[arg].c_str(), 32);
-                printf("interface: %s\n", interface);
             }
         } else {
             receive_message(mode_buf, false); // receive indication if using interface or reading from file
