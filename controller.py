@@ -302,7 +302,7 @@ def run_main(mode:str, host:str, log:str, arg:str, sniff_time:int, out:str, cmd_
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
-    log_orig = None
+    log_orig = log
     if log != "*":
         log_orig = log
         log = os.path.join("logs", log)
