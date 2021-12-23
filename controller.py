@@ -278,13 +278,14 @@ def next_hop_extractor(new_flows_container, ip:str, visited:List[str], blacklist
                         visited.append(new_ip)
     return (ips, visited)
 
-def run_main(mode:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=False):
+def run_main(mode:str, host:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=False):
     """
     When monitoring an application, iteratively send IP address to agent and collect flows.
     When reading a pcap file, send filename and collect flows. Then in both cases, generate call graph.
 
     Args:
-        mode (str): Specifies the framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
+        mode (str): The framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
+        host (str): The address of the machine hosting the agent.
         log (str): Indicates the mode in which to send flows (* for TCP mode, else a filename for logging mode).
         arg (str): IP address of component to be monitored or name of pcap file to be read.
         sniff_time (int): Number of seconds that component at IP address specified or capture file specified in arg will be monitored.
@@ -295,6 +296,10 @@ def run_main(mode:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=
         dict: JSON object containing call graph information.
     """
     # INITIAL START
+    if host != "127.0.0.1":
+        setup_client(host)
+        print("Connected")
+
     total_time=0.0
     t = time.perf_counter()
     f = FlowArray()
@@ -414,19 +419,12 @@ def run_main(mode:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=
     # FINAL STOP - this excludes the execution time for write_json_output()
     return write_json_output(out)
 
-def run_startup(mode:str, log:str, host:str, arg:str, sniff_time:int, out:str):    
-    setup_client(host)
-    print("Connected")
-    return run_main(mode, log, arg, sniff_time, out)
-
 @app.route("/run", methods=['GET'])
 def run():
     mode, log, host, arg, time, out = request.args.values()
-    time = int(time)
-    json_obj = run_startup(mode, log, host, arg, time, out)
-    return json_obj
+    return run_main(mode, host, log, arg, int(time), out)
 
-def run_startup_parser():
+def run_parser():
     parser = argparse.ArgumentParser()
     group1 = parser.add_mutually_exclusive_group(required=True)
     group2 = parser.add_mutually_exclusive_group()
@@ -445,11 +443,8 @@ def run_startup_parser():
     elif args.file is not None:
         mode = "f"
         arg = args.file
-
-    setup_client(args.host)
-    print("Connected")
     
-    run_main(mode, args.log, arg, args.time, args.output, cmd_mode=True)
+    run_main(mode, args.host, args.log, arg, args.time, args.output, cmd_mode=True)
 
 if __name__ == '__main__':
-    run_startup_parser()
+    run_parser()

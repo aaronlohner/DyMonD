@@ -67,8 +67,8 @@ def sniff(mode:str, log:str, arg:str, time:int=8):
     Sends data to agent to initiate application monitoring on one component or to read from a capture file.
 
     Args:
-        mode (str): Specifies the framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
-        log (str): Indicates the mode in which to send flows (* for TCP mode, else a filename for logging mode).
+        mode (str): The framework usage mode (i for application monitoring or f for reading from file), not to be confused with TCP vs logging mode.
+        log (str): The mode in which to send flows (* for TCP mode, else a filename for logging mode).
         arg (str): IP address of component to be monitored or name of pcap file to be read.
         time (int, optional): Number of seconds that component at IP address specified or capture file specified in arg will be monitored.
 
