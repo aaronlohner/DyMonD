@@ -425,7 +425,6 @@ int main(int argc, char *argv[]){
     char ID[28];
     string log_str = "logs/logging.txt"; // for debugging
     char *input_ip;
-    bool cmd_mode = false;
 
 wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
     for (int i=0; i<argc; i++) {
@@ -464,7 +463,7 @@ wchar_t** _argv = (wchar_t**)PyMem_Malloc(sizeof(wchar_t*)*argc);
 InitMethodName();
 // Standalone args and sniffing time
 bool standalone = true;
-while((opt = getopt(argc, argv, "t:i:f:p:c")) != -1){
+while((opt = getopt(argc, argv, "t:i:f:p")) != -1){
                 switch(opt){
             case 't':
                 if(atof(optarg) <= 5 || atof(optarg) >= 1000) {
@@ -478,16 +477,13 @@ while((opt = getopt(argc, argv, "t:i:f:p:c")) != -1){
                     ipaddress = optarg; break;
             case 'f':
                     tracefile = optarg; break;
-            case 'c':
-                    cmd_mode = true; break;
-                }
         }
 
 char mode_buf[64], log[64], arg[64], time[64];
 bool sniff_more = true;
 string capture_dir; // = "captures/"
 map<string, string> ip_map;
-if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode){
+if(argc == 1 || strstr(argv[1], "-t") != NULL){
     standalone = false;
     setup_server(); // prepare server for incoming client tcp connection
 } else { // Standalone mode
@@ -989,7 +985,7 @@ std::string label=GetMSLabel(services[j]->URLS);
          }
      }
      FP.close();
-    if(argc == 1 || strstr(argv[1], "-t") != NULL || cmd_mode) send_message(); // blank message indicates finished writing to log
+    if(argc == 1 || strstr(argv[1], "-t") != NULL) send_message(); // blank message indicates finished writing to log
     } else { // use tcp
 
         // For debugging flows
