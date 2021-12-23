@@ -55,7 +55,7 @@ def setup_client(host):
     global connected
     if not connected:
         print("Setting up connection with agent...")
-        if host is None:
+        if host is None or host == HOST:
             s.connect((HOST, PORT))
         else:
             print("Attempting to connect to agent on host address " + host)
