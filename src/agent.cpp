@@ -940,8 +940,8 @@ std::string label=GetMSLabel(services[j]->URLS);
      double diff, RST;
     if(log[0] != '*'){ // anything but '*' indicates that log should be used
         string log_str = "logs/";
-        if(strlen(log) == 0){
-            log_str.append("log.txt");
+        if(mode_buf[0] == 'i'){
+            log_str.append("temp-log.txt");
         } else {
             log_str.append(log);
         }
