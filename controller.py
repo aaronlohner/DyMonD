@@ -296,9 +296,8 @@ def run_main(mode:str, host:str, log:str, arg:str, sniff_time:int, out:str, cmd_
         dict: JSON object containing call graph information.
     """
     # INITIAL START
-    if host != "127.0.0.1":
-        setup_client(host)
-        print("Connected")
+    setup_client(host)
+    print("Connected")
 
     total_time=0.0
     t = time.perf_counter()
