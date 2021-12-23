@@ -303,7 +303,7 @@ def run_main(mode:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=
         log_orig = log
         log = os.path.join("logs", log)
         create_missing_directories(log)
-        #open(log, "w").close()
+        open(log, "w").close()
 
     if mode == "f": # reading from pcap file
         sniff(mode, log_orig, arg, sniff_time)
@@ -368,7 +368,6 @@ def run_main(mode:str, log:str, arg:str, sniff_time:int, out:str, cmd_mode:bool=
             generate_graph(l)
         else: # if using log
             temp_log = os.path.join("logs", "temp-log.txt")
-            #open(temp_log, "w").close()
             lines_to_write = []
             while len(q) > 0:
                 print("IP address(es) in queue: {}".format(q))
