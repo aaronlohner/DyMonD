@@ -424,7 +424,7 @@ def run_startup_parser():
     group2 = parser.add_mutually_exclusive_group()
     group1.add_argument("-f", "--file", help="read capture file containing flows to be sniffed")
     group1.add_argument("-i", "--IP", help="perform live sniffing starting with provided IP")
-    group2.add_argument("-H", "--host", default='127.0.0.1', help="address for sniffer host. Defaults to localhost")
+    group2.add_argument("-H", "--host", nargs="?", const='127.0.0.1', help="address for sniffer host. Defaults to localhost")
     group2.add_argument("-l", "--log", nargs="?", const="log.txt", default="*", help="send results from sniffer using log file (uses log.txt if no arg). Defaults to sending flows via TCP and omitting a log")
     parser.add_argument("-t", "--time", type=int, choices=range(7,1000), metavar="7-1000", default=8, help="sniffing time for each component")
     parser.add_argument("-o", "--output", default="out.json", help="name of json output file. Defaults to out.json")

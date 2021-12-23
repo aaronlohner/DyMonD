@@ -62,7 +62,7 @@ def setup_client(host):
             s.connect((host, PORT))
         connected = True
 
-def sniff(mode:str, log:str, arg:str, time:int=30):
+def sniff(mode:str, log:str, arg:str, time:int=8):
     """
     Sends data to agent to initiate application monitoring on one component or to read from a capture file.
 
