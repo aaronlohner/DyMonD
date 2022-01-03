@@ -35,6 +35,8 @@ def recv_message() -> FlowArray: # if using protobuf, this fcn should have a par
         flow = Flow()
         line = line.split()
         print(line)
+        if len(line) == 0:
+            continue
         flow.s_addr, flow.s_port, flow.d_addr, flow.d_port = line[0:4]
         flow.num_bytes = int(float(line[4]))
         if line[5] == "1":
