@@ -17,7 +17,7 @@ void stop_server();
 
 //void add_to_flow_array(flow *flow); // uses protobuf
 
-void add_to_flow_array(flow *flow, double RST);
+void add_to_flow_array(flow *flow, double RST, double time);
 
 bool is_server(flow *flow);
 

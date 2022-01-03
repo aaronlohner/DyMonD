@@ -85,7 +85,7 @@ void receive_message(char inputBuffer[], bool suppress_output) {
 /*
  * Add flow element to flow array with RST
  */
-void add_to_flow_array(flow *flow, double RST) {
+void add_to_flow_array(flow *flow, double RST, double time) {
 	size_t length = flow_string.size();
 	if(length > 1380){
 		send_message(flow_string_smaller);
@@ -97,7 +97,7 @@ void add_to_flow_array(flow *flow, double RST) {
 	flow_last.append(flow->sport).append(" ");
 	flow_last.append(flow->daddr).append(" ");
 	flow_last.append(flow->dport).append(" ");
-	flow_last.append(to_string(flow->NumBytes/30)).append(" ");
+	flow_last.append(to_string(flow->NumBytes/time)).append(" ");
 	flow_last.append(to_string(is_server(flow))).append(" ");
 	get_service_type(flow, service);
 	flow_last.append(service).append(" ");

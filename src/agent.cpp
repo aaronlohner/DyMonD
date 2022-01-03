@@ -1022,14 +1022,14 @@ std::string label=GetMSLabel(services[j]->URLS);
                                  (flowarray[i]->Ack_times[j]->sec + flowarray[i]->Ack_times[j]->usec * 0.000001);
                     }
                     RST = abs(diff/( flowarray[i]->Ack_times.size() -1)); 
-                    add_to_flow_array(flowarray[i], RST);
+                    add_to_flow_array(flowarray[i], RST, duration);
 
                     // For debugging flows
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
                     << flowarray[i]->dport <<" " << flowarray[i]->proto << " " << flowarray[i]->NumBytes / 30 << "-" << RST << "\n";
                 }
                 else {
-                    add_to_flow_array(flowarray[i], 0.0);
+                    add_to_flow_array(flowarray[i], 0.0, duration);
 
                     // For debugging flows
                     FP << flowarray[i]->saddr << ":" << flowarray[i]->sport << " " << flowarray[i]->daddr << ":"
