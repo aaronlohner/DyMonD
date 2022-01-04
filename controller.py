@@ -235,7 +235,7 @@ def write_json_output(fname:str):
     create_missing_directories(out_path)
     with open(out_path, "w") as f:
         json.dump(json_dict, f, indent=4)
-
+    print("Data sent to local machine")
     return json_dict
 
 def render_readable(num:int) -> str:
