@@ -215,7 +215,7 @@ def generate_graph(flow_array:FlowArray):
         id1 = None
         id2 = None
 
-def write_json_output(fname:str):
+def write_json_output(fname:str, cmd_mode:bool=False):
     print("Producing call graph data")
     json_dict = {}
     json_dict["class"] = [{"id":str(key), "type":nodes[key].type} for key in nodes]
@@ -235,7 +235,8 @@ def write_json_output(fname:str):
     create_missing_directories(out_path)
     with open(out_path, "w") as f:
         json.dump(json_dict, f, indent=4)
-    print("Data sent to local machine")
+    if not cmd_mode:
+        print("Data sent to local machine")
     return json_dict
 
 def render_readable(num:int) -> str:
@@ -416,7 +417,7 @@ def run_main(mode:str, host:str, log:str, arg:str, sniff_time:int, out:str, cmd_
 
     print("Elapsed time since controller started: {} seconds".format(round(time.perf_counter() - t, 5)))
     # FINAL STOP - this excludes the execution time for write_json_output()
-    return write_json_output(out)
+    return write_json_output(out, cmd_mode)
 
 @app.route("/run", methods=['GET'])
 def run():
